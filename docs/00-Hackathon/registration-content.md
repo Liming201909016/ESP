@@ -6,7 +6,7 @@ Enterprise Skill Platform (ESP)
 
 ## Tagline
 
-Build governed AI skills once, plug them into any Copilot, and trust every outcome through evidence, versioning, and human accountability.
+Move from agent-centric AI to capability-centric AI: build trusted enterprise Skills once, govern them as products, and compose them into any Copilot.
 
 ## Executive Challenge
 
@@ -107,6 +107,19 @@ This enables organizations to:
 - accelerate AI delivery without sacrificing accountability.
 
 The Security Review scenario is the first proof point. The same architecture can support architecture review, compliance, procurement, operations, finance, and other evidence-sensitive enterprise workflows.
+
+### Relationship to MCP and Agent platforms
+
+ESP complements rather than replaces MCP, Copilot Studio, or other Agent platforms. MCP standardizes how an Agent accesses tools and resources. ESP addresses the enterprise layer above interoperability: how a business capability is identified, owned, contracted, versioned, evaluated, approved, released, evidenced, reused, and measured.
+
+MCP can be one Plugin integration mechanism inside ESP, while Copilot Studio can be one runtime consumer. The distinction is concise:
+
+```text
+MCP: Agent → Tool or Resource
+ESP: Copilot → Skill → Plugin → Evidence → Evaluation → Governance
+```
+
+This separation allows enterprises to adopt new Agent runtimes and integration standards without losing stable capability identity or governance history.
 
 ### Designed to run and designed to scale
 

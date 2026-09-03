@@ -1,10 +1,80 @@
 # Enterprise Skill Platform (ESP)
 
-> Build governed AI Skills once, plug them into any Copilot, and trust every outcome through evidence, versioning, and human accountability.
+> Move from agent-centric AI to capability-centric AI: build trusted enterprise Skills once, govern them as products, and compose them into any Copilot.
 
 ESP is a Microsoft Global Hackathon 2026 project that changes the unit of enterprise AI reuse from an entire Agent to a governed business capability.
 
-Enterprise teams repeatedly embed document intake, evidence extraction, policy analysis, risk rating, and report generation inside individual Agents. ESP separates those capabilities into stable, versioned **Skills**, connects them to bounded and replaceable **Plugins**, and composes them through one Copilot entry point.
+## From AI Agents to Enterprise Capabilities
+
+Enterprises are rapidly adopting Copilots and AI agents across HR, Legal, Sales, Procurement, Security, and Operations. Yet most organizations are unknowingly recreating the same capabilities again and again.
+
+Document intake, evidence extraction, policy checks, risk assessment, decision support, report generation, and approval workflows are commonly embedded inside individual Agents. As the number of Agents grows, so does a hidden estate of duplicated prompts, workflows, integrations, and evaluation logic.
+
+This is not only a maintenance problem. It is an enterprise trust and governance problem. When an Agent produces a recommendation, organizations need to answer:
+
+- Which capability produced this result?
+- Which implementation and Plugin versions were used?
+- What evidence supported the recommendation?
+- Which policies governed the decision?
+- Was human oversight required?
+- Who owns and supports the capability?
+
+As enterprise AI scales, these questions matter more than the number of Agents deployed.
+
+## The ESP Model
+
+Enterprise Skill Platform treats business capabilities as governed products rather than implementation details hidden inside individual Agents.
+
+ESP introduces a reusable capability layer:
+
+```text
+Copilots, Workflows, Applications, and APIs
+		      ↓
+	 Governed Enterprise Skills
+		      ↓
+	      Reusable Plugins
+		      ↓
+	      Enterprise Systems
+```
+
+- A **Skill** is a stable business capability with explicit input/output/error contracts, versioned behavior, evidence requirements, evaluation criteria, governance policy, limitations, and human-accountability rules.
+- A **Plugin** is a bounded implementation adapter that can evolve independently without changing the Skill contract.
+- A **Copilot** is a consumer and composer of Skills, not the owner of private capability implementations.
+
+One Copilot can compose many Skills. One Skill can use multiple Plugins. One Plugin can support multiple Skills. This many-to-many model enables capabilities to be built once, evaluated once, approved once, and reused everywhere.
+
+## Why This Matters
+
+The future challenge for enterprises is not creating more Agents. It is governing AI capabilities at enterprise scale.
+
+A modern organization may deploy hundreds of Copilots, but many require the same core capabilities: risk assessment, policy analysis, evidence collection, compliance validation, decision support, and reporting. ESP provides the foundation to manage these capabilities once and measure what actually matters:
+
+- capability reuse;
+- trustworthiness and evidence coverage;
+- governance and policy coverage;
+- auditability and compliance alignment;
+- maintainability and operating cost;
+- measurable business impact.
+
+ESP accelerates delivery without trading away explainability, control, or human accountability.
+
+## ESP, MCP, and Agent Platforms
+
+ESP complements rather than replaces MCP, Copilot Studio, or other Agent platforms.
+
+**MCP standardizes how an Agent accesses tools and context.**
+
+```text
+Agent → Tool or Resource
+```
+
+**ESP standardizes how an enterprise defines, governs, evaluates, releases, and measures business capabilities.**
+
+```text
+Copilot → Skill → Plugin → Evidence → Evaluation → Governance
+```
+
+MCP can be one Plugin integration mechanism inside ESP. Copilot Studio can be one runtime consumer. ESP adds the capability identity, ownership, contracts, versioning, evidence, evaluation, lifecycle, and value layer above runtime interoperability.
 
 ## Hackathon MVP
 
@@ -27,6 +97,16 @@ The mandatory deliverable is a local Demo Mode using synthetic data. Copilot Stu
 - **Treat failure as a governed outcome.** Missing evidence, policy denial, and human handoff are explicit states.
 - **Keep people accountable.** Models can propose risk; an analyst confirms the final decision.
 - **Measure real value.** Reuse, quality, risk, adoption, maintainability, and cost remain distinct measures.
+
+## Long-Term Vision
+
+ESP represents a shift from agent-centric architecture to capability-centric architecture. In the same way that APIs transformed software development, governed Skills can transform enterprise AI.
+
+Organizations should not rebuild business intelligence, risk analysis, compliance validation, or evidence extraction inside every new Agent. These capabilities should exist as trusted enterprise products that can be composed into any Copilot, workflow, application, or AI system.
+
+> Enterprises do not need thousands of disconnected AI agents. They need trusted, governed, reusable Skills that can be composed wherever work happens.
+
+ESP is the governance and delivery layer that makes enterprise AI scalable, explainable, reusable, and trustworthy.
 
 ## Architecture
 
@@ -146,7 +226,7 @@ Foundation work status and ordering are tracked in [docs/08-Development/foundati
 
 Suggested GitHub description:
 
-> Governed, reusable AI Skills and Plugins for trusted enterprise Copilots. Microsoft Global Hackathon 2026.
+> From agent-centric to capability-centric AI: governed, reusable Skills for trusted enterprise Copilots.
 
 Suggested GitHub topics:
 
