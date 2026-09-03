@@ -93,8 +93,10 @@ def main() -> None:
     repository_url = "https://github.com/Liming201909016/ESP"
     if repository_url not in registration or repository_url not in brief:
         errors.append("Hackathon registration and project brief must contain the canonical code location")
-    if "currently exists but is empty" not in registration:
-        errors.append("Registration notes must disclose the current empty remote repository")
+    if "public repository contains the validated architecture" not in registration.lower():
+        errors.append("Registration notes must accurately describe the published foundation")
+    if "runnable local vertical slice is under active Hackathon development" not in registration:
+        errors.append("Registration notes must disclose that the runnable vertical slice is still in development")
 
     skill_codes = set(re.findall(r"LS-SEC-[A-Z-]+", profile))
     plugin_codes = set(re.findall(r"PLG-[A-Z-]+", profile))

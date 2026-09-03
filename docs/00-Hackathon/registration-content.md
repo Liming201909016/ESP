@@ -2,11 +2,11 @@
 
 ## Title
 
-Enterprise Skill Platform (ESP)
+Enterprise Skill Platform (ESP): From Agents to Capabilities
 
 ## Tagline
 
-Move from agent-centric AI to capability-centric AI: build trusted enterprise Skills once, govern them as products, and compose them into any Copilot.
+Build trusted enterprise Skills once, govern them as products, and compose them into any Copilot.
 
 ## Executive Challenge
 
@@ -36,7 +36,7 @@ https://github.com/Liming201909016/ESP
 Repository visibility: Public  
 Expected default branch: `main`
 
-The remote repository currently exists but is empty. Push the runnable source, setup instructions, synthetic demo assets, and license/usage information before final submission. The registration URL may be saved now, but the project must not be represented as reviewer-runnable from GitHub until the push and clean-clone test pass.
+The public repository contains the validated architecture, Skill contracts, synthetic demo assets, evaluation tooling, and Power Platform Solution foundations. The runnable local vertical slice is under active Hackathon development. Final submission requires a clean-clone setup, startup, and evaluation check.
 
 ## Description
 
@@ -49,6 +49,8 @@ This creates a scaling problem. The capability cannot be independently owned, ve
 ### Our idea: Enterprise Skill Platform
 
 Enterprise Skill Platform, or ESP, treats an enterprise capability as a governed, reusable product rather than code hidden inside one agent.
+
+ESP shifts enterprise AI architecture from **agent-centric** to **capability-centric**. Instead of asking every Agent team to recreate and govern its own implementation, the enterprise establishes trusted capability products that any authorized experience can consume.
 
 ESP separates three concepts:
 
@@ -121,6 +123,16 @@ ESP: Copilot → Skill → Plugin → Evidence → Evaluation → Governance
 
 This separation allows enterprises to adopt new Agent runtimes and integration standards without losing stable capability identity or governance history.
 
+### Long-term vision
+
+In the same way that APIs transformed software development, governed Skills can transform enterprise AI. Organizations should not repeatedly rebuild business intelligence, risk analysis, compliance validation, or evidence extraction inside every new Agent. These capabilities should exist as trusted enterprise products.
+
+Our vision is simple:
+
+> Enterprises do not need thousands of disconnected AI agents. They need trusted, governed, reusable Skills that can be composed into any Copilot, workflow, application, or AI system.
+
+ESP is the governance and delivery layer that makes enterprise AI scalable, explainable, reusable, and trustworthy.
+
 ### Designed to run and designed to scale
 
 The Hackathon deliverable has two modes:
@@ -130,7 +142,7 @@ The Hackathon deliverable has two modes:
 
 Demo Mode ensures the project remains reproducible for reviewers even when cloud connectivity is unavailable. Connected Mode demonstrates how the same Skill and Plugin contracts can integrate with enterprise identity, DLP, ALM, telemetry, and governance.
 
-The local project workspace already contains the canonical contracts, positive and negative fixtures, synthetic RG and APP cases, an evaluation runner, Power Platform Solution foundations, and architecture documentation. These assets are being prepared for publication to the project repository. The local runnable vertical slice is the current Hackathon implementation focus. We explicitly do not claim customer validation, Pilot readiness, or production authorization from synthetic results.
+The public project repository contains the canonical contracts, positive and negative fixtures, synthetic RG and APP cases, an evaluation runner, Power Platform Solution foundations, and architecture documentation. The local runnable vertical slice is the current Hackathon implementation focus. We explicitly do not claim customer validation, Pilot readiness, or production authorization from synthetic results.
 
 ### Success for the Hackathon
 
@@ -144,13 +156,13 @@ Enterprise Skill Platform, ESP, Copilot Studio, AI Agents, Agentic AI, Reusable 
 
 ## Short Description
 
-ESP turns reusable enterprise AI capabilities into governed, versioned Skills that can be safely composed by any Copilot. Our Security Review MVP uses one Copilot, five Skills, and four reusable Plugins to produce evidence-grounded findings, human-confirmed risk, a cited draft report, and a complete execution trace.
+ESP moves enterprise AI from agent-centric to capability-centric architecture. It turns reusable capabilities into governed, versioned Skills that any Copilot can compose. Our Security Review MVP demonstrates one Copilot, five Skills, and four reusable Plugins with evidence-grounded findings, human-confirmed risk, citations, and a complete execution trace.
 
 ## Submission Accuracy Notes
 
-- Use future or present-progressive language for the local application until Gate A passes.
+- Use present-progressive language for the runnable local application until Gate A passes.
 - Do not claim customer validation, Pilot readiness, Production readiness, or approved quality thresholds.
 - Label local Plugin implementations as Demo or Mock.
 - Describe Copilot Studio and Dataverse as optional Connected Mode until a governed environment is available.
 - Replace the challenge guidance above with the exact selected Innovation Studio challenge names before final submission.
-- Verify that `https://github.com/Liming201909016/ESP` contains the runnable source and that a clean clone passes setup, startup, and evaluation checks.
+- Before final submission, verify that `https://github.com/Liming201909016/ESP` contains the runnable source and that a clean clone passes setup, startup, and evaluation checks.
