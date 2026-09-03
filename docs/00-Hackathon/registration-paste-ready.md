@@ -14,6 +14,22 @@ https://github.com/Liming201909016/ESP
 
 ## Description
 
+### Executive summary
+
+Enterprise Skill Platform (ESP) moves enterprise AI from agent-centric to capability-centric architecture. Instead of rebuilding prompts, tools, integrations, evidence rules, and evaluations inside every Agent, organizations define trusted business capabilities as governed, versioned Skills that can be composed into any Copilot.
+
+Our Hackathon MVP proves this model through an evidence-grounded Security Review Copilot:
+
+```text
+One Copilot
+→ Five governed Skills
+→ Four reusable Plugins
+→ Evidence and evaluation
+→ Human accountability
+```
+
+The result is not simply another Agent. It is a reusable delivery and governance pattern for making enterprise AI scalable, explainable, maintainable, and trustworthy.
+
 ### From AI agents to enterprise capabilities
 
 Enterprises are rapidly adopting Copilots and AI agents across HR, Legal, Sales, Procurement, Security, and Operations. Yet most organizations are unknowingly recreating the same capabilities again and again.
@@ -52,6 +68,20 @@ Copilots, Workflows, Applications, and APIs
                     ↓
              Enterprise Systems
 ```
+
+### What makes ESP different
+
+Most Agent platforms focus on conversation, reasoning, orchestration, or tool access. ESP focuses on the enterprise lifecycle of the capability itself.
+
+ESP combines five properties that are usually fragmented across individual Agent projects:
+
+1. **Stable capability identity:** the Skill exists independently of a Copilot, model, Plugin, or runtime.
+2. **Contract-first reuse:** explicit input, output, error, evidence, and human-oversight contracts protect Consumers from implementation change.
+3. **Version-pinned delivery:** an invocation records the exact Skill, implementation, Plugin, dependency, and policy context instead of silently following `Latest`.
+4. **Evidence-native execution:** facts, rule results, tool results, model suggestions, and human decisions remain distinguishable and traceable.
+5. **Lifecycle and value governance:** capabilities can be assessed, evaluated, approved, released, reused, measured, deprecated, and retired as enterprise products.
+
+This creates a portable governance layer above individual Agent runtimes without rebuilding the runtimes themselves.
 
 ### Hackathon MVP: evidence-grounded security review
 
@@ -118,6 +148,32 @@ The Hackathon deliverable has two modes:
 Demo Mode keeps the project reproducible when cloud connectivity is unavailable. Connected Mode demonstrates how the same contracts integrate with enterprise identity, DLP, ALM, telemetry, and governance.
 
 The public repository contains the validated architecture, canonical Skill contracts, positive and negative fixtures, synthetic RG and APP cases, evaluation tooling, and Power Platform Solution foundations. The runnable local vertical slice is under active Hackathon development. Synthetic results do not establish customer validation, Pilot readiness, or production authorization.
+
+### Measured progress
+
+The project has executable validation rather than architecture slides alone:
+
+- 15 valid and 10 invalid Skill contract fixtures pass automated validation;
+- four versioned synthetic RG and APP scenarios cover happy path, missing input, and prompt injection;
+- 36 of 36 mandatory Foundation evaluation assertions pass;
+- the evaluator explicitly reports `pilotEligible=false` for synthetic data;
+- seven Power Platform Solution foundations package successfully for the enterprise scale-out path;
+- the local Node/Express/Ajv foundation has compiled the canonical JSON Schema and passed an HTTP runtime smoke test.
+
+The browser experience, Skill Router, Plugin runtime, analyst workflow, and end-to-end report path remain the active Hackathon build scope.
+
+### What the judges will see
+
+In the final demonstration, a reviewer will:
+
+1. submit a synthetic resource-group or application-registration package through one Copilot-style entry point;
+2. watch five pinned Skills execute through four reusable Plugins;
+3. inspect the evidence, Runbook authority, versions, policy outcomes, and ordered trace;
+4. confirm or modify the proposed risk as the accountable analyst;
+5. generate a cited draft report and view the automated evaluation result;
+6. see a second Consumer reuse an existing Skill without copying its assets.
+
+The local Demo Mode remains the required judging path, so the demonstration does not depend on tenant availability, customer data, or production credentials.
 
 ### Long-term vision
 

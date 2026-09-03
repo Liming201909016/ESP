@@ -101,6 +101,15 @@ def main() -> None:
         errors.append("Registration notes must accurately describe the published foundation")
     if "runnable local vertical slice is under active Hackathon development" not in registration:
         errors.append("Registration notes must disclose that the runnable vertical slice is still in development")
+    judge_sections = [
+        "### Executive summary",
+        "### What makes ESP different",
+        "### Measured progress",
+        "### What the judges will see",
+    ]
+    for section in judge_sections:
+        if section not in registration:
+            errors.append(f"Registration content is missing judge section: {section}")
 
     paste_title = section_value(paste_ready, "Title")
     paste_tagline = section_value(paste_ready, "Tagline")
@@ -123,6 +132,9 @@ def main() -> None:
     for forbidden in ["Do not invent", "Use this selection order", "Submission Accuracy Notes", "Replace the challenge"]:
         if forbidden in paste_ready:
             errors.append(f"Paste-ready registration contains internal guidance: {forbidden}")
+    for section in judge_sections:
+        if section not in paste_ready:
+            errors.append(f"Paste-ready registration is missing judge section: {section}")
     for placeholder in ["## Demo URL\n\nTBD", "## Video URL\n\nTBD", "## Team\n\nTBD"]:
         if placeholder not in additional_info:
             errors.append(f"Additional Information does not expose required placeholder: {placeholder.splitlines()[0]}")
