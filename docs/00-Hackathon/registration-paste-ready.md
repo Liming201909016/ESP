@@ -189,4 +189,4 @@ Enterprise Skill Platform, ESP, Copilot Studio, AI Agents, Agentic AI, Reusable 
 
 ## Short Description
 
-ESP moves enterprise AI from agent-centric to capability-centric architecture. It turns reusable capabilities into governed, versioned Skills that any Copilot can compose. Our Security Review MVP demonstrates one Copilot, five Skills, and four reusable Plugins with evidence-grounded findings, human-confirmed risk, citations, and a complete execution trace.
+ESP moves enterprise AI from agent-centric to capability-centric architecture. Our Security Review MVP composes five governed Skills and four reusable Plugins through one Copilot, producing evidence-grounded findings, human-confirmed risk, citations, and a complete trace.

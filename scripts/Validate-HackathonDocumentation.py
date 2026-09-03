@@ -73,6 +73,7 @@ def main() -> None:
 
     registration_title = section_value(registration, "Title")
     registration_tagline = section_value(registration, "Tagline")
+    registration_short_description = section_value(registration, "Short Description")
     registration_description = re.search(
         r"^## Description\s*$\s*(.*?)(?=^## Keywords\s*$)",
         registration,
@@ -89,6 +90,8 @@ def main() -> None:
         errors.append(f"Registration tagline exceeds 300 characters: {len(registration_tagline)}")
     if description_length > 30000:
         errors.append(f"Registration description exceeds 30000 characters: {description_length}")
+    if len(registration_short_description) > 300:
+        errors.append(f"Registration Short Description exceeds 300 characters: {len(registration_short_description)}")
     for term in ["Enterprise Skill Platform", "One Copilot", "Five governed Skills", "Four reusable Plugins", "Responsible AI"]:
         if term not in registration:
             errors.append(f"Registration content is missing ESP emphasis: {term}")
@@ -113,6 +116,7 @@ def main() -> None:
 
     paste_title = section_value(paste_ready, "Title")
     paste_tagline = section_value(paste_ready, "Tagline")
+    paste_short_description = section_value(paste_ready, "Short Description")
     paste_description = re.search(
         r"^## Description\s*$\s*(.*?)(?=^## Keywords\s*$)",
         paste_ready,
@@ -131,8 +135,12 @@ def main() -> None:
         errors.append("Paste-ready Title does not match the master registration Title")
     if paste_tagline != registration_tagline:
         errors.append("Paste-ready Tagline does not match the master registration Tagline")
+    if paste_short_description != registration_short_description:
+        errors.append("Paste-ready Short Description does not match the master registration Short Description")
     if paste_description_length > 30000:
         errors.append(f"Paste-ready description exceeds 30000 characters: {paste_description_length}")
+    if len(paste_short_description) > 300:
+        errors.append(f"Paste-ready Short Description exceeds 300 characters: {len(paste_short_description)}")
     for forbidden in ["Do not invent", "Use this selection order", "Submission Accuracy Notes", "Replace the challenge"]:
         if forbidden in paste_ready:
             errors.append(f"Paste-ready registration contains internal guidance: {forbidden}")
@@ -180,6 +188,7 @@ def main() -> None:
         f"(registrationTitle={len(registration_title)} chars, "
         f"registrationTagline={len(registration_tagline)} chars, "
         f"registrationDescription={description_length} chars, "
+        f"shortDescription={len(registration_short_description)} chars, "
         f"pasteReadyDescription={paste_description_length} chars, "
         f"skills={len(skill_codes)}, plugins={len(plugin_codes)})"
     )
