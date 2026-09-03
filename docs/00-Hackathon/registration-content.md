@@ -76,16 +76,6 @@ ESP separates three concepts:
 
 The relationship is deliberately flexible: one Copilot can use many Skills, one Skill can use multiple Plugins, and the same Plugin can support multiple Skills. Skills remain stable while implementations and Plugins evolve behind their contracts.
 
-In short:
-
-```text
-One Copilot
-→ N governed Skills
-→ N reusable Plugins
-→ Evidence and evaluation
-→ Human accountability
-```
-
 ### What makes ESP different
 
 Most Agent platforms focus on conversation, reasoning, orchestration, or tool access. ESP focuses on the enterprise lifecycle of the capability itself.
@@ -153,16 +143,6 @@ ESP: Copilot → Skill → Plugin → Evidence → Evaluation → Governance
 
 This separation allows enterprises to adopt new Agent runtimes and integration standards without losing stable capability identity or governance history.
 
-### Long-term vision
-
-In the same way that APIs transformed software development, governed Skills can transform enterprise AI. Organizations should not repeatedly rebuild business intelligence, risk analysis, compliance validation, or evidence extraction inside every new Agent. These capabilities should exist as trusted enterprise products.
-
-Our vision is simple:
-
-> Enterprises do not need thousands of disconnected AI agents. They need trusted, governed, reusable Skills that can be composed into any Copilot, workflow, application, or AI system.
-
-ESP is the governance and delivery layer that makes enterprise AI scalable, explainable, reusable, and trustworthy.
-
 ### Designed to run and designed to scale
 
 The Hackathon deliverable has two modes:
@@ -200,11 +180,13 @@ In the final demonstration, a reviewer will:
 
 The local Demo Mode remains the required judging path, so the demonstration does not depend on tenant availability, customer data, or production credentials.
 
-### Success for the Hackathon
+### Long-term vision
 
-A reviewer should be able to start ESP locally, submit a synthetic review, watch the five Skills and four Plugins execute, inspect the evidence behind every material fact, make the required analyst decision, generate a cited draft report, and view the automated evaluation result.
+In the same way that APIs transformed software development, governed Skills can transform enterprise AI. Organizations should not repeatedly rebuild business intelligence, risk analysis, compliance validation, or evidence extraction inside every new Agent. These capabilities should exist as trusted enterprise products.
 
-The larger vision is simple: **build a trusted enterprise Skill once, plug it into any Copilot, and retain the evidence needed to understand, govern, and improve every outcome.**
+> Enterprises do not need thousands of disconnected AI agents. They need trusted, governed, reusable Skills that can be composed into any Copilot, workflow, application, or AI system.
+
+ESP is the governance and delivery layer that makes enterprise AI scalable, explainable, reusable, and trustworthy.
 
 ## Keywords
 

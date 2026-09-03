@@ -89,7 +89,7 @@ def main() -> None:
         errors.append(f"Registration tagline exceeds 300 characters: {len(registration_tagline)}")
     if description_length > 30000:
         errors.append(f"Registration description exceeds 30000 characters: {description_length}")
-    for term in ["Enterprise Skill Platform", "One Copilot", "N governed Skills", "N reusable Plugins", "Responsible AI"]:
+    for term in ["Enterprise Skill Platform", "One Copilot", "Five governed Skills", "Four reusable Plugins", "Responsible AI"]:
         if term not in registration:
             errors.append(f"Registration content is missing ESP emphasis: {term}")
     if "do not claim customer validation" not in registration.lower():
@@ -127,6 +127,10 @@ def main() -> None:
         errors.append(f"Paste-ready title exceeds 140 characters: {len(paste_title)}")
     if len(paste_tagline) > 300:
         errors.append(f"Paste-ready tagline exceeds 300 characters: {len(paste_tagline)}")
+    if paste_title != registration_title:
+        errors.append("Paste-ready Title does not match the master registration Title")
+    if paste_tagline != registration_tagline:
+        errors.append("Paste-ready Tagline does not match the master registration Tagline")
     if paste_description_length > 30000:
         errors.append(f"Paste-ready description exceeds 30000 characters: {paste_description_length}")
     for forbidden in ["Do not invent", "Use this selection order", "Submission Accuracy Notes", "Replace the challenge"]:
@@ -173,7 +177,8 @@ def main() -> None:
         raise ValueError("\n".join(errors))
     print(
         "Hackathon documentation: PASS "
-        f"(title={len(title)} chars, tagline={len(tagline)} chars, "
+        f"(registrationTitle={len(registration_title)} chars, "
+        f"registrationTagline={len(registration_tagline)} chars, "
         f"registrationDescription={description_length} chars, "
         f"pasteReadyDescription={paste_description_length} chars, "
         f"skills={len(skill_codes)}, plugins={len(plugin_codes)})"
