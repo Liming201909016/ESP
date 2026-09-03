@@ -143,6 +143,8 @@ Start with:
 
 - [Project brief](docs/00-Hackathon/project-brief.md)
 - [Registration content](docs/00-Hackathon/registration-content.md)
+- [Paste-ready registration fields](docs/00-Hackathon/registration-paste-ready.md)
+- [Additional Information draft](docs/00-Hackathon/additional-information.md)
 - [MVP delivery profile](docs/00-Hackathon/mvp-delivery-profile.md)
 - [Hackathon backlog](docs/08-Development/hackathon-mvp-backlog.md)
 - [Five-minute demo script](docs/00-Hackathon/demo-script.md)

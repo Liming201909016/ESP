@@ -10,6 +10,8 @@ BRIEF = DOCS / "00-Hackathon" / "project-brief.md"
 PROFILE = DOCS / "00-Hackathon" / "mvp-delivery-profile.md"
 DEMO_SCRIPT = DOCS / "00-Hackathon" / "demo-script.md"
 REGISTRATION = DOCS / "00-Hackathon" / "registration-content.md"
+PASTE_READY = DOCS / "00-Hackathon" / "registration-paste-ready.md"
+ADDITIONAL_INFO = DOCS / "00-Hackathon" / "additional-information.md"
 BACKLOG = DOCS / "08-Development" / "hackathon-mvp-backlog.md"
 
 
@@ -46,7 +48,7 @@ def validate_links(errors: list[str]) -> None:
 
 def main() -> None:
     errors: list[str] = []
-    required_files = [BRIEF, PROFILE, DEMO_SCRIPT, REGISTRATION, BACKLOG]
+    required_files = [BRIEF, PROFILE, DEMO_SCRIPT, REGISTRATION, PASTE_READY, ADDITIONAL_INFO, BACKLOG]
     for path in required_files:
         if not path.exists():
             errors.append(f"Missing Hackathon document: {path.relative_to(ROOT)}")
@@ -57,6 +59,8 @@ def main() -> None:
     profile = PROFILE.read_text(encoding="utf-8")
     demo_script = DEMO_SCRIPT.read_text(encoding="utf-8")
     registration = REGISTRATION.read_text(encoding="utf-8")
+    paste_ready = PASTE_READY.read_text(encoding="utf-8")
+    additional_info = ADDITIONAL_INFO.read_text(encoding="utf-8")
     backlog = BACKLOG.read_text(encoding="utf-8")
     root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
 
@@ -98,6 +102,31 @@ def main() -> None:
     if "runnable local vertical slice is under active Hackathon development" not in registration:
         errors.append("Registration notes must disclose that the runnable vertical slice is still in development")
 
+    paste_title = section_value(paste_ready, "Title")
+    paste_tagline = section_value(paste_ready, "Tagline")
+    paste_description = re.search(
+        r"^## Description\s*$\s*(.*?)(?=^## Keywords\s*$)",
+        paste_ready,
+        re.MULTILINE | re.DOTALL,
+    )
+    if not paste_description:
+        errors.append("Paste-ready registration has no Description body")
+        paste_description_length = 0
+    else:
+        paste_description_length = len(paste_description.group(1).strip())
+    if len(paste_title) > 140:
+        errors.append(f"Paste-ready title exceeds 140 characters: {len(paste_title)}")
+    if len(paste_tagline) > 300:
+        errors.append(f"Paste-ready tagline exceeds 300 characters: {len(paste_tagline)}")
+    if paste_description_length > 30000:
+        errors.append(f"Paste-ready description exceeds 30000 characters: {paste_description_length}")
+    for forbidden in ["Do not invent", "Use this selection order", "Submission Accuracy Notes", "Replace the challenge"]:
+        if forbidden in paste_ready:
+            errors.append(f"Paste-ready registration contains internal guidance: {forbidden}")
+    for placeholder in ["## Demo URL\n\nTBD", "## Video URL\n\nTBD", "## Team\n\nTBD"]:
+        if placeholder not in additional_info:
+            errors.append(f"Additional Information does not expose required placeholder: {placeholder.splitlines()[0]}")
+
     skill_codes = set(re.findall(r"LS-SEC-[A-Z-]+", profile))
     plugin_codes = set(re.findall(r"PLG-[A-Z-]+", profile))
     if len(skill_codes) != 5:
@@ -134,6 +163,7 @@ def main() -> None:
         "Hackathon documentation: PASS "
         f"(title={len(title)} chars, tagline={len(tagline)} chars, "
         f"registrationDescription={description_length} chars, "
+        f"pasteReadyDescription={paste_description_length} chars, "
         f"skills={len(skill_codes)}, plugins={len(plugin_codes)})"
     )
 

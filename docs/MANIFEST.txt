@@ -1,6 +1,8 @@
 00-Hackathon/demo-script.md
+00-Hackathon/additional-information.md
 00-Hackathon/mvp-delivery-profile.md
 00-Hackathon/project-brief.md
+00-Hackathon/registration-paste-ready.md
 00-Hackathon/registration-content.md
 01-Architecture/business-architecture.md
 01-Architecture/agent-skill-validation.md
