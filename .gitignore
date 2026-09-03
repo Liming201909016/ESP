@@ -1,12 +1,15 @@
 .venv/
+node_modules/
 __pycache__/
 *.py[cod]
+*.tsbuildinfo
 
 .vs/
 .vscode/tasks.json
 .vscode/*.local.json
 
 artifacts/
+dist/
 bin/
 obj/
 *.zip

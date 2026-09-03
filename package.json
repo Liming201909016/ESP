@@ -1,0 +1,22 @@
+{
+  "name": "enterprise-skill-platform",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c cyan,green \"npm run dev -w @esp/api\" \"npm run dev -w @esp/web\"",
+    "build": "npm run build -w @esp/api && npm run build -w @esp/web",
+    "test": "npm run test -w @esp/api",
+    "start": "npm run start -w @esp/api"
+  },
+  "devDependencies": {
+    "concurrently": "9.2.1",
+    "typescript": "5.9.2"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

@@ -167,6 +167,17 @@ The repository is currently a validated implementation foundation, not yet the c
 
 Local Hackathon implementation with synthetic, non-sensitive data is permitted. Customer data, Connected TEST, Pilot, Production, production identities, and production connections remain blocked until the Development Readiness Gate is approved.
 
+## Run Demo Mode
+
+```powershell
+npm.cmd install
+npm.cmd run dev
+```
+
+Open `http://127.0.0.1:5173`. The API health endpoint is available at `http://127.0.0.1:8787/api/health`.
+
+The current walking skeleton provides the local browser shell and API boundary. Skill Router and Plugin behavior are implemented in the next Hackathon backlog slice.
+
 ## Validation
 
 Create or refresh the local validation environment:

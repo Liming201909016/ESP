@@ -15,6 +15,8 @@ $portableGitRoot = Join-Path $env:LOCALAPPDATA 'Programs\MinGit\cmd'
 if (-not (Get-Command git -ErrorAction SilentlyContinue) -and (Test-Path (Join-Path $portableGitRoot 'git.exe'))) {
     $env:PATH = "$portableGitRoot;$env:PATH"
 }
+$nodeRoot = Split-Path (Get-Command node -ErrorAction SilentlyContinue).Source -ErrorAction SilentlyContinue
+$npm = if ($nodeRoot) { Join-Path $nodeRoot 'npm.cmd' } else { $null }
 
 function Add-CheckError {
     param([string]$Message)
@@ -48,6 +50,17 @@ foreach ($relativePath in $requiredFiles) {
 }
 
 if ($errors.Count -eq 0) {
+    if (-not $npm -or -not (Test-Path $npm)) {
+        Add-CheckError 'Node/npm toolchain is missing.'
+    } elseif (-not (Test-Path (Join-Path $repoRoot 'node_modules'))) {
+        $warnings.Add('Node dependencies are not installed; run npm.cmd install before application validation.')
+    } else {
+        & $npm run build
+        if ($LASTEXITCODE -ne 0) { Add-CheckError 'Hackathon application build failed.' }
+        & $npm test
+        if ($LASTEXITCODE -ne 0) { Add-CheckError 'Hackathon application tests failed.' }
+    }
+
     $solutionManifest = Get-Content (Join-Path $repoRoot 'config\solution-manifest.json') -Raw | ConvertFrom-Json
     foreach ($solutionDefinition in $solutionManifest.solutions) {
         $solutionName = [string]$solutionDefinition.uniqueName
