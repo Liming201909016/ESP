@@ -1,0 +1,19 @@
+{
+  "datasetCode": "DS-SEC-SYNTHETIC",
+  "version": "1.0.0",
+  "classification": "SyntheticNonSensitive",
+  "synthetic": true,
+  "artifact": "dataset.json",
+  "sha256": "2b261198913a929dc15a736405e6f51940b4c311d3432b29f8a4362bd8fef0d1",
+  "caseCount": 4,
+  "requestTypes": {
+    "APP": 2,
+    "RG": 2
+  },
+  "categories": {
+    "HappyPath": 2,
+    "MissingInput": 1,
+    "PromptInjection": 1
+  },
+  "labelStatus": "PendingDomainSMEReview"
+}

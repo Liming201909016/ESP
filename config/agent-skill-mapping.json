@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.0",
+  "host": "CopilotStudio",
+  "primaryConsumer": "CON-SEC-REVIEW-AGENT",
+  "exposureMechanism": "AgentAction",
+  "transport": "PowerAutomateFlow",
+  "copilotToolContract": "TypedMinimalInputsAndStructuredOutputs",
+  "internalEnvelopeSchema": "docs/05-Asset-Standards/schemas/logical-skill-contract.schema.json",
+  "workflowControl": "ExplicitOrchestratingAgentFlow",
+  "criticalResponseMode": "StructuredResponseOrAdaptiveCard",
+  "skills": [
+    {
+      "skillCode": "LS-SEC-DOC-INTAKE",
+      "actionName": "esp_document_intake",
+      "flowName": "ESP - Document Intake - v1",
+      "solution": "ESPSecurityReviewMVP",
+      "humanOversight": "ReviewRequired",
+      "writesBusinessSystem": false
+    },
+    {
+      "skillCode": "LS-SEC-EVIDENCE-EXTRACT",
+      "actionName": "esp_evidence_extract",
+      "flowName": "ESP - Evidence Extraction - v1",
+      "solution": "ESPSecurityReviewMVP",
+      "humanOversight": "ReviewRequired",
+      "writesBusinessSystem": false
+    },
+    {
+      "skillCode": "LS-SEC-REVIEW",
+      "actionName": "esp_security_review",
+      "flowName": "ESP - Security Review - v1",
+      "solution": "ESPSecurityReviewMVP",
+      "humanOversight": "ReviewRequired",
+      "writesBusinessSystem": false
+    },
+    {
+      "skillCode": "LS-SEC-RISK-RATING",
+      "actionName": "esp_risk_rating",
+      "flowName": "ESP - Risk Rating - v1",
+      "solution": "ESPSecurityReviewMVP",
+      "humanOversight": "ApprovalRequired",
+      "writesBusinessSystem": false
+    },
+    {
+      "skillCode": "LS-SEC-REPORT-GEN",
+      "actionName": "esp_report_generation",
+      "flowName": "ESP - Report Generation - v1",
+      "solution": "ESPSecurityReviewMVP",
+      "humanOversight": "ReviewRequired",
+      "writesBusinessSystem": false
+    }
+  ]
+}

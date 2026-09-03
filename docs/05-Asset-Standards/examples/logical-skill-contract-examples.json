@@ -1,0 +1,357 @@
+{
+  "valid": [
+    {
+      "messageType": "request",
+      "contractVersion": "1.0.0",
+      "correlationId": "corr-doc-001",
+      "useCaseCode": "UC-SR-001",
+      "consumerBindingCode": "CB-TEST-001",
+      "skillCode": "LS-SEC-DOC-INTAKE",
+      "classification": "Internal",
+      "payload": {
+        "projectDescription": "Review the authorized project package",
+        "documents": ["source-document-001"]
+      },
+      "sourceReferences": []
+    },
+    {
+      "messageType": "request",
+      "contractVersion": "1.0.0",
+      "correlationId": "corr-evidence-001",
+      "useCaseCode": "UC-SR-002",
+      "consumerBindingCode": "CB-TEST-001",
+      "skillCode": "LS-SEC-EVIDENCE-EXTRACT",
+      "classification": "Internal",
+      "payload": {
+        "normalizedContext": { "requestTypes": ["RG"] },
+        "sourceInventory": ["source-document-001"]
+      },
+      "sourceReferences": []
+    },
+    {
+      "messageType": "request",
+      "contractVersion": "1.0.0",
+      "correlationId": "corr-review-001",
+      "useCaseCode": "UC-SR-003",
+      "consumerBindingCode": "CB-TEST-001",
+      "skillCode": "LS-SEC-REVIEW",
+      "classification": "Internal",
+      "payload": {
+        "normalizedContext": { "requestTypes": ["RG"] },
+        "evidenceItems": [
+          {
+            "evidenceId": "EV-001",
+            "type": "Fact",
+            "sourceId": "source-document-001",
+            "claimReference": "claim-001"
+          }
+        ],
+        "runbookReference": "https://example.invalid/runbooks/rg/1.0.0"
+      },
+      "sourceReferences": []
+    },
+    {
+      "messageType": "request",
+      "contractVersion": "1.0.0",
+      "correlationId": "corr-risk-001",
+      "useCaseCode": "UC-SR-004",
+      "consumerBindingCode": "CB-TEST-001",
+      "skillCode": "LS-SEC-RISK-RATING",
+      "classification": "Internal",
+      "payload": {
+        "findings": [{ "findingId": "F-001", "statement": "Review finding", "authority": "MandatoryRunbook", "evidenceIds": ["EV-001"] }],
+        "methodReference": "https://example.invalid/methods/risk/1.0.0"
+      },
+      "sourceReferences": []
+    },
+    {
+      "messageType": "request",
+      "contractVersion": "1.0.0",
+      "correlationId": "corr-report-001",
+      "useCaseCode": "UC-SR-005",
+      "consumerBindingCode": "CB-TEST-001",
+      "skillCode": "LS-SEC-REPORT-GEN",
+      "classification": "Internal",
+      "payload": {
+        "analystDispositions": [{ "findingId": "F-001", "decision": "Accept" }],
+        "templateReference": "https://example.invalid/templates/report/1.0.0"
+      },
+      "sourceReferences": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "corr-doc-001",
+      "skillCode": "LS-SEC-DOC-INTAKE",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "Success",
+      "payload": {
+        "normalizedContext": { "requestTypes": ["RG"] },
+        "requestTypes": ["RG"],
+        "materialComplete": true,
+        "sourceInventory": ["source-document-001"],
+        "dataGaps": []
+      },
+      "evidence": [{ "evidenceId": "EV-001", "type": "Fact", "sourceId": "source-document-001", "claimReference": "request-type" }],
+      "oversight": "ReviewRequired",
+      "errors": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "corr-evidence-001",
+      "skillCode": "LS-SEC-EVIDENCE-EXTRACT",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "Success",
+      "payload": {
+        "facts": [{ "claim": "Resource is declared", "sourceId": "source-document-001" }],
+        "conflicts": [],
+        "dataGaps": []
+      },
+      "evidence": [{ "evidenceId": "EV-002", "type": "Fact", "sourceId": "source-document-001", "claimReference": "resource-claim" }],
+      "oversight": "ReviewRequired",
+      "errors": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "corr-review-001",
+      "skillCode": "LS-SEC-REVIEW",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "Success",
+      "payload": {
+        "findings": [{ "findingId": "F-001", "statement": "Review finding", "authority": "MandatoryRunbook", "evidenceIds": ["EV-001"] }],
+        "questions": [],
+        "requiredActions": ["Analyst review"],
+        "cannotAssessItems": []
+      },
+      "evidence": [{ "evidenceId": "EV-001", "type": "RuleResult", "sourceId": "RB-RG-CUSTOMER-001", "claimReference": "F-001" }],
+      "oversight": "ReviewRequired",
+      "errors": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "corr-risk-001",
+      "skillCode": "LS-SEC-RISK-RATING",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "Success",
+      "payload": {
+        "proposedRating": "High",
+        "rationale": "Approved method applied",
+        "supportingEvidenceIds": ["EV-001"],
+        "humanConfirmationRequired": true
+      },
+      "evidence": [{ "evidenceId": "EV-003", "type": "ModelSuggestion", "sourceId": "METHOD-RISK-001", "claimReference": "proposed-rating" }],
+      "oversight": "ApprovalRequired",
+      "errors": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "corr-report-001",
+      "skillCode": "LS-SEC-REPORT-GEN",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "Success",
+      "payload": {
+        "reportArtifactReference": "https://example.invalid/reports/report-001",
+        "documentStatus": "Draft",
+        "citationsPreserved": true
+      },
+      "evidence": [{ "evidenceId": "EV-004", "type": "HumanDecision", "sourceId": "analyst-disposition-001", "claimReference": "report-content" }],
+      "oversight": "Completed",
+      "errors": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "boundary-doc-needs-information",
+      "skillCode": "LS-SEC-DOC-INTAKE",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "NeedsInformation",
+      "payload": {},
+      "evidence": [],
+      "oversight": "ReviewRequired",
+      "errors": [{ "category": "InvalidInput", "message": "Mandatory material list is missing", "retryable": true }]
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "boundary-evidence-cannot-assess",
+      "skillCode": "LS-SEC-EVIDENCE-EXTRACT",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "CannotAssess",
+      "payload": {},
+      "evidence": [],
+      "oversight": "ReviewRequired",
+      "errors": [{ "category": "MissingEvidence", "message": "Authorized source is unreadable", "retryable": false }]
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "boundary-review-policy",
+      "skillCode": "LS-SEC-REVIEW",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "RejectedByPolicy",
+      "payload": {},
+      "evidence": [],
+      "oversight": "ReviewRequired",
+      "errors": [{ "category": "PolicyDenial", "message": "Runbook access denied", "retryable": false }]
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "boundary-risk-handoff",
+      "skillCode": "LS-SEC-RISK-RATING",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "HumanHandoff",
+      "payload": {},
+      "evidence": [],
+      "oversight": "ApprovalRequired",
+      "errors": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "boundary-report-failed",
+      "skillCode": "LS-SEC-REPORT-GEN",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "Failed",
+      "payload": {},
+      "evidence": [],
+      "oversight": "ReviewRequired",
+      "errors": [{ "category": "DependencyFailure", "message": "Approved template is unavailable", "retryable": true }]
+    }
+  ],
+  "invalid": [
+    {
+      "messageType": "request",
+      "contractVersion": "1.0.0",
+      "correlationId": "bad-doc",
+      "useCaseCode": "UC-SR-001",
+      "consumerBindingCode": "CB-TEST-001",
+      "skillCode": "LS-SEC-DOC-INTAKE",
+      "classification": "Internal",
+      "payload": { "projectDescription": "Missing documents" },
+      "sourceReferences": []
+    },
+    {
+      "messageType": "request",
+      "contractVersion": "1.0.0",
+      "correlationId": "bad-evidence",
+      "useCaseCode": "UC-SR-002",
+      "consumerBindingCode": "CB-TEST-001",
+      "skillCode": "LS-SEC-EVIDENCE-EXTRACT",
+      "classification": "Internal",
+      "payload": { "normalizedContext": {} },
+      "sourceReferences": []
+    },
+    {
+      "messageType": "request",
+      "contractVersion": "1.0.0",
+      "correlationId": "bad-review",
+      "useCaseCode": "UC-SR-003",
+      "consumerBindingCode": "CB-TEST-001",
+      "skillCode": "LS-SEC-REVIEW",
+      "classification": "Internal",
+      "payload": { "normalizedContext": {}, "evidenceItems": [] },
+      "sourceReferences": []
+    },
+    {
+      "messageType": "request",
+      "contractVersion": "1.0.0",
+      "correlationId": "bad-risk",
+      "useCaseCode": "UC-SR-004",
+      "consumerBindingCode": "CB-TEST-001",
+      "skillCode": "LS-SEC-RISK-RATING",
+      "classification": "Internal",
+      "payload": { "findings": [{ "findingId": "F-001" }] },
+      "sourceReferences": []
+    },
+    {
+      "messageType": "request",
+      "contractVersion": "1.0.0",
+      "correlationId": "bad-report",
+      "useCaseCode": "UC-SR-005",
+      "consumerBindingCode": "CB-TEST-001",
+      "skillCode": "LS-SEC-REPORT-GEN",
+      "classification": "Internal",
+      "payload": { "analystDispositions": [], "templateRefrence": "not-a-uri" },
+      "sourceReferences": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "bad-doc-response",
+      "skillCode": "LS-SEC-DOC-INTAKE",
+      "logicalSkillVersion": "1.0.0",
+      "outcome": "Success",
+      "payload": { "normalizedContext": { "requestTypes": ["RG"] }, "requestTypes": ["RG"], "materialComplete": true, "sourceInventory": [], "dataGaps": [] },
+      "evidence": [],
+      "oversight": "ReviewRequired",
+      "errors": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "bad-evidence-response",
+      "skillCode": "LS-SEC-EVIDENCE-EXTRACT",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "Success",
+      "payload": { "facts": [{ "claim": "Claim", "sourceId": "source-1", "unsupported": true }], "conflicts": [], "dataGaps": [] },
+      "evidence": [],
+      "oversight": "ReviewRequired",
+      "errors": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "bad-review-response",
+      "skillCode": "LS-SEC-REVIEW",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "Success",
+      "payload": { "findings": [{ "findingId": "F-001", "statement": "Finding", "authority": "Invented", "evidenceIds": [] }], "questions": [], "requiredActions": [], "cannotAssessItems": [] },
+      "evidence": [],
+      "oversight": "ReviewRequired",
+      "errors": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "bad-risk-response",
+      "skillCode": "LS-SEC-RISK-RATING",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "Success",
+      "payload": { "proposedRating": "High", "rationale": "Rating", "supportingEvidenceIds": [], "humanConfirmationRequired": false },
+      "evidence": [],
+      "oversight": "ApprovalRequired",
+      "errors": []
+    },
+    {
+      "messageType": "response",
+      "contractVersion": "1.0.0",
+      "correlationId": "bad-report-response",
+      "skillCode": "LS-SEC-REPORT-GEN",
+      "logicalSkillVersion": "1.0.0",
+      "implementationVersion": "1.0.0",
+      "outcome": "Success",
+      "payload": { "reportArtifactReference": "https://example.invalid/reports/report-001", "documentStatus": "Draft", "citationsPreserved": false },
+      "evidence": [],
+      "oversight": "Completed",
+      "errors": []
+    }
+  ]
+}

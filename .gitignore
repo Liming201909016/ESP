@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+
+.vs/
+.vscode/tasks.json
+.vscode/*.local.json
+
+artifacts/
+bin/
+obj/
+*.zip
+*.log
+
+config/*.local.json
+config/deployment-settings.*.json
+!config/environments.template.json

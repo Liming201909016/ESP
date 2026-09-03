@@ -1,0 +1,57 @@
+{
+  "tool": "esp-workbook-builder-semantic-validator",
+  "schemaVersion": "2.0",
+  "validatorVersion": "1.0.0",
+  "result": "valid",
+  "exitCode": 0,
+  "input": {
+    "path": "02-Data-Design/dataverse-build-workbook.xlsx",
+    "sha256": "930cba91ecd1cdbe64a75dd009bcc3c11a15228558c7a870f1097086091fe8fe",
+    "sizeBytes": 41169,
+    "kind": "xlsx"
+  },
+  "summary": {
+    "errorCount": 0,
+    "warningCount": 0,
+    "tableCount": 42,
+    "columnCount": 312,
+    "relationshipCount": 57,
+    "solutionDependencyCount": 4,
+    "ruleCount": 6
+  },
+  "sheets": {
+    "Tables": {
+      "rows": 43,
+      "columns": 7
+    },
+    "Columns": {
+      "rows": 313,
+      "columns": 9
+    },
+    "Relationships": {
+      "rows": 58,
+      "columns": 7
+    },
+    "Solution Dependencies": {
+      "rows": 5,
+      "columns": 4
+    },
+    "Choices": {
+      "rows": 145,
+      "columns": 4
+    },
+    "Rules": {
+      "rows": 7,
+      "columns": 6
+    },
+    "Security": {
+      "rows": 8,
+      "columns": 8
+    },
+    "Seed Data": {
+      "rows": 11,
+      "columns": 6
+    }
+  },
+  "issues": []
+}

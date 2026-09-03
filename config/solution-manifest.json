@@ -1,0 +1,43 @@
+{
+  "publisher": {
+    "name": "EnterpriseSkillPlatform",
+    "prefix": "esp"
+  },
+  "solutions": [
+    {
+      "uniqueName": "ESPCore",
+      "dependsOn": [],
+      "purpose": "Canonical demand, capability, implementation, dependency, and consumer metadata"
+    },
+    {
+      "uniqueName": "ESPSharedAssets",
+      "dependsOn": [],
+      "purpose": "Governed Knowledge, Prompt, Template, Method, Tool Contract, Workflow, and external-reference assets"
+    },
+    {
+      "uniqueName": "ESPSharedRuntime",
+      "dependsOn": ["ESPCore", "ESPSharedAssets"],
+      "purpose": "Reusable connectors, flows, runtime profiles, and contract mappings"
+    },
+    {
+      "uniqueName": "ESPGovernance",
+      "dependsOn": ["ESPCore", "ESPSharedAssets"],
+      "purpose": "Evaluation, approval, package, release, deployment, identity, and policy governance"
+    },
+    {
+      "uniqueName": "ESPEvidence",
+      "dependsOn": ["ESPCore", "ESPGovernance"],
+      "purpose": "Invocation indexes, evidence packages, evidence items, operational evidence, and value references"
+    },
+    {
+      "uniqueName": "ESPSecurityReviewMVP",
+      "dependsOn": ["ESPCore", "ESPSharedAssets", "ESPSharedRuntime", "ESPGovernance", "ESPEvidence"],
+      "purpose": "Security Review Agent, flows, UI, and scenario-specific components"
+    },
+    {
+      "uniqueName": "ESPReporting",
+      "dependsOn": ["ESPCore", "ESPEvidence"],
+      "purpose": "Semantic reporting assets and Power BI integration metadata"
+    }
+  ]
+}

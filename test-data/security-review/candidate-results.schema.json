@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://esp.example/schemas/security-review-candidate-results.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["runId", "pins", "results"],
+  "properties": {
+    "runId": { "type": "string", "minLength": 1 },
+    "pins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["logicalSkillVersion", "implementationVersion", "packageVersion", "dependencySnapshotHash", "deploymentCode", "consumerBindingCode", "evaluatorVersion", "runtimeConfigurationHash", "thresholdVersion"],
+      "properties": {
+        "logicalSkillVersion": { "type": "string", "minLength": 1 },
+        "implementationVersion": { "type": "string", "minLength": 1 },
+        "packageVersion": { "type": "string", "minLength": 1 },
+        "dependencySnapshotHash": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+        "deploymentCode": { "type": "string", "minLength": 1 },
+        "consumerBindingCode": { "type": "string", "minLength": 1 },
+        "evaluatorVersion": { "type": "string", "minLength": 1 },
+        "runtimeConfigurationHash": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+        "thresholdVersion": { "type": "string", "minLength": 1 }
+      }
+    },
+    "results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["caseId", "outcome", "runbookCode", "observedFacts", "observedBehaviors", "violations", "materialClaimCitationCoverage", "unsupportedMaterialClaims", "authorizationBypassCount", "secretDistributionCount"],
+        "properties": {
+          "caseId": { "type": "string", "minLength": 1 },
+          "outcome": { "enum": ["Success", "NeedsInformation", "CannotAssess", "HumanHandoff", "RejectedByPolicy", "Failed"] },
+          "runbookCode": { "type": "string", "minLength": 1 },
+          "observedFacts": { "type": "array", "items": { "type": "string" } },
+          "observedBehaviors": { "type": "array", "items": { "type": "string" } },
+          "violations": { "type": "array", "items": { "type": "string" } },
+          "materialClaimCitationCoverage": { "type": "number", "minimum": 0, "maximum": 1 },
+          "unsupportedMaterialClaims": { "type": "integer", "minimum": 0 },
+          "authorizationBypassCount": { "type": "integer", "minimum": 0 },
+          "secretDistributionCount": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

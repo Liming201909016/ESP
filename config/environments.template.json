@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0",
+  "environments": {
+    "DEV": {
+      "environmentUrl": null,
+      "tenantId": null,
+      "pacAuthProfile": "esp-dev",
+      "solutionType": "Unmanaged",
+      "allowedData": "SyntheticNonSensitiveOnly",
+      "deploymentSettingsFile": "config/deployment-settings.dev.json"
+    },
+    "TEST": {
+      "environmentUrl": null,
+      "tenantId": null,
+      "pacAuthProfile": "esp-test",
+      "solutionType": "Managed",
+      "allowedData": "ApprovedTestDataOnly",
+      "deploymentSettingsFile": "config/deployment-settings.test.json"
+    },
+    "PROD": {
+      "environmentUrl": null,
+      "tenantId": null,
+      "pacAuthProfile": "esp-prod",
+      "solutionType": "Managed",
+      "allowedData": "ApprovedProductionDataOnly",
+      "deploymentSettingsFile": "config/deployment-settings.prod.json"
+    }
+  },
+  "rules": {
+    "storeSecrets": false,
+    "requireManagedDownstream": true,
+    "requireConnectionReferences": true,
+    "requireEnvironmentVariables": true,
+    "requireDlpApprovalForTestAndProd": true
+  }
+}
