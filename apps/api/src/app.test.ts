@@ -37,6 +37,41 @@ describe("health endpoint", () => {
     expect(body.plugins.every((plugin: { status: string; mode: string }) => plugin.status === "healthy" && plugin.mode === "Demo")).toBe(true);
   });
 
+  it("exports four application candidate results with reproducible pins", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/evaluation/candidate-results`);
+    const body = await response.json();
+
+    expect(body.results).toHaveLength(4);
+    expect(body.pins).toMatchObject({
+      logicalSkillVersion: "1.0.0",
+      implementationVersion: "demo-1.0.0",
+      packageVersion: "0.1.0",
+      consumerBindingCode: "CB-ESP-DEMO-001",
+    });
+    expect(body.results.every((result: { materialClaimCitationCoverage: number }) => result.materialClaimCitationCoverage === 1)).toBe(true);
+  });
+
+  it("reports Foundation evaluation without granting Pilot eligibility", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/evaluation/summary`);
+    const body = await response.json();
+
+    expect(body).toMatchObject({
+      status: "FoundationPass",
+      caseCount: 4,
+      passedCaseCount: 4,
+      mandatoryAssertionCount: 36,
+      passedMandatoryAssertionCount: 36,
+      mandatoryAssertionPassRate: 1,
+      pilotEligible: false,
+    });
+  });
+
   it("runs the RG happy path through five pinned Skills", async () => {
     const address = server.address();
     if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");

@@ -9,6 +9,16 @@ interface Registry {
   plugins: Array<{ code: string; name: string; version: string; status: string }>;
 }
 
+interface EvaluationSummary {
+  status: string;
+  caseCount: number;
+  passedCaseCount: number;
+  mandatoryAssertionCount: number;
+  passedMandatoryAssertionCount: number;
+  pilotEligible: boolean;
+  pilotBlockers: string[];
+}
+
 interface ReviewResult {
   correlationId: string;
   caseId: string;
@@ -36,6 +46,7 @@ interface ReviewResult {
 
 function App() {
   const [registry, setRegistry] = useState<Registry | null>(null);
+  const [evaluation, setEvaluation] = useState<EvaluationSummary | null>(null);
   const [caseId, setCaseId] = useState("SYN-RG-001");
   const [requestText, setRequestText] = useState("Review this package and produce an evidence-grounded draft.");
   const [review, setReview] = useState<ReviewResult | null>(null);
@@ -48,6 +59,9 @@ function App() {
     fetch("/api/registry")
       .then((response) => response.json())
       .then(setRegistry);
+    fetch("/api/evaluation/summary")
+      .then((response) => response.json())
+      .then(setEvaluation);
   }, []);
 
   async function runReview() {
@@ -267,6 +281,20 @@ function App() {
             </>
           )}
         </div>
+      </section>
+
+      <section className="evaluation-band" aria-labelledby="evaluation-title">
+        <div>
+          <p className="section-label">Independent evaluation</p>
+          <h2 id="evaluation-title">{evaluation?.status ?? "Evaluating application"}</h2>
+          <p>Application results are exported to the existing Python acceptance oracle.</p>
+        </div>
+        <dl>
+          <div><dt>Scenarios</dt><dd>{evaluation ? `${evaluation.passedCaseCount}/${evaluation.caseCount}` : "—"}</dd></div>
+          <div><dt>Assertions</dt><dd>{evaluation ? `${evaluation.passedMandatoryAssertionCount}/${evaluation.mandatoryAssertionCount}` : "—"}</dd></div>
+          <div><dt>Pilot eligible</dt><dd>{evaluation?.pilotEligible ? "Yes" : "No"}</dd></div>
+        </dl>
+        {evaluation?.pilotBlockers?.length ? <p className="evaluation-note">{evaluation.pilotBlockers.join(" · ")}</p> : null}
       </section>
     </main>
   );

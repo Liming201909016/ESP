@@ -563,6 +563,56 @@ h1 {
   font-size: 0.78rem;
 }
 
+.evaluation-band {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(340px, 1fr);
+  gap: 40px;
+  padding: 48px;
+  color: #ffffff;
+  background: #17201c;
+}
+
+.evaluation-band h2 {
+  margin-bottom: 10px;
+  font-size: 2rem;
+}
+
+.evaluation-band > div > p:last-child,
+.evaluation-note {
+  color: #b8c8c0;
+}
+
+.evaluation-band dl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin: 0;
+  background: #496259;
+}
+
+.evaluation-band dl div {
+  padding: 16px;
+  background: #22302a;
+}
+
+.evaluation-band dt {
+  color: #9db3a7;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.evaluation-band dd {
+  margin: 8px 0 0;
+  font-size: 1.45rem;
+  font-weight: 600;
+}
+
+.evaluation-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.8rem;
+}
+
 @media (max-width: 760px) {
   .shell {
     width: min(100% - 28px, 1180px);
@@ -616,6 +666,15 @@ h1 {
   }
 
   .report-preview dl {
+    grid-template-columns: 1fr;
+  }
+
+  .evaluation-band {
+    grid-template-columns: 1fr;
+    padding: 28px 20px;
+  }
+
+  .evaluation-band dl {
     grid-template-columns: 1fr;
   }
 

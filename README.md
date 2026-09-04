@@ -194,11 +194,20 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\scripts\Test-FoundationReadiness.ps1
 ```
 
+Run application tests directly:
+
+```powershell
+npm.cmd run test:api
+npm.cmd run test:e2e
+npm.cmd run evaluate
+```
+
 Current validation covers:
 
 - 15 valid and 10 invalid Skill contract examples;
 - four versioned synthetic Security Review cases;
 - 36 mandatory evaluation assertions;
+- eight desktop/mobile browser journeys across four governed scenarios;
 - Hackathon registration and documentation consistency;
 - Dataverse workbook hash and semantic checks;
 - seven Power Platform Solution project identities.

@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 
 import { getRegistry } from "./registry.js";
+import { generateCandidateResults, getEvaluationSummary } from "./evaluation.js";
 import { applyAnalystDisposition, runSecurityReview, type AnalystDecision } from "./workflow.js";
 
 export function createApp() {
@@ -23,6 +24,22 @@ export function createApp() {
 
   app.get("/api/registry", (_request, response) => {
     response.json(getRegistry());
+  });
+
+  app.get("/api/evaluation/candidate-results", async (_request, response, next) => {
+    try {
+      response.json(await generateCandidateResults());
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/evaluation/summary", async (_request, response, next) => {
+    try {
+      response.json(await getEvaluationSummary());
+    } catch (error) {
+      next(error);
+    }
   });
 
   app.post("/api/reviews", async (request, response, next) => {

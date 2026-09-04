@@ -10,6 +10,8 @@ __pycache__/
 
 artifacts/
 dist/
+playwright-report/
+test-results/
 bin/
 obj/
 *.zip

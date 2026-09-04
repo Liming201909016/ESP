@@ -7,7 +7,8 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "export:evaluation": "tsx src/export-evaluation.ts ../../artifacts/evaluation-runs/app-candidate-results.json"
   },
   "dependencies": {
     "cors": "2.8.5",
