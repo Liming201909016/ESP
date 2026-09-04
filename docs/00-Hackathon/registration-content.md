@@ -36,7 +36,7 @@ https://github.com/Liming201909016/ESP
 Repository visibility: Public  
 Expected default branch: `main`
 
-The public repository contains a runnable local vertical slice plus the validated architecture, Skill contracts, synthetic demo assets, evaluation tooling, and Power Platform Solution foundations. Final submission still requires a clean-clone setup, startup, and evaluation check.
+The public repository contains a runnable local vertical slice plus the validated architecture, Skill contracts, synthetic demo assets, evaluation tooling, and Power Platform Solution foundations. A clean-clone validation has reproduced installation, build, 10 API tests, eight desktop/mobile browser journeys, and 36/36 evaluation assertions.
 
 ## Description
 
@@ -204,4 +204,4 @@ ESP moves enterprise AI from agent-centric to capability-centric architecture. O
 - Label local Plugin implementations as Demo or Mock.
 - Describe Copilot Studio and Dataverse as optional Connected Mode until a governed environment is available.
 - Replace the challenge guidance above with the exact selected Innovation Studio challenge names before final submission.
-- Before final submission, verify that `https://github.com/Liming201909016/ESP` contains the runnable source and that a clean clone passes setup, startup, and evaluation checks.
+- Before final submission, rerun clean-clone validation against the final commit and attach the completed demo/video links.

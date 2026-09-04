@@ -13,6 +13,7 @@ DEMO_SCRIPT = DOCS / "00-Hackathon" / "demo-script.md"
 REGISTRATION = DOCS / "00-Hackathon" / "registration-content.md"
 PASTE_READY = DOCS / "00-Hackathon" / "registration-paste-ready.md"
 ADDITIONAL_INFO = DOCS / "00-Hackathon" / "additional-information.md"
+CLEAN_CLONE = DOCS / "00-Hackathon" / "clean-clone-validation.md"
 DEMO_DESKTOP = DOCS / "00-Hackathon" / "assets" / "esp-demo-desktop.png"
 DEMO_MOBILE = DOCS / "00-Hackathon" / "assets" / "esp-demo-mobile.png"
 BACKLOG = DOCS / "08-Development" / "hackathon-mvp-backlog.md"
@@ -51,7 +52,7 @@ def validate_links(errors: list[str]) -> None:
 
 def main() -> None:
     errors: list[str] = []
-    required_files = [BRIEF, PROFILE, DEMO_SCRIPT, REGISTRATION, PASTE_READY, ADDITIONAL_INFO, DEMO_DESKTOP, DEMO_MOBILE, BACKLOG]
+    required_files = [BRIEF, PROFILE, DEMO_SCRIPT, REGISTRATION, PASTE_READY, ADDITIONAL_INFO, CLEAN_CLONE, DEMO_DESKTOP, DEMO_MOBILE, BACKLOG]
     for path in required_files:
         if not path.exists():
             errors.append(f"Missing Hackathon document: {path.relative_to(ROOT)}")
@@ -64,6 +65,7 @@ def main() -> None:
     registration = REGISTRATION.read_text(encoding="utf-8")
     paste_ready = PASTE_READY.read_text(encoding="utf-8")
     additional_info = ADDITIONAL_INFO.read_text(encoding="utf-8")
+    clean_clone = CLEAN_CLONE.read_text(encoding="utf-8")
     backlog = BACKLOG.read_text(encoding="utf-8")
     root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
 
@@ -153,6 +155,9 @@ def main() -> None:
     for placeholder in ["## Demo URL\n\nTBD", "## Video URL\n\nTBD", "## Team\n\nTBD"]:
         if placeholder not in additional_info:
             errors.append(f"Additional Information does not expose required placeholder: {placeholder.splitlines()[0]}")
+    for term in ["10/10", "8/8", "36/36", "Pilot eligibility: `false`"]:
+        if term not in clean_clone:
+            errors.append(f"Clean-clone evidence is missing: {term}")
 
     for image, minimum_width in [(DEMO_DESKTOP, 1200), (DEMO_MOBILE, 360)]:
         header = image.read_bytes()[:24]

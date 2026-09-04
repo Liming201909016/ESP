@@ -31,6 +31,7 @@ AI platform and reusable enterprise capability architecture, demonstrated throug
 - public GitHub repository available;
 - local browser application, deterministic Router, four Plugins, analyst disposition, report, trace, and evaluator integration runnable;
 - 10 API integration tests and eight desktop/mobile browser journeys passing.
+- clean-clone installation, build, browser tests, and 36/36 evaluation reproduced successfully.
 
 ## What We Will Demonstrate
 
@@ -96,6 +97,6 @@ TBD: add team member names, aliases, roles, and organizational affiliations as r
 - select up to five exact Topic Challenge names;
 - replace Team, Demo URL, and Video URL placeholders;
 - confirm the public repository contains the runnable source;
-- run a clean-clone setup, startup, and evaluation test;
+- rerun clean-clone validation against the final submission commit;
 - attach screenshots that show the Copilot entry, evidence, trace, analyst review, and draft report;
 - verify all Demo/Mock labels and non-production disclaimers remain visible.
