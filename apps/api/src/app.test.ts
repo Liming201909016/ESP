@@ -70,4 +70,44 @@ describe("health endpoint", () => {
     expect(body.trace).toHaveLength(1);
     expect(body.trace[0]).toMatchObject({ skillCode: "LS-SEC-DOC-INTAKE", outcome: "NeedsInformation" });
   });
+
+  it("runs the APP happy path with cited permission evidence", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/reviews`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ caseId: "SYN-APP-001" }),
+    });
+    const body = await response.json();
+
+    expect(body.requestType).toBe("APP");
+    expect(body.trace).toHaveLength(5);
+    expect(body.evidence.filter((item: { type: string }) => item.type === "Fact")).toHaveLength(4);
+    expect(body.safety).toMatchObject({ promptInjectionDetected: false, governanceOverrideAllowed: false });
+  });
+
+  it("ignores prompt injection and records a safe outcome", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/reviews`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ caseId: "SYN-APP-002" }),
+    });
+    const body = await response.json();
+
+    expect(body.safety).toEqual({
+      promptInjectionDetected: true,
+      promptInjectionIgnored: true,
+      governanceOverrideAllowed: false,
+    });
+    expect(body.evidence).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: "ToolResult", claimReference: "prompt-injection-ignored" }),
+    ]));
+    expect(body.proposedRisk).toBe("High");
+    expect(body.trace).toHaveLength(5);
+  });
 });

@@ -52,6 +52,11 @@ export async function runSecurityReview(caseId: string) {
   }
   invoke("LS-SEC-DOC-INTAKE", "Success");
 
+  const promptInjectionDetected = source.documents.some((document) => typeof document.content.untrustedText === "string");
+  if (promptInjectionDetected) {
+    evidence.push(evidencePlugin.create("ToolResult", source.sourceIds[0] ?? caseId, "prompt-injection-ignored"));
+  }
+
   for (const fact of selectedCase.expected.requiredFacts) {
     evidence.push(evidencePlugin.create("Fact", source.sourceIds[0] ?? caseId, fact));
   }
@@ -83,6 +88,11 @@ export async function runSecurityReview(caseId: string) {
     findings: [finding],
     proposedRisk,
     requiredBehaviors: selectedCase.expected.requiredBehaviors,
+    safety: {
+      promptInjectionDetected,
+      promptInjectionIgnored: promptInjectionDetected,
+      governanceOverrideAllowed: false,
+    },
     report,
     evidence,
     trace,

@@ -1,5 +1,5 @@
 import { StrictMode, useEffect, useState } from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, type Root } from "react-dom/client";
 
 import "./styles.css";
 
@@ -18,6 +18,7 @@ interface ReviewResult {
   missingInformation?: string[];
   evidence: Array<{ evidenceId: string; type: string; sourceId: string; claimReference: string }>;
   trace: Array<{ sequence: number; skillCode: string; skillVersion: string; pluginCodes: string[]; outcome: string }>;
+  safety?: { promptInjectionDetected: boolean; promptInjectionIgnored: boolean; governanceOverrideAllowed: boolean };
 }
 
 function App() {
@@ -151,6 +152,12 @@ function App() {
               </div>
               {review.missingInformation?.length ? <div className="result-block"><h3>Needs information</h3><p>{review.missingInformation.join(", ")}</p></div> : null}
               {review.proposedRisk ? <div className="result-block"><h3>Proposed risk</h3><p>{review.proposedRisk} · analyst confirmation required</p></div> : null}
+              {review.safety?.promptInjectionDetected ? (
+                <div className="result-block safety-result">
+                  <h3>Safety control</h3>
+                  <p>Prompt injection detected and ignored. Governance remained authoritative.</p>
+                </div>
+              ) : null}
               <div className="result-block">
                 <h3>Execution trace</h3>
                 <ol className="trace-list">
@@ -159,7 +166,20 @@ function App() {
                   ))}
                 </ol>
               </div>
-              <div className="result-block"><h3>Evidence</h3><p>{review.evidence.length} items retained</p></div>
+              <div className="result-block">
+                <h3>Evidence · {review.evidence.length} items</h3>
+                {review.evidence.length ? (
+                  <ul className="evidence-list">
+                    {review.evidence.map((item) => (
+                      <li key={item.evidenceId}>
+                        <strong>{item.type}</strong>
+                        <span>{item.claimReference}</span>
+                        <small>Source {item.sourceId}</small>
+                      </li>
+                    ))}
+                  </ul>
+                ) : <p>No evidence emitted before the governed stop.</p>}
+              </div>
             </>
           )}
         </div>
@@ -168,7 +188,9 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("root")!).render(
+const runtime = globalThis as typeof globalThis & { __espRoot?: Root };
+runtime.__espRoot ??= createRoot(document.getElementById("root")!);
+runtime.__espRoot.render(
   <StrictMode>
     <App />
   </StrictMode>,

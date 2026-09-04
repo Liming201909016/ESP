@@ -32,7 +32,7 @@ The Hackathon MVP is done when a reviewer can clone or open the repository, run 
 |---|---|---|---|
 | HCK-201 | Copilot-style entry | User selects a synthetic package and submits a natural-language review request | Done |
 | HCK-202 | Review workflow | Five Skills execute with visible progress and standard failure outcomes | Ready |
-| HCK-203 | Evidence experience | Facts, sources, Runbook authority, versions, and conflicts are inspectable | Blocked by HCK-202 |
+| HCK-203 | Evidence experience | Evidence type, claim, source, Runbook authority, and versioned execution context are inspectable | Done |
 | HCK-204 | Analyst disposition | Analyst accepts, modifies, rejects, escalates, or marks Cannot Assess | Blocked by HCK-202 |
 | HCK-205 | Draft report | Report preserves citations, analyst decisions, and Draft status | Blocked by HCK-204 |
 | HCK-206 | Trace view | Correlation, Consumer, Binding, Skills, Plugins, versions, outcomes, and timings are visible | Blocked by HCK-202 |
