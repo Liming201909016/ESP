@@ -1,7 +1,7 @@
 # ESP Clean-Clone Validation
 
 **Validated:** 2026-09-04  
-**Commit:** `62ea1fe`  
+**Commit:** `ef67627`  
 **Result:** Pass
 
 ## Environment
@@ -21,21 +21,23 @@
 3. creation of a new Python virtual environment;
 4. installation from `requirements-dev.txt`;
 5. TypeScript/API and Vite production builds;
-6. 10 API integration tests;
-7. eight desktop/mobile Playwright journeys;
+6. 21 API integration tests;
+7. 16 desktop/mobile Playwright journeys;
 8. application candidate-result export;
 9. independent Python evaluation.
 
 ## Results
 
-- Node packages installed: 216
-- API tests: 10/10
-- browser journeys: 8/8
+- Node package paths resolved: 227
+- API tests: 21/21
+- browser journeys: 16/16
 - synthetic scenarios: 4/4
 - mandatory evaluation assertions: 36/36
 - Foundation status: `FoundationPass`
 - Pilot eligibility: `false`
 
 The first clean-clone attempt exposed a line-ending-dependent dataset hash. The manifest and evaluator now hash canonical JSON, making verification stable across Git line-ending normalization.
+
+The final wrapper exceeded the automation wait window after producing candidate results. The independent Python oracle was completed directly in the same clean workspace and passed 36/36; the Playwright result file reported `passed` with no failed tests.
 
 This validation establishes reproducibility of the local synthetic Demo Mode. It does not establish customer validation, Connected Mode readiness, Pilot approval, or Production authorization.

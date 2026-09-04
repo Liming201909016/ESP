@@ -36,7 +36,7 @@ https://github.com/Liming201909016/ESP
 Repository visibility: Public  
 Expected default branch: `main`
 
-The public repository contains a runnable local vertical slice plus the validated architecture, Skill contracts, synthetic demo assets, evaluation tooling, and Power Platform Solution foundations. A clean-clone validation has reproduced installation, build, 10 API tests, eight desktop/mobile browser journeys, and 36/36 evaluation assertions.
+The public repository contains a runnable local vertical slice plus the validated architecture, Skill contracts, synthetic demo assets, evaluation tooling, and Power Platform Solution foundations. A clean-clone validation has reproduced installation, build, 21 API tests, 16 desktop/mobile browser journeys, and 36/36 evaluation assertions.
 
 ## Description
 

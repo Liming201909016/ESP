@@ -64,12 +64,14 @@ Deployment completed on 2026-09-04:
 
 - Public Demo: `https://app-esp-esp-demo-vw6mjjpc4xh64.azurewebsites.net/`
 - Health endpoint: HTTP 200 with `status=healthy`, `mode=Demo`, five Skills, and four Plugins
-- Active OneDeploy ID: `1e15c2df-5dc2-4748-bd99-3a83abc3f821`, status `4` (Success)
-- Source package SHA-256: `678618b3de466f94612141a2c6e28499fabd488e040c388bb81f447a2312755f`
+- Active OneDeploy ID: `b8f82d2b-15da-47db-9d3a-5bcfe2d946da`, status `4` (Success)
+- Source package SHA-256: `8987edf566558acf673dbc40dbc37dc55d8607bd0975d5f4c429de73f26dcdc8`
 - Four live scenarios returned their expected governed states with zero runtime violations
 - Analyst acceptance produced a Final report and one HumanDecision Evidence Item
 - Correlation `06aeaad2-4bac-4d72-991d-074aa83359d5` remained Completed/Final/Accept after an App Service restart
 - Desktop and 390px mobile browser checks reported no horizontal overflow
+- Helmet CSP/HSTS/nosniff/referrer headers, same-origin browser access, and the API rate limit are active
+- Production dependency audit reports zero high or critical advisories; two moderate `qs` advisories remain upstream because a fixed 6.16.0 package is not yet published
 
 The first remote build excluded development build tools because `NODE_ENV=production`, and the pre-deployment container also started before the Oryx manifest was active. The final configuration sets `NPM_CONFIG_INCLUDE=dev`; after successful Oryx build and a clean App Service restart, the deployed application passed all checks.
 

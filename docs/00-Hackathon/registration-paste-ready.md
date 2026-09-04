@@ -147,7 +147,7 @@ The Hackathon deliverable has two modes:
 
 Demo Mode keeps the project reproducible when cloud connectivity is unavailable. Connected Mode demonstrates how the same contracts integrate with enterprise identity, DLP, ALM, telemetry, and governance.
 
-The public repository contains a runnable local vertical slice plus the validated architecture, canonical Skill contracts, positive and negative fixtures, synthetic RG and APP cases, evaluation tooling, and Power Platform Solution foundations. A clean-clone validation reproduced installation, build, 10 API tests, eight desktop/mobile browser journeys, and 36/36 evaluation assertions. Synthetic results do not establish customer validation, Pilot readiness, or production authorization.
+The public repository contains a runnable local vertical slice plus the validated architecture, canonical Skill contracts, positive and negative fixtures, synthetic RG and APP cases, evaluation tooling, and Power Platform Solution foundations. A clean-clone validation reproduced installation, build, 21 API tests, 16 desktop/mobile browser journeys, and 36/36 evaluation assertions. Synthetic results do not establish customer validation, Pilot readiness, or production authorization.
 
 ### Measured progress
 

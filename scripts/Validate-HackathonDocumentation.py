@@ -159,7 +159,7 @@ def main() -> None:
         errors.append("Additional Information Video URL must be an HTTPS URL")
     if section_value(additional_info, "Team").upper().startswith("TBD"):
         errors.append("Additional Information Team section is not complete")
-    for term in ["10/10", "8/8", "36/36", "Pilot eligibility: `false`"]:
+    for term in ["21/21", "16/16", "36/36", "Pilot eligibility: `false`"]:
         if term not in clean_clone:
             errors.append(f"Clean-clone evidence is missing: {term}")
 
