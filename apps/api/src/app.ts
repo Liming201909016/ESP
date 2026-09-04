@@ -1,5 +1,6 @@
-import cors from "cors";
 import express from "express";
+import { rateLimit } from "express-rate-limit";
+import helmet from "helmet";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
@@ -11,7 +12,26 @@ import { applyAnalystDisposition, getReview, runBoundDocumentIntake, runSecurity
 export function createApp() {
   const app = express();
 
-  app.use(cors());
+  app.set("trust proxy", 1);
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
+        imgSrc: ["'self'", "data:"],
+        connectSrc: ["'self'"],
+      },
+    },
+    referrerPolicy: { policy: "no-referrer" },
+  }));
+  app.use("/api", rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 120,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: { error: "Too many Demo API requests; retry later." },
+  }));
   app.use(express.json({ limit: "1mb" }));
 
   app.get("/api/health", (_request, response) => {

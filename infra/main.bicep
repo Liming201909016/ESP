@@ -67,6 +67,7 @@ module webApp 'br/public:avm/res/web/site:0.24.0' = {
           HOST: '0.0.0.0'
           NPM_CONFIG_INCLUDE: 'dev'
           NODE_ENV: 'production'
+          POST_BUILD_COMMAND: 'npm prune --omit=dev'
           SCM_DO_BUILD_DURING_DEPLOYMENT: 'true'
         }
       }
