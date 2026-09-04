@@ -36,4 +36,38 @@ describe("health endpoint", () => {
     expect(body.skills.every((skill: { version: string }) => skill.version === "1.0.0")).toBe(true);
     expect(body.plugins.every((plugin: { status: string; mode: string }) => plugin.status === "healthy" && plugin.mode === "Demo")).toBe(true);
   });
+
+  it("runs the RG happy path through five pinned Skills", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/reviews`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ caseId: "SYN-RG-001" }),
+    });
+    const body = await response.json();
+
+    expect(body.state).toBe("AwaitingAnalystDisposition");
+    expect(body.trace).toHaveLength(5);
+    expect(body.trace.map((entry: { sequence: number }) => entry.sequence)).toEqual([1, 2, 3, 4, 5]);
+    expect(body.evidence.length).toBeGreaterThan(0);
+    expect(body.report).toMatchObject({ status: "Draft", citationsPreserved: true });
+  });
+
+  it("stops after intake when mandatory material is missing", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/reviews`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ caseId: "SYN-RG-002" }),
+    });
+    const body = await response.json();
+
+    expect(body.outcome).toBe("NeedsInformation");
+    expect(body.trace).toHaveLength(1);
+    expect(body.trace[0]).toMatchObject({ skillCode: "LS-SEC-DOC-INTAKE", outcome: "NeedsInformation" });
+  });
 });

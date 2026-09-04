@@ -207,6 +207,150 @@ h1 {
   font-size: 0.76rem;
 }
 
+.review-console {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.2fr);
+  gap: 56px;
+  padding: 72px 0;
+  border-top: 1px solid #cbd5ce;
+}
+
+.review-controls > div > p:last-child {
+  color: #60746b;
+  line-height: 1.6;
+}
+
+.review-controls label {
+  display: block;
+  margin-top: 22px;
+  color: #384b43;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.review-controls select,
+.review-controls textarea {
+  width: 100%;
+  margin-top: 7px;
+  border: 1px solid #aab9b0;
+  border-radius: 4px;
+  color: #17201c;
+  background: rgba(255, 255, 255, 0.72);
+  font: inherit;
+}
+
+.review-controls select {
+  height: 44px;
+  padding: 0 12px;
+}
+
+.review-controls textarea {
+  resize: vertical;
+  min-height: 104px;
+  padding: 12px;
+  line-height: 1.5;
+}
+
+.review-controls button {
+  min-height: 44px;
+  margin-top: 18px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 4px;
+  color: #ffffff;
+  background: #14503e;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.review-controls button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.review-output {
+  min-height: 420px;
+  padding-left: 32px;
+  border-left: 1px solid #9db3a7;
+}
+
+.empty-state {
+  display: grid;
+  align-content: center;
+  min-height: 360px;
+  color: #60746b;
+}
+
+.empty-state span {
+  color: #17201c;
+  font-family: "Aptos Display", "Segoe UI Variable Display", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.result-summary {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #cbd5ce;
+}
+
+.outcome {
+  padding: 7px 10px;
+  border-radius: 4px;
+  color: #ffffff;
+  background: #14503e;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.result-summary strong,
+.result-summary small,
+.trace-list span,
+.trace-list small {
+  display: block;
+}
+
+.result-summary small {
+  max-width: 420px;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  color: #6d7c75;
+}
+
+.result-block {
+  padding: 22px 0;
+  border-bottom: 1px solid #d7ded9;
+}
+
+.result-block h3 {
+  margin: 0 0 8px;
+  font-size: 0.88rem;
+  text-transform: uppercase;
+}
+
+.result-block p {
+  margin: 0;
+  color: #496259;
+}
+
+.trace-list {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.trace-list li {
+  padding: 8px 0 8px 6px;
+}
+
+.trace-list small {
+  margin-top: 3px;
+  color: #6d7c75;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 760px) {
   .shell {
     width: min(100% - 28px, 1180px);
@@ -241,6 +385,18 @@ h1 {
 
   .catalog-grid {
     gap: 32px;
+  }
+
+  .review-console {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .review-output {
+    min-height: 260px;
+    padding: 28px 0 0;
+    border-top: 1px solid #9db3a7;
+    border-left: 0;
   }
 
   .intro h2 {

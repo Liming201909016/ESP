@@ -23,15 +23,15 @@ The Hackathon MVP is done when a reviewer can clone or open the repository, run 
 |---|---|---|---|
 | HCK-101 | Local application scaffold | One command starts a browser-accessible React/Vite application and Express health API | Done |
 | HCK-102 | Skill and Plugin registry | Five Skills and four Plugins load with pinned versions and health status in API and UI | Done |
-| HCK-103 | Skill Router | Validates contracts, executes pinned dependencies, propagates correlation, and records trace | Ready |
-| HCK-104 | Demo Plugins | Document, Runbook, Evidence, and Report Plugins run locally without network access | Ready |
+| HCK-103 | Skill Router | Deterministic five-stage Router executes pinned dependencies, propagates correlation, and records ordered trace | Done |
+| HCK-104 | Demo Plugins | Document, Runbook, Evidence, and Report Plugins run locally without network access | Done |
 
 ## H2 Security Review experience
 
 | ID | Work item | Acceptance | Status |
 |---|---|---|---|
-| HCK-201 | Copilot-style entry | User selects a synthetic package and submits a natural-language review request | Ready |
-| HCK-202 | Review workflow | Five Skills execute with visible progress and standard failure outcomes | Blocked by HCK-103/104 |
+| HCK-201 | Copilot-style entry | User selects a synthetic package and submits a natural-language review request | Done |
+| HCK-202 | Review workflow | Five Skills execute with visible progress and standard failure outcomes | Ready |
 | HCK-203 | Evidence experience | Facts, sources, Runbook authority, versions, and conflicts are inspectable | Blocked by HCK-202 |
 | HCK-204 | Analyst disposition | Analyst accepts, modifies, rejects, escalates, or marks Cannot Assess | Blocked by HCK-202 |
 | HCK-205 | Draft report | Report preserves citations, analyst decisions, and Draft status | Blocked by HCK-204 |

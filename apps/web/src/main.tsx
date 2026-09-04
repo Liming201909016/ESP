@@ -9,14 +9,43 @@ interface Registry {
   plugins: Array<{ code: string; name: string; version: string; status: string }>;
 }
 
+interface ReviewResult {
+  correlationId: string;
+  caseId: string;
+  state: string;
+  outcome: string;
+  proposedRisk?: string;
+  missingInformation?: string[];
+  evidence: Array<{ evidenceId: string; type: string; sourceId: string; claimReference: string }>;
+  trace: Array<{ sequence: number; skillCode: string; skillVersion: string; pluginCodes: string[]; outcome: string }>;
+}
+
 function App() {
   const [registry, setRegistry] = useState<Registry | null>(null);
+  const [caseId, setCaseId] = useState("SYN-RG-001");
+  const [requestText, setRequestText] = useState("Review this package and produce an evidence-grounded draft.");
+  const [review, setReview] = useState<ReviewResult | null>(null);
+  const [running, setRunning] = useState(false);
 
   useEffect(() => {
     fetch("/api/registry")
       .then((response) => response.json())
       .then(setRegistry);
   }, []);
+
+  async function runReview() {
+    setRunning(true);
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ caseId, request: requestText }),
+      });
+      setReview(await response.json());
+    } finally {
+      setRunning(false);
+    }
+  }
 
   return (
     <main className="shell">
@@ -80,6 +109,59 @@ function App() {
               ))}
             </ul>
           </div>
+        </div>
+      </section>
+
+      <section className="review-console" aria-labelledby="review-title">
+        <div className="review-controls">
+          <div>
+            <p className="section-label">Copilot entry</p>
+            <h2 id="review-title">Run a governed review</h2>
+            <p>Select an included synthetic package. No tenant, secret, or network integration is used.</p>
+          </div>
+
+          <label>
+            Synthetic package
+            <select value={caseId} onChange={(event) => setCaseId(event.target.value)}>
+              <option value="SYN-RG-001">RG happy path</option>
+              <option value="SYN-RG-002">RG missing information</option>
+              <option value="SYN-APP-001">APP happy path</option>
+              <option value="SYN-APP-002">APP prompt injection</option>
+            </select>
+          </label>
+
+          <label>
+            Request
+            <textarea value={requestText} onChange={(event) => setRequestText(event.target.value)} rows={4} />
+          </label>
+
+          <button type="button" onClick={runReview} disabled={running}>
+            {running ? "Running review..." : "Run review"}
+          </button>
+        </div>
+
+        <div className="review-output" aria-live="polite">
+          {!review ? (
+            <div className="empty-state"><span>Awaiting request</span><p>The ordered Skill trace and evidence will appear here.</p></div>
+          ) : (
+            <>
+              <div className="result-summary">
+                <span className="outcome">{review.outcome}</span>
+                <div><strong>{review.state}</strong><small>Correlation {review.correlationId}</small></div>
+              </div>
+              {review.missingInformation?.length ? <div className="result-block"><h3>Needs information</h3><p>{review.missingInformation.join(", ")}</p></div> : null}
+              {review.proposedRisk ? <div className="result-block"><h3>Proposed risk</h3><p>{review.proposedRisk} · analyst confirmation required</p></div> : null}
+              <div className="result-block">
+                <h3>Execution trace</h3>
+                <ol className="trace-list">
+                  {review.trace.map((entry) => (
+                    <li key={entry.sequence}><span>{entry.skillCode}</span><small>v{entry.skillVersion} · {entry.pluginCodes.join(" + ")} · {entry.outcome}</small></li>
+                  ))}
+                </ol>
+              </div>
+              <div className="result-block"><h3>Evidence</h3><p>{review.evidence.length} items retained</p></div>
+            </>
+          )}
         </div>
       </section>
     </main>
