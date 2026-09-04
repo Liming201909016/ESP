@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import struct
 from pathlib import Path
 
 
@@ -12,6 +13,8 @@ DEMO_SCRIPT = DOCS / "00-Hackathon" / "demo-script.md"
 REGISTRATION = DOCS / "00-Hackathon" / "registration-content.md"
 PASTE_READY = DOCS / "00-Hackathon" / "registration-paste-ready.md"
 ADDITIONAL_INFO = DOCS / "00-Hackathon" / "additional-information.md"
+DEMO_DESKTOP = DOCS / "00-Hackathon" / "assets" / "esp-demo-desktop.png"
+DEMO_MOBILE = DOCS / "00-Hackathon" / "assets" / "esp-demo-mobile.png"
 BACKLOG = DOCS / "08-Development" / "hackathon-mvp-backlog.md"
 
 
@@ -48,7 +51,7 @@ def validate_links(errors: list[str]) -> None:
 
 def main() -> None:
     errors: list[str] = []
-    required_files = [BRIEF, PROFILE, DEMO_SCRIPT, REGISTRATION, PASTE_READY, ADDITIONAL_INFO, BACKLOG]
+    required_files = [BRIEF, PROFILE, DEMO_SCRIPT, REGISTRATION, PASTE_READY, ADDITIONAL_INFO, DEMO_DESKTOP, DEMO_MOBILE, BACKLOG]
     for path in required_files:
         if not path.exists():
             errors.append(f"Missing Hackathon document: {path.relative_to(ROOT)}")
@@ -100,10 +103,10 @@ def main() -> None:
     repository_url = "https://github.com/Liming201909016/ESP"
     if repository_url not in registration or repository_url not in brief:
         errors.append("Hackathon registration and project brief must contain the canonical code location")
-    if "public repository contains the validated architecture" not in registration.lower():
-        errors.append("Registration notes must accurately describe the published foundation")
-    if "runnable local vertical slice is under active Hackathon development" not in registration:
-        errors.append("Registration notes must disclose that the runnable vertical slice is still in development")
+    registration_lower = registration.lower()
+    for term in ["public repository", "runnable local vertical slice", "validated architecture"]:
+        if term not in registration_lower:
+            errors.append(f"Registration notes are missing published-status evidence: {term}")
     judge_sections = [
         "### Executive summary",
         "### What makes ESP different",
@@ -150,6 +153,15 @@ def main() -> None:
     for placeholder in ["## Demo URL\n\nTBD", "## Video URL\n\nTBD", "## Team\n\nTBD"]:
         if placeholder not in additional_info:
             errors.append(f"Additional Information does not expose required placeholder: {placeholder.splitlines()[0]}")
+
+    for image, minimum_width in [(DEMO_DESKTOP, 1200), (DEMO_MOBILE, 360)]:
+        header = image.read_bytes()[:24]
+        if len(header) < 24 or header[:8] != b"\x89PNG\r\n\x1a\n":
+            errors.append(f"Demo image is not a valid PNG: {image.relative_to(ROOT)}")
+            continue
+        width, height = struct.unpack(">II", header[16:24])
+        if width < minimum_width or height < 800:
+            errors.append(f"Demo image dimensions are too small: {image.relative_to(ROOT)} {width}x{height}")
 
     skill_codes = set(re.findall(r"LS-SEC-[A-Z-]+", profile))
     plugin_codes = set(re.findall(r"PLG-[A-Z-]+", profile))

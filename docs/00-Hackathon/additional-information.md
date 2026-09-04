@@ -29,7 +29,8 @@ AI platform and reusable enterprise capability architecture, demonstrated throug
 - 36 of 36 mandatory synthetic evaluation assertions passing;
 - seven Power Platform Solution foundations packaging successfully;
 - public GitHub repository available;
-- local browser application and end-to-end Router implementation in active development.
+- local browser application, deterministic Router, four Plugins, analyst disposition, report, trace, and evaluator integration runnable;
+- 10 API integration tests and eight desktop/mobile browser journeys passing.
 
 ## What We Will Demonstrate
 

@@ -1,5 +1,7 @@
 00-Hackathon/demo-script.md
 00-Hackathon/additional-information.md
+00-Hackathon/assets/esp-demo-desktop.png
+00-Hackathon/assets/esp-demo-mobile.png
 00-Hackathon/mvp-delivery-profile.md
 00-Hackathon/project-brief.md
 00-Hackathon/registration-paste-ready.md

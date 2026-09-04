@@ -36,7 +36,7 @@ https://github.com/Liming201909016/ESP
 Repository visibility: Public  
 Expected default branch: `main`
 
-The public repository contains the validated architecture, Skill contracts, synthetic demo assets, evaluation tooling, and Power Platform Solution foundations. The runnable local vertical slice is under active Hackathon development. Final submission requires a clean-clone setup, startup, and evaluation check.
+The public repository contains a runnable local vertical slice plus the validated architecture, Skill contracts, synthetic demo assets, evaluation tooling, and Power Platform Solution foundations. Final submission still requires a clean-clone setup, startup, and evaluation check.
 
 ## Description
 
@@ -164,8 +164,9 @@ The project has executable validation rather than architecture slides alone:
 - the evaluator explicitly reports `pilotEligible=false` for synthetic data;
 - seven Power Platform Solution foundations package successfully for the enterprise scale-out path;
 - the local Node/Express/Ajv foundation has compiled the canonical JSON Schema and passed an HTTP runtime smoke test.
+- 10 API integration tests and eight desktop/mobile browser journeys pass across all four scenarios.
 
-The browser experience, Skill Router, Plugin runtime, analyst workflow, and end-to-end report path remain the active Hackathon build scope.
+The local browser experience, Skill Router, Plugin runtime, analyst workflow, report path, execution trace, and evaluator integration are runnable. Recorded fallback media and optional Connected Mode remain active Hackathon work.
 
 ### What the judges will see
 

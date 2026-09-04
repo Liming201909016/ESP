@@ -147,7 +147,7 @@ The Hackathon deliverable has two modes:
 
 Demo Mode keeps the project reproducible when cloud connectivity is unavailable. Connected Mode demonstrates how the same contracts integrate with enterprise identity, DLP, ALM, telemetry, and governance.
 
-The public repository contains the validated architecture, canonical Skill contracts, positive and negative fixtures, synthetic RG and APP cases, evaluation tooling, and Power Platform Solution foundations. The runnable local vertical slice is under active Hackathon development. Synthetic results do not establish customer validation, Pilot readiness, or production authorization.
+The public repository contains a runnable local vertical slice plus the validated architecture, canonical Skill contracts, positive and negative fixtures, synthetic RG and APP cases, evaluation tooling, and Power Platform Solution foundations. Synthetic results do not establish customer validation, Pilot readiness, or production authorization.
 
 ### Measured progress
 
@@ -159,8 +159,9 @@ The project has executable validation rather than architecture slides alone:
 - the evaluator explicitly reports `pilotEligible=false` for synthetic data;
 - seven Power Platform Solution foundations package successfully for the enterprise scale-out path;
 - the local Node/Express/Ajv foundation has compiled the canonical JSON Schema and passed an HTTP runtime smoke test.
+- 10 API integration tests and eight desktop/mobile browser journeys pass across all four scenarios.
 
-The browser experience, Skill Router, Plugin runtime, analyst workflow, and end-to-end report path remain the active Hackathon build scope.
+The local browser experience, Skill Router, Plugin runtime, analyst workflow, report path, execution trace, and evaluator integration are runnable. Recorded fallback media and optional Connected Mode remain active Hackathon work.
 
 ### What the judges will see
 

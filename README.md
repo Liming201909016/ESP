@@ -128,6 +128,8 @@ flowchart LR
 
 The Security Review path is an explicit state machine. Generative orchestration cannot silently reorder mandatory stages, select `Latest`, bypass a denied source, or replace analyst approval.
 
+![ESP Demo Mode showing the governed Skill and Plugin execution experience](docs/00-Hackathon/assets/esp-demo-desktop.png)
+
 ## Demo Scenarios
 
 The committed synthetic dataset covers:
@@ -157,11 +159,11 @@ Start with:
 | Synthetic RG/APP dataset | Ready, pending Domain SME approval for Pilot use |
 | Foundation evaluation | 36/36 mandatory synthetic assertions passing |
 | Power Platform ALM foundation | Seven Solution projects package successfully |
-| Local browser application | In development |
+| Local browser application | Runnable Demo Mode |
 | Copilot Studio Connected Mode | Optional, environment and governance gated |
 | Pilot or Production | Not authorized |
 
-The repository is currently a validated implementation foundation, not yet the completed runnable Hackathon application. See the [technical feasibility assessment](docs/09-Feasibility/technical-feasibility-assessment.md) for the precise Go/No-Go status.
+The repository now contains the runnable local Hackathon vertical slice: Copilot-style entry, five Skills, four Plugins, evidence, analyst disposition, structured report, trace, and application evaluation. See the [technical feasibility assessment](docs/09-Feasibility/technical-feasibility-assessment.md) for the enterprise Connected Mode and governance status.
 
 ## Data Boundary
 
@@ -205,6 +207,7 @@ npm.cmd run evaluate
 Current validation covers:
 
 - 15 valid and 10 invalid Skill contract examples;
+- 10 API integration tests;
 - four versioned synthetic Security Review cases;
 - 36 mandatory evaluation assertions;
 - eight desktop/mobile browser journeys across four governed scenarios;

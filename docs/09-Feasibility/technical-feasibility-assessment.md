@@ -2,11 +2,11 @@
 
 **Assessment date:** 2026-09-03  
 **Target:** Microsoft Global Hackathon 2026  
-**Overall verdict:** Conditional Go
+**Overall verdict:** Local Demo Go; Connected Mode Conditional Go
 
 ## 1. Decision
 
-The proposed architecture is technically feasible. The repository is ready to begin implementation, but it is not yet a runnable Hackathon MVP.
+The proposed architecture is technically feasible, and the repository contains a runnable local Hackathon MVP using synthetic data. Connected Mode and enterprise promotion remain conditional on environment and governance prerequisites.
 
 | Layer | Verdict | Verified evidence |
 |---|---|---|
@@ -14,11 +14,11 @@ The proposed architecture is technically feasible. The repository is ready to be
 | Local toolchain | Go | Node 24.19.0, npm 11.17.0, Python 3.12.10, Vite 8.2.2, Express 5.2.1, Ajv 8.20.0, and Ajv Formats 3.0.1 are available or resolvable |
 | Synthetic data and evaluation | Go | Four synthetic RG/APP cases validate; Foundation evaluation passes 36/36 mandatory assertions while correctly setting Pilot eligibility to false |
 | Power Platform ALM foundation | Go | PAC 2.11.2 is installed; seven Solution source projects and unmanaged packages validate locally |
-| Runnable local application | No-Go today | No browser application, API, Router, Skill implementation, Plugin implementation, live trace store, or analyst workflow exists yet |
+| Runnable local application | Go | React/Vite and Express provide one-command Demo Mode with five Skills, four Plugins, evidence, analyst disposition, structured report, trace, and evaluation |
 | Copilot Studio Connected Mode | Conditional Go | The platform supports Agent flows, connectors, REST APIs, MCP, and explicit topic calls; tenant connectivity, identity, DLP, and deployment remain gated |
 | Production/Pilot | No-Go | Owners, Runbooks, approved labels/thresholds, data authority, TEST environment, and formal gates remain incomplete |
 
-`Conditional Go` means implementation should proceed with the local synthetic vertical slice. It does not authorize Connected TEST, customer data, Pilot, or Production claims.
+`Local Demo Go` means the synthetic vertical slice is runnable and suitable for Hackathon demonstration. It does not authorize Connected TEST, customer data, Pilot, or Production claims.
 
 ## 2. Local implementation decision
 
@@ -34,7 +34,7 @@ Use a TypeScript monorepo with a browser client and local API:
 
 This stack is suitable because the local Node/npm toolchain and package registry access were verified. It supports one-command startup, a browser UI, shared contracts, deterministic Plugins, and later replacement of local adapters with connected adapters.
 
-An isolated executable smoke test installed the pinned Express/Ajv packages outside the repository, compiled the canonical Draft 2020-12 Skill Schema, accepted a canonical valid request, rejected a canonical invalid request, started an Express API on an ephemeral localhost port, returned a structured health response, and shut down cleanly. This proves the selected contract-validation and HTTP foundation works on the development machine; it does not substitute for the missing MVP application.
+The implementation now passes 10 API integration tests and eight Playwright desktop/mobile journeys across all four governed scenarios. Four real Router runs export evaluator-compatible candidate results and pass the independent Python oracle at 36/36 mandatory assertions with `pilotEligible=false`.
 
 Python remains the source of the existing workbook, dataset-manifest, documentation, and Foundation evaluation tooling. The application must emit candidate results compatible with `Run-SyntheticEvaluation.py`; it must not duplicate the evaluator in a divergent format.
 
@@ -142,15 +142,15 @@ These are Hackathon engineering targets, not enterprise service-level commitment
 
 ## 9. Implementation gates
 
-### Gate A: walking skeleton
+### Gate A: walking skeleton - Passed
 
 Pass when one command starts web/API, the registry loads 5/4 pinned entries, health is visible, and one request returns a traced response.
 
-### Gate B: RG vertical slice
+### Gate B: RG vertical slice - Passed
 
 Pass when RG happy and missing-input cases complete through analyst disposition and draft report with evidence.
 
-### Gate C: complete demo
+### Gate C: complete demo - Passed
 
 Pass when APP happy and prompt-injection cases pass, candidate results feed the existing evaluator, and desktop/mobile E2E checks pass.
 
@@ -160,4 +160,4 @@ Pass only after Demo Mode is green and the Power Platform environment, identity,
 
 ## 10. Conclusion
 
-Proceed with local implementation. Do not claim the repository is runnable until Gate A passes, or demo-ready until Gate C passes. Do not let Dataverse provisioning or Connected Mode delay Gates A-C.
+The local MVP is runnable and demo-ready under the synthetic-data boundary. Continue with recorded fallback media and optional Connected Mode. Do not interpret Gate C as customer validation, Pilot approval, or Production authorization.
