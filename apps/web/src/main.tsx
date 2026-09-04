@@ -117,8 +117,8 @@ function App() {
         <div className="status-panel">
           <span className="status-dot" aria-hidden="true" />
           <div>
-            <strong>Walking skeleton ready</strong>
-            <p>Web experience and Skill Router API are available locally.</p>
+            <strong>Demo workflow ready</strong>
+            <p>Four governed scenarios, analyst review, reports, traces, and evaluation run locally.</p>
           </div>
         </div>
       </section>
