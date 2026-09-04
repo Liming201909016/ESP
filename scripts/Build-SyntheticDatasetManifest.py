@@ -16,6 +16,11 @@ DATASET_PATH = DATASET_ROOT / "v1.0.0" / "dataset.json"
 MANIFEST_PATH = DATASET_PATH.parent / "manifest.json"
 
 
+def canonical_json_hash(value: object) -> str:
+    content = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("ascii")
+    return hashlib.sha256(content).hexdigest()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true", help="Validate the existing manifest without rewriting it")
@@ -32,7 +37,7 @@ def main() -> None:
         raise ValueError("Dataset case IDs must be unique")
     request_types = Counter(case["requestType"] for case in dataset["cases"])
     categories = Counter(case["category"] for case in dataset["cases"])
-    digest = hashlib.sha256(DATASET_PATH.read_bytes()).hexdigest()
+    digest = canonical_json_hash(dataset)
     manifest = {
         "datasetCode": dataset["datasetCode"],
         "version": dataset["version"],

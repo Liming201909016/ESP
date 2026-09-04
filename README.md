@@ -204,6 +204,12 @@ npm.cmd run test:e2e
 npm.cmd run evaluate
 ```
 
+Validate setup from a fresh local clone:
+
+```powershell
+.\scripts\Test-CleanClone.ps1
+```
+
 Current validation covers:
 
 - 15 valid and 10 invalid Skill contract examples;

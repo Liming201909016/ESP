@@ -22,6 +22,11 @@ def load_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def canonical_json_hash(value: Any) -> str:
+    content = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("ascii")
+    return hashlib.sha256(content).hexdigest()
+
+
 def assert_schema(instance: Any, schema_path: Path) -> None:
     schema = load_json(schema_path)
     Draft202012Validator.check_schema(schema)
@@ -70,7 +75,7 @@ def main() -> None:
     dataset_manifest = load_json(DATASET_MANIFEST_PATH)
     results = load_json(arguments.results)
     assert_schema(results, RESULTS_SCHEMA_PATH)
-    dataset_hash = hashlib.sha256(DATASET_PATH.read_bytes()).hexdigest()
+    dataset_hash = canonical_json_hash(dataset)
     if dataset_hash != dataset_manifest["sha256"]:
         raise ValueError("Dataset hash does not match its manifest")
 
