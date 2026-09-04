@@ -9,6 +9,11 @@
   box-sizing: border-box;
 }
 
+:where(button, select, textarea):focus-visible {
+  outline: 3px solid #126f99;
+  outline-offset: 3px;
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -577,6 +582,10 @@ h1 {
   font-size: 2rem;
 }
 
+.evaluation-band .section-label {
+  color: #b8c8c0;
+}
+
 .evaluation-band > div > p:last-child,
 .evaluation-note {
   color: #b8c8c0;
@@ -681,4 +690,27 @@ h1 {
   .intro h2 {
     font-size: 2.65rem;
   }
+}
+
+.error-panel {
+  color: #8a251f;
+  border-color: #c8756f;
+}
+
+.error-panel .status-dot {
+  background: #a8322a;
+  box-shadow: 0 0 0 5px #f2d9d6;
+}
+
+.error-panel button {
+  min-height: 36px;
+  margin-top: 12px;
+  padding: 0 14px;
+  border: 1px solid #a8322a;
+  border-radius: 4px;
+  color: #7c211b;
+  background: #fff7f6;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
 }

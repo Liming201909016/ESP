@@ -59,6 +59,8 @@ if ($errors.Count -eq 0) {
         if ($LASTEXITCODE -ne 0) { Add-CheckError 'Hackathon application build failed.' }
         & $npm test
         if ($LASTEXITCODE -ne 0) { Add-CheckError 'Hackathon application tests failed.' }
+        & $npm run measure:performance
+        if ($LASTEXITCODE -ne 0) { Add-CheckError 'Hackathon application performance targets failed.' }
     }
 
     $solutionManifest = Get-Content (Join-Path $repoRoot 'config\solution-manifest.json') -Raw | ConvertFrom-Json

@@ -42,7 +42,7 @@ try {
   const review = await (await fetch(`${baseUrl}/api/reviews`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ caseId: "SYN-RG-001" }),
+    body: JSON.stringify({ caseId: "SYN-RG-001", request: "Perform an evidence-grounded security review.", consumerBindingCode: "CB-ESP-DEMO-001" }),
   })).json();
 
   if (!rootResponse.ok || !html.includes("Enterprise Skill Platform")) throw new Error("Built UI was not served");

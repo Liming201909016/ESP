@@ -11,6 +11,8 @@
     "export:evaluation": "tsx src/export-evaluation.ts ../../artifacts/evaluation-runs/app-candidate-results.json"
   },
   "dependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "cors": "2.8.5",
     "express": "5.2.1"
   },

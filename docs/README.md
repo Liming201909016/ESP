@@ -86,8 +86,9 @@ The package contains Hackathon submission and demo guidance, enterprise architec
 25. `04-Governance/architecture-baseline-v1.0.md`
 26. `08-Development/hackathon-mvp-backlog.md`
 27. `08-Development/foundation-backlog.md`
-28. `09-Feasibility/technical-feasibility-assessment.md`
-29. `09-Feasibility/adr-001-local-mvp-stack.md`
+28. `08-Development/mvp-hardening-backlog.md`
+29. `09-Feasibility/technical-feasibility-assessment.md`
+30. `09-Feasibility/adr-001-local-mvp-stack.md`
 
 ## 5. Design principles
 

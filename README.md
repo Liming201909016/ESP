@@ -190,7 +190,7 @@ npm.cmd run dev
 
 Open `http://127.0.0.1:5173`. The API health endpoint remains available at `http://127.0.0.1:8787/api/health`.
 
-The current walking skeleton provides the local browser shell and API boundary. Skill Router and Plugin behavior are implemented in the next Hackathon backlog slice.
+The current Demo Mode provides the complete local Hackathon workflow: governed routing, pinned Consumer Bindings, five Skills, four Plugins, evidence, analyst disposition, cited reports, persistence, evaluation, and operational checks.
 
 ## Validation
 
@@ -226,10 +226,10 @@ Validate setup from a fresh local clone:
 Current validation covers:
 
 - 15 valid and 10 invalid Skill contract examples;
-- 10 API integration tests;
+- 21 API integration tests;
 - four versioned synthetic Security Review cases;
 - 36 mandatory evaluation assertions;
-- eight desktop/mobile browser journeys across four governed scenarios;
+- 16 desktop/mobile browser journeys covering governed scenarios, error recovery, accessibility, and keyboard operation;
 - Hackathon registration and documentation consistency;
 - Dataverse workbook hash and semantic checks;
 - seven Power Platform Solution project identities.

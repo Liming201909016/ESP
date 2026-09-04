@@ -25,6 +25,11 @@ export interface EvidenceItem {
   claimReference: string;
 }
 
+export interface ExtractedFact {
+  claimReference: string;
+  sourceId: string;
+}
+
 const datasetUrl = new URL("../../../test-data/security-review/v1.0.0/dataset.json", import.meta.url);
 
 export async function loadCase(caseId: string): Promise<DatasetCase> {
@@ -44,7 +49,47 @@ export const documentSourcePlugin = {
       materialComplete: selectedCase.input.documents.length > 0,
     };
   },
+  extractFacts(
+    requestType: DatasetCase["requestType"],
+    category: string,
+    documents: DatasetCase["input"]["documents"],
+  ): ExtractedFact[] {
+    const facts: ExtractedFact[] = [];
+    for (const document of documents) {
+      const content = document.content;
+      if (requestType === "RG") {
+        if (Array.isArray(content.resources) && content.resources.length) facts.push({ claimReference: "resource list", sourceId: document.documentId });
+        if (typeof content.region === "string") facts.push({ claimReference: "region", sourceId: document.documentId });
+        if (Array.isArray(content.identities) && content.identities.length) facts.push({ claimReference: "identity", sourceId: document.documentId });
+        if (typeof content.networkExposure === "string") facts.push({ claimReference: "network exposure", sourceId: document.documentId });
+        if (Array.isArray(content.permissions) && content.permissions.length) facts.push({ claimReference: "permission list", sourceId: document.documentId });
+      } else {
+        if (typeof content.signInAudience === "string") facts.push({ claimReference: "sign-in audience", sourceId: document.documentId });
+        if (Array.isArray(content.permissions) && content.permissions.length) {
+          facts.push({ claimReference: category === "PromptInjection" ? "requested permission" : "permission name", sourceId: document.documentId });
+        }
+        if (typeof content.permissionType === "string") facts.push({ claimReference: "permission type", sourceId: document.documentId });
+        if (Array.isArray(content.redirectUris) && content.redirectUris.length) facts.push({ claimReference: "redirect URI", sourceId: document.documentId });
+      }
+    }
+    return facts;
+  },
 };
+
+function stringValues(value: unknown): string[] {
+  if (typeof value === "string") return [value];
+  if (Array.isArray(value)) return value.flatMap(stringValues);
+  if (value && typeof value === "object") return Object.values(value).flatMap(stringValues);
+  return [];
+}
+
+export function containsPromptInjection(value: unknown) {
+  const patterns = [
+    /\b(ignore|bypass|override|disregard)\b.{0,100}\b(governance|instruction|policy|evidence|approval)\b/i,
+    /\b(mark|declare)\b.{0,60}\bapproved\b.{0,60}\bwithout\b.{0,30}\bevidence\b/i,
+  ];
+  return stringValues(value).some((text) => patterns.some((pattern) => pattern.test(text)));
+}
 
 export const runbookPlugin = {
   code: "PLG-RUNBOOK",

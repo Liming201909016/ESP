@@ -4,8 +4,9 @@ import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
 import { getRegistry } from "./registry.js";
+import { assertRouterRequest } from "./router-contract.js";
 import { generateCandidateResults, getEvaluationSummary } from "./evaluation.js";
-import { applyAnalystDisposition, runSecurityReview, type AnalystDecision } from "./workflow.js";
+import { applyAnalystDisposition, getReview, runBoundDocumentIntake, runSecurityReview, type AnalystDecision } from "./workflow.js";
 
 export function createApp() {
   const app = express();
@@ -46,18 +47,40 @@ export function createApp() {
 
   app.post("/api/reviews", async (request, response, next) => {
     try {
-      const caseId = request.body?.caseId;
-      if (typeof caseId !== "string" || !caseId) {
-        response.status(400).json({ error: "caseId is required" });
-        return;
-      }
-      response.json(await runSecurityReview(caseId));
+      assertRouterRequest(request.body);
+      response.json(await runSecurityReview(request.body.caseId, request.body.request, request.body.consumerBindingCode));
     } catch (error) {
       next(error);
     }
   });
 
-  app.post("/api/reviews/:correlationId/disposition", (request, response, next) => {
+  app.post("/api/skill-invocations/document-intake", async (request, response, next) => {
+    try {
+      const { caseId, request: requestText, consumerBindingCode } = request.body ?? {};
+      if (typeof caseId !== "string" || typeof requestText !== "string" || typeof consumerBindingCode !== "string") {
+        response.status(400).json({ error: "caseId, request, and consumerBindingCode are required" });
+        return;
+      }
+      response.json(await runBoundDocumentIntake(caseId, requestText, consumerBindingCode));
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/reviews/:correlationId", async (request, response, next) => {
+    try {
+      const review = await getReview(request.params.correlationId);
+      if (!review) {
+        response.status(404).json({ error: `Review not found: ${request.params.correlationId}` });
+        return;
+      }
+      response.json(review);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/reviews/:correlationId/disposition", async (request, response, next) => {
     try {
       const decisions: AnalystDecision[] = ["Accept", "Modify", "Reject", "Escalate", "CannotAssess"];
       const decision = request.body?.decision as AnalystDecision;
@@ -66,7 +89,7 @@ export function createApp() {
         response.status(400).json({ error: "A valid decision and rationale are required" });
         return;
       }
-      response.json(applyAnalystDisposition(request.params.correlationId, decision, rationale.trim(), request.body?.finalRisk));
+      response.json(await applyAnalystDisposition(request.params.correlationId, decision, rationale.trim(), request.body?.finalRisk));
     } catch (error) {
       next(error);
     }
@@ -78,7 +101,7 @@ export function createApp() {
   app.use((error: unknown, _request: express.Request, response: express.Response, _next: express.NextFunction) => {
     const message = error instanceof Error ? error.message : "Unexpected error";
     const status = message.startsWith("Unknown synthetic case") || message.startsWith("Review not found") ? 404
-      : message.includes("required") || message.includes("not awaiting") ? 400
+      : message.includes("required") || message.includes("not awaiting") || message.includes("Consumer Binding") || message.includes("does not permit") || message.includes("citations do not resolve") || message.includes("request contract violation") ? 400
       : 500;
     response.status(status).json({ error: message });
   });

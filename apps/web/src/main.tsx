@@ -22,6 +22,8 @@ interface EvaluationSummary {
 interface ReviewResult {
   correlationId: string;
   caseId: string;
+  consumer: { code: string; name: string };
+  consumerBinding: { code: string; status: string };
   state: string;
   outcome: string;
   proposedRisk?: string;
@@ -44,6 +46,25 @@ interface ReviewResult {
   analystDisposition?: { decision: string; rationale: string; finalRisk?: string };
 }
 
+async function fetchJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
+  const response = await fetch(input, init);
+  const text = await response.text();
+  if (!response.ok) {
+    let detail = "";
+    try {
+      detail = (JSON.parse(text) as { error?: string }).error ?? "";
+    } catch {
+      detail = text;
+    }
+    throw new Error(detail || `Request failed (${response.status})`);
+  }
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new Error("The service returned an invalid response.");
+  }
+}
+
 function App() {
   const [registry, setRegistry] = useState<Registry | null>(null);
   const [evaluation, setEvaluation] = useState<EvaluationSummary | null>(null);
@@ -54,25 +75,39 @@ function App() {
   const [analystRationale, setAnalystRationale] = useState("Reviewed against the cited evidence and synthetic Runbook.");
   const [finalRisk, setFinalRisk] = useState("Medium");
   const [dispositionRunning, setDispositionRunning] = useState(false);
+  const [startupError, setStartupError] = useState("");
+  const [reviewError, setReviewError] = useState("");
 
   useEffect(() => {
-    fetch("/api/registry")
-      .then((response) => response.json())
-      .then(setRegistry);
-    fetch("/api/evaluation/summary")
-      .then((response) => response.json())
-      .then(setEvaluation);
+    void loadDashboard();
   }, []);
+
+  async function loadDashboard() {
+    setStartupError("");
+    try {
+      const [nextRegistry, nextEvaluation] = await Promise.all([
+        fetchJson<Registry>("/api/registry"),
+        fetchJson<EvaluationSummary>("/api/evaluation/summary"),
+      ]);
+      setRegistry(nextRegistry);
+      setEvaluation(nextEvaluation);
+    } catch (error) {
+      setStartupError(error instanceof Error ? error.message : "Unable to load Demo status.");
+    }
+  }
 
   async function runReview() {
     setRunning(true);
+    setReviewError("");
     try {
-      const response = await fetch("/api/reviews", {
+      const result = await fetchJson<ReviewResult>("/api/reviews", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ caseId, request: requestText }),
+        body: JSON.stringify({ caseId, request: requestText, consumerBindingCode: "CB-ESP-DEMO-001" }),
       });
-      setReview(await response.json());
+      setReview(result);
+    } catch (error) {
+      setReviewError(error instanceof Error ? error.message : "Unable to run the review.");
     } finally {
       setRunning(false);
     }
@@ -81,13 +116,16 @@ function App() {
   async function submitDisposition(decision: string) {
     if (!review) return;
     setDispositionRunning(true);
+    setReviewError("");
     try {
-      const response = await fetch(`/api/reviews/${review.correlationId}/disposition`, {
+      const result = await fetchJson<ReviewResult>(`/api/reviews/${review.correlationId}/disposition`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ decision, rationale: analystRationale, finalRisk }),
       });
-      setReview(await response.json());
+      setReview(result);
+    } catch (error) {
+      setReviewError(error instanceof Error ? error.message : "Unable to save the analyst disposition.");
     } finally {
       setDispositionRunning(false);
     }
@@ -114,11 +152,12 @@ function App() {
           </p>
         </div>
 
-        <div className="status-panel">
+        <div className={`status-panel${startupError ? " error-panel" : ""}`} role={startupError ? "alert" : undefined}>
           <span className="status-dot" aria-hidden="true" />
           <div>
-            <strong>Demo workflow ready</strong>
-            <p>Four governed scenarios, analyst review, reports, traces, and evaluation run locally.</p>
+            <strong>{startupError ? "Demo status unavailable" : "Demo workflow ready"}</strong>
+            <p>{startupError || "Four governed scenarios, analyst review, reports, traces, and evaluation run locally."}</p>
+            {startupError ? <button type="button" onClick={loadDashboard}>Retry status</button> : null}
           </div>
         </div>
       </section>
@@ -187,13 +226,24 @@ function App() {
         </div>
 
         <div className="review-output" aria-live="polite">
+          {reviewError ? (
+            <div className="result-block error-panel" role="alert">
+              <h3>Request failed</h3>
+              <p>{reviewError}</p>
+              <button type="button" onClick={runReview} disabled={running}>Retry review</button>
+            </div>
+          ) : null}
           {!review ? (
             <div className="empty-state"><span>Awaiting request</span><p>The ordered Skill trace and evidence will appear here.</p></div>
           ) : (
             <>
               <div className="result-summary">
                 <span className="outcome">{review.outcome}</span>
-                <div><strong>{review.state}</strong><small>Correlation {review.correlationId}</small></div>
+                <div>
+                  <strong>{review.state}</strong>
+                  <small>{review.consumer.name} · {review.consumerBinding.code} ({review.consumerBinding.status})</small>
+                  <small>Correlation {review.correlationId}</small>
+                </div>
               </div>
               {review.missingInformation?.length ? <div className="result-block"><h3>Needs information</h3><p>{review.missingInformation.join(", ")}</p></div> : null}
               {review.proposedRisk ? <div className="result-block"><h3>Proposed risk</h3><p>{review.proposedRisk} · analyst confirmation required</p></div> : null}

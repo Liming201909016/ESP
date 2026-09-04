@@ -17,6 +17,23 @@ export interface PluginRegistration {
   status: RegistryStatus;
 }
 
+export interface ConsumerBinding {
+  code: string;
+  consumerCode: string;
+  status: "Active" | "Suspended";
+  skillCodes: string[];
+}
+
+export const consumers = [
+  { code: "CON-SEC-REVIEW-AGENT", name: "Security Review Copilot", type: "Copilot" },
+  { code: "CON-ARCH-REVIEW", name: "Architecture Review Workflow", type: "Workflow" },
+] as const;
+
+export const bindings: ConsumerBinding[] = [
+  { code: "CB-ESP-DEMO-001", consumerCode: "CON-SEC-REVIEW-AGENT", status: "Active", skillCodes: ["LS-SEC-DOC-INTAKE", "LS-SEC-EVIDENCE-EXTRACT", "LS-SEC-REVIEW", "LS-SEC-RISK-RATING", "LS-SEC-REPORT-GEN"] },
+  { code: "CB-ARCH-DEMO-001", consumerCode: "CON-ARCH-REVIEW", status: "Active", skillCodes: ["LS-SEC-DOC-INTAKE", "LS-SEC-EVIDENCE-EXTRACT"] },
+];
+
 export const plugins: PluginRegistration[] = [
   { code: "PLG-DOC-SOURCE", name: "Document Source", version: "1.0.0", mode: "Demo", status: "healthy" },
   { code: "PLG-RUNBOOK", name: "Runbook", version: "1.0.0", mode: "Demo", status: "healthy" },
@@ -50,6 +67,16 @@ export function validateRegistry() {
     if (!/^\d+\.\d+\.\d+$/.test(plugin.version)) errors.push(`${plugin.code} has an invalid version`);
   }
 
+  const consumerCodes = new Set<string>(consumers.map((consumer) => consumer.code));
+  const bindingCodes = new Set(bindings.map((binding) => binding.code));
+  if (bindingCodes.size !== bindings.length) errors.push("Consumer Binding codes must be unique");
+  for (const binding of bindings) {
+    if (!consumerCodes.has(binding.consumerCode)) errors.push(`${binding.code} references an unavailable Consumer`);
+    for (const skillCode of binding.skillCodes) {
+      if (!skillCodes.has(skillCode)) errors.push(`${binding.code} references unavailable Skill ${skillCode}`);
+    }
+  }
+
   if (errors.length) throw new Error(errors.join("; "));
 }
 
@@ -60,5 +87,17 @@ export function getRegistry() {
     status: plugins.every((plugin) => plugin.status === "healthy") ? "healthy" as const : "degraded" as const,
     skills,
     plugins,
+    consumers,
+    bindings,
   };
+}
+
+export function resolveBinding(bindingCode: string, requiredSkillCodes: string[]) {
+  const binding = bindings.find((candidate) => candidate.code === bindingCode);
+  if (!binding || binding.status !== "Active") throw new Error(`Active Consumer Binding not found: ${bindingCode}`);
+  const missingSkills = requiredSkillCodes.filter((skillCode) => !binding.skillCodes.includes(skillCode));
+  if (missingSkills.length) throw new Error(`${bindingCode} does not permit Skills: ${missingSkills.join(", ")}`);
+  const consumer = consumers.find((candidate) => candidate.code === binding.consumerCode);
+  if (!consumer) throw new Error(`Consumer not found: ${binding.consumerCode}`);
+  return { binding, consumer };
 }

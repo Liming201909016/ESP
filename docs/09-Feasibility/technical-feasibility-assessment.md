@@ -34,7 +34,7 @@ Use a TypeScript monorepo with a browser client and local API:
 
 This stack is suitable because the local Node/npm toolchain and package registry access were verified. It supports one-command startup, a browser UI, shared contracts, deterministic Plugins, and later replacement of local adapters with connected adapters.
 
-The implementation now passes 10 API integration tests and eight Playwright desktop/mobile journeys across all four governed scenarios. Four real Router runs export evaluator-compatible candidate results and pass the independent Python oracle at 36/36 mandatory assertions with `pilotEligible=false`.
+The implementation now passes 21 API integration tests and 16 Playwright desktop/mobile journeys across governed scenarios, error recovery, accessibility, and keyboard operation. Four real Router runs export evaluator-compatible candidate results and pass the independent Python oracle at 36/36 mandatory assertions with `pilotEligible=false`.
 
 Python remains the source of the existing workbook, dataset-manifest, documentation, and Foundation evaluation tooling. The application must emit candidate results compatible with `Run-SyntheticEvaluation.py`; it must not duplicate the evaluator in a divergent format.
 

@@ -30,7 +30,7 @@ AI platform and reusable enterprise capability architecture, demonstrated throug
 - seven Power Platform Solution foundations packaging successfully;
 - public GitHub repository available;
 - local browser application, deterministic Router, four Plugins, analyst disposition, report, trace, and evaluator integration runnable;
-- 10 API integration tests and eight desktop/mobile browser journeys passing.
+- 21 API integration tests and 16 desktop/mobile browser journeys passing.
 - clean-clone installation, build, browser tests, and 36/36 evaluation reproduced successfully.
 
 ## What We Will Demonstrate
@@ -89,13 +89,13 @@ TBD after `docs/00-Hackathon/assets/esp-demo-fallback.webm` is uploaded to an ap
 
 ## Team
 
-TBD: add team member names, aliases, roles, and organizational affiliations as required by the form.
+- Liming - Project Manager - Microsoft
 
 ## Submission Checklist
 
 - select the exact Executive Challenge from the Innovation Studio list;
 - select up to five exact Topic Challenge names;
-- replace Team, Demo URL, and Video URL placeholders;
+- replace Demo URL and Video URL placeholders;
 - confirm the public repository contains the runnable source;
 - rerun clean-clone validation against the final submission commit;
 - attach screenshots that show the Copilot entry, evidence, trace, analyst review, and draft report;

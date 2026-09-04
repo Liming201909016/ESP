@@ -1,4 +1,5 @@
 .venv/
+.esp-data/
 node_modules/
 __pycache__/
 *.py[cod]
