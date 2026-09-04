@@ -19,6 +19,9 @@ interface ReviewResult {
   evidence: Array<{ evidenceId: string; type: string; sourceId: string; claimReference: string }>;
   trace: Array<{ sequence: number; skillCode: string; skillVersion: string; pluginCodes: string[]; outcome: string }>;
   safety?: { promptInjectionDetected: boolean; promptInjectionIgnored: boolean; governanceOverrideAllowed: boolean };
+  report?: { reportId: string; status: string; citationsPreserved: boolean };
+  analystReviewRequired?: boolean;
+  analystDisposition?: { decision: string; rationale: string; finalRisk?: string };
 }
 
 function App() {
@@ -27,6 +30,9 @@ function App() {
   const [requestText, setRequestText] = useState("Review this package and produce an evidence-grounded draft.");
   const [review, setReview] = useState<ReviewResult | null>(null);
   const [running, setRunning] = useState(false);
+  const [analystRationale, setAnalystRationale] = useState("Reviewed against the cited evidence and synthetic Runbook.");
+  const [finalRisk, setFinalRisk] = useState("Medium");
+  const [dispositionRunning, setDispositionRunning] = useState(false);
 
   useEffect(() => {
     fetch("/api/registry")
@@ -45,6 +51,21 @@ function App() {
       setReview(await response.json());
     } finally {
       setRunning(false);
+    }
+  }
+
+  async function submitDisposition(decision: string) {
+    if (!review) return;
+    setDispositionRunning(true);
+    try {
+      const response = await fetch(`/api/reviews/${review.correlationId}/disposition`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ decision, rationale: analystRationale, finalRisk }),
+      });
+      setReview(await response.json());
+    } finally {
+      setDispositionRunning(false);
     }
   }
 
@@ -180,6 +201,34 @@ function App() {
                   </ul>
                 ) : <p>No evidence emitted before the governed stop.</p>}
               </div>
+              {review.state === "AwaitingAnalystDisposition" ? (
+                <div className="analyst-panel">
+                  <h3>Analyst disposition</h3>
+                  <label>
+                    Final risk
+                    <select value={finalRisk} onChange={(event) => setFinalRisk(event.target.value)}>
+                      {['Blocker', 'High', 'Medium', 'Low', 'Info', 'Unrated'].map((risk) => <option key={risk}>{risk}</option>)}
+                    </select>
+                  </label>
+                  <label>
+                    Rationale
+                    <textarea value={analystRationale} onChange={(event) => setAnalystRationale(event.target.value)} rows={3} />
+                  </label>
+                  <div className="decision-actions">
+                    {['Accept', 'Modify', 'Reject', 'Escalate', 'CannotAssess'].map((decision) => (
+                      <button key={decision} type="button" disabled={dispositionRunning} onClick={() => submitDisposition(decision)}>
+                        {decision === 'CannotAssess' ? 'Cannot assess' : decision}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : review.analystDisposition ? (
+                <div className="analyst-panel completed-disposition">
+                  <h3>Human decision retained</h3>
+                  <p><strong>{review.analystDisposition.decision}</strong> · {review.analystDisposition.rationale}</p>
+                  <p>Final risk: {review.analystDisposition.finalRisk ?? "Not assigned"} · Report: {review.report?.status}</p>
+                </div>
+              ) : null}
             </>
           )}
         </div>

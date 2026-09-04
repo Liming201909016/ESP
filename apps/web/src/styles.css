@@ -390,6 +390,85 @@ h1 {
   overflow-wrap: anywhere;
 }
 
+.analyst-panel {
+  padding: 24px 0;
+}
+
+.analyst-panel h3 {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.analyst-panel label {
+  display: block;
+  margin-top: 14px;
+  color: #384b43;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.analyst-panel select,
+.analyst-panel textarea {
+  width: 100%;
+  margin-top: 6px;
+  border: 1px solid #aab9b0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.72);
+  font: inherit;
+}
+
+.analyst-panel select {
+  height: 42px;
+  padding: 0 10px;
+}
+
+.analyst-panel textarea {
+  resize: vertical;
+  min-height: 82px;
+  padding: 10px;
+}
+
+.decision-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.decision-actions button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid #769184;
+  border-radius: 4px;
+  color: #14503e;
+  background: transparent;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.decision-actions button:first-child,
+.decision-actions button:nth-child(2) {
+  color: #ffffff;
+  background: #14503e;
+}
+
+.decision-actions button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.completed-disposition {
+  border-bottom: 1px solid #9db3a7;
+}
+
+.completed-disposition p {
+  color: #496259;
+  line-height: 1.5;
+}
+
 @media (max-width: 760px) {
   .shell {
     width: min(100% - 28px, 1180px);

@@ -110,4 +110,36 @@ describe("health endpoint", () => {
     expect(body.proposedRisk).toBe("High");
     expect(body.trace).toHaveLength(5);
   });
+
+  it("accepts the proposed risk and finalizes the report with HumanDecision evidence", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const baseUrl = `http://127.0.0.1:${address.port}`;
+    const review = await (await fetch(`${baseUrl}/api/reviews`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ caseId: "SYN-RG-001" }),
+    })).json();
+    const disposition = await (await fetch(`${baseUrl}/api/reviews/${review.correlationId}/disposition`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ decision: "Accept", rationale: "Evidence reviewed" }),
+    })).json();
+
+    expect(disposition).toMatchObject({ state: "Completed", outcome: "Success", report: { status: "Final" } });
+    expect(disposition.evidence).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: "HumanDecision", claimReference: "disposition:Accept" }),
+    ]));
+  });
+
+  it("keeps the report Draft when the analyst marks Cannot Assess", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const baseUrl = `http://127.0.0.1:${address.port}`;
+    const review = await (await fetch(`${baseUrl}/api/reviews`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ caseId: "SYN-APP-001" }),
+    })).json();
+    const disposition = await (await fetch(`${baseUrl}/api/reviews/${review.correlationId}/disposition`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ decision: "CannotAssess", rationale: "Evidence requires clarification" }),
+    })).json();
+
+    expect(disposition).toMatchObject({ state: "CannotAssess", outcome: "CannotAssess", report: { status: "Draft" } });
+    expect(disposition.analystDisposition.finalRisk).toBeUndefined();
+  });
 });
