@@ -56,7 +56,7 @@ On 2026-09-04, Azure CLI resource-group `what-if` completed with status `Succeed
 - FTP and SCM basic publishing credential policies;
 - Web App application settings.
 
-The preview did not create or modify Azure resources. Azure Developer CLI 1.33.0 ARM64 installation remained pending because GitHub asset downloads were intermittent; the successful Azure CLI `what-if` evaluated the same compiled Bicep template.
+The preview did not create or modify Azure resources. Azure Developer CLI 1.33.0 ARM64 was installed from the official alpha release archive after verifying SHA-256 `27dbc0b69c7facff26cd174ab5f16f07a39c029b8c11a41dd945fab6a6cd0c58`. The local `esp-demo` azd environment was created and pinned to the approved subscription and region. On this Windows ARM64 machine, `azd provision --preview` did not complete, so the successful Azure CLI `what-if` against the same compiled Bicep template is the authoritative preview evidence. Azure Resource Graph reconfirmed zero App Service Plans and zero Web Apps after both preview attempts.
 
 After deployment, validate the `SERVICE_WEB_URI` output, `/api/health`, all four synthetic scenarios, analyst disposition, persistence after restart, and App Service logs. Keep one instance because the Demo review store uses one JSON file with a process-local write queue.
 
