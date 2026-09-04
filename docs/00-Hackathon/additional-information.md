@@ -73,7 +73,7 @@ AI platform and reusable enterprise capability architecture, demonstrated throug
 
 ## Help Wanted
 
-We welcome contributors who can help complete the local Copilot experience, deterministic Skill Router, Plugin adapters, evidence/trace views, responsive UX, Connected Mode adapters, and the final demo video.
+We welcome contributors who can help with Connected Mode adapters, Power Platform integration, security review subject-matter validation, and future enterprise scale-out.
 
 ## Repository
 
@@ -85,7 +85,7 @@ https://app-esp-esp-demo-vw6mjjpc4xh64.azurewebsites.net/
 
 ## Video URL
 
-TBD after `docs/00-Hackathon/assets/esp-demo-fallback.webm` is uploaded to an approved shareable location.
+https://github.com/Liming201909016/ESP/blob/main/docs/00-Hackathon/assets/esp-demo-fallback.webm
 
 ## Team
 
@@ -95,7 +95,6 @@ TBD after `docs/00-Hackathon/assets/esp-demo-fallback.webm` is uploaded to an ap
 
 - select the exact Executive Challenge from the Innovation Studio list;
 - select up to five exact Topic Challenge names;
-- replace the Video URL placeholder;
 - confirm the public repository contains the runnable source;
 - rerun clean-clone validation against the final submission commit;
 - attach screenshots that show the Copilot entry, evidence, trace, analyst review, and draft report;
