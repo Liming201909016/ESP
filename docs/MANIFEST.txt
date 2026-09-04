@@ -1,5 +1,6 @@
 00-Hackathon/demo-script.md
 00-Hackathon/additional-information.md
+00-Hackathon/azure-deployment.md
 00-Hackathon/assets/esp-demo-desktop.png
 00-Hackathon/assets/esp-demo-fallback.webm
 00-Hackathon/assets/esp-demo-mobile.png

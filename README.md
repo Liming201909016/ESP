@@ -152,6 +152,7 @@ Start with:
 - [MVP delivery profile](docs/00-Hackathon/mvp-delivery-profile.md)
 - [Hackathon backlog](docs/08-Development/hackathon-mvp-backlog.md)
 - [Five-minute demo script](docs/00-Hackathon/demo-script.md)
+- [Azure Demo deployment plan](docs/00-Hackathon/azure-deployment.md)
 
 ## Current Status
 

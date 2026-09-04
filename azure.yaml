@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://aka.ms/azure.yaml.json
+name: esp-hackathon-demo
+resourceGroup: ESP
+
+requiredVersions:
+  azd: ">= 1.20.0"
+
+infra:
+  provider: bicep
+  path: infra
+
+services:
+  web:
+    project: .
+    language: js
+    host: appservice
+    resourceName: ${SERVICE_WEB_RESOURCE_NAME}

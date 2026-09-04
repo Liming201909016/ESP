@@ -1,4 +1,5 @@
 .venv/
+.azure/
 .esp-data/
 node_modules/
 __pycache__/
@@ -11,6 +12,7 @@ __pycache__/
 
 artifacts/
 dist/
+infra/main.json
 playwright-report/
 test-results/
 bin/
