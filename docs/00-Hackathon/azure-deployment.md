@@ -58,7 +58,22 @@ On 2026-09-04, Azure CLI resource-group `what-if` completed with status `Succeed
 
 The preview did not create or modify Azure resources. Azure Developer CLI 1.33.0 ARM64 was installed from the official alpha release archive after verifying SHA-256 `27dbc0b69c7facff26cd174ab5f16f07a39c029b8c11a41dd945fab6a6cd0c58`. The local `esp-demo` azd environment was created and pinned to the approved subscription and region. On this Windows ARM64 machine, `azd provision --preview` did not complete, so the successful Azure CLI `what-if` against the same compiled Bicep template is the authoritative preview evidence. Azure Resource Graph reconfirmed zero App Service Plans and zero Web Apps after both preview attempts.
 
-After deployment, validate the `SERVICE_WEB_URI` output, `/api/health`, all four synthetic scenarios, analyst disposition, persistence after restart, and App Service logs. Keep one instance because the Demo review store uses one JSON file with a process-local write queue.
+## Deployment Evidence
+
+Deployment completed on 2026-09-04:
+
+- Public Demo: `https://app-esp-esp-demo-vw6mjjpc4xh64.azurewebsites.net/`
+- Health endpoint: HTTP 200 with `status=healthy`, `mode=Demo`, five Skills, and four Plugins
+- Active OneDeploy ID: `1e15c2df-5dc2-4748-bd99-3a83abc3f821`, status `4` (Success)
+- Source package SHA-256: `678618b3de466f94612141a2c6e28499fabd488e040c388bb81f447a2312755f`
+- Four live scenarios returned their expected governed states with zero runtime violations
+- Analyst acceptance produced a Final report and one HumanDecision Evidence Item
+- Correlation `06aeaad2-4bac-4d72-991d-074aa83359d5` remained Completed/Final/Accept after an App Service restart
+- Desktop and 390px mobile browser checks reported no horizontal overflow
+
+The first remote build excluded development build tools because `NODE_ENV=production`, and the pre-deployment container also started before the Oryx manifest was active. The final configuration sets `NPM_CONFIG_INCLUDE=dev`; after successful Oryx build and a clean App Service restart, the deployed application passed all checks.
+
+Keep one instance because the Demo review store uses one JSON file with a process-local write queue.
 
 ## Security And Operations
 

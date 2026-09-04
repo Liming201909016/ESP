@@ -65,6 +65,7 @@ module webApp 'br/public:avm/res/web/site:0.24.0' = {
         properties: {
           ESP_DATA_DIR: '/home/data/esp'
           HOST: '0.0.0.0'
+          NPM_CONFIG_INCLUDE: 'dev'
           NODE_ENV: 'production'
           SCM_DO_BUILD_DURING_DEPLOYMENT: 'true'
         }
@@ -72,7 +73,7 @@ module webApp 'br/public:avm/res/web/site:0.24.0' = {
     ]
     siteConfig: {
       alwaysOn: true
-      appCommandLine: 'npm start'
+      appCommandLine: 'cd /home/site/wwwroot && npm start'
       ftpsState: 'Disabled'
       healthCheckPath: '/api/health'
       http20Enabled: true

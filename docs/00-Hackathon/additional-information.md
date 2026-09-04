@@ -81,7 +81,7 @@ https://github.com/Liming201909016/ESP
 
 ## Demo URL
 
-TBD after the local runnable application is deployed or packaged.
+https://app-esp-esp-demo-vw6mjjpc4xh64.azurewebsites.net/
 
 ## Video URL
 
@@ -95,7 +95,7 @@ TBD after `docs/00-Hackathon/assets/esp-demo-fallback.webm` is uploaded to an ap
 
 - select the exact Executive Challenge from the Innovation Studio list;
 - select up to five exact Topic Challenge names;
-- replace Demo URL and Video URL placeholders;
+- replace the Video URL placeholder;
 - confirm the public repository contains the runnable source;
 - rerun clean-clone validation against the final submission commit;
 - attach screenshots that show the Copilot entry, evidence, trace, analyst review, and draft report;

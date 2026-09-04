@@ -163,6 +163,7 @@ Start with:
 | Foundation evaluation | 36/36 mandatory synthetic assertions passing |
 | Power Platform ALM foundation | Seven Solution projects package successfully |
 | Local browser application | Runnable Demo Mode |
+| Hosted synthetic Demo | [Azure App Service](https://app-esp-esp-demo-vw6mjjpc4xh64.azurewebsites.net/) |
 | Copilot Studio Connected Mode | Optional, environment and governance gated |
 | Pilot or Production | Not authorized |
 

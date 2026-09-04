@@ -153,9 +153,11 @@ def main() -> None:
     for section in judge_sections:
         if section not in paste_ready:
             errors.append(f"Paste-ready registration is missing judge section: {section}")
-    for placeholder in ["## Demo URL\n\nTBD", "## Video URL\n\nTBD"]:
+    for placeholder in ["## Video URL\n\nTBD"]:
         if placeholder not in additional_info:
             errors.append(f"Additional Information does not expose required placeholder: {placeholder.splitlines()[0]}")
+    if not section_value(additional_info, "Demo URL").startswith("https://"):
+        errors.append("Additional Information Demo URL must be an HTTPS URL")
     if section_value(additional_info, "Team").upper().startswith("TBD"):
         errors.append("Additional Information Team section is not complete")
     for term in ["10/10", "8/8", "36/36", "Pilot eligibility: `false`"]:
