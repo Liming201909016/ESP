@@ -85,7 +85,7 @@ TBD after the local runnable application is deployed or packaged.
 
 ## Video URL
 
-TBD after the five-minute demo and recorded fallback are complete.
+TBD after `docs/00-Hackathon/assets/esp-demo-fallback.webm` is uploaded to an approved shareable location.
 
 ## Team
 

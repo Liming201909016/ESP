@@ -16,6 +16,7 @@ ADDITIONAL_INFO = DOCS / "00-Hackathon" / "additional-information.md"
 CLEAN_CLONE = DOCS / "00-Hackathon" / "clean-clone-validation.md"
 DEMO_DESKTOP = DOCS / "00-Hackathon" / "assets" / "esp-demo-desktop.png"
 DEMO_MOBILE = DOCS / "00-Hackathon" / "assets" / "esp-demo-mobile.png"
+DEMO_VIDEO = DOCS / "00-Hackathon" / "assets" / "esp-demo-fallback.webm"
 BACKLOG = DOCS / "08-Development" / "hackathon-mvp-backlog.md"
 
 
@@ -52,7 +53,7 @@ def validate_links(errors: list[str]) -> None:
 
 def main() -> None:
     errors: list[str] = []
-    required_files = [BRIEF, PROFILE, DEMO_SCRIPT, REGISTRATION, PASTE_READY, ADDITIONAL_INFO, CLEAN_CLONE, DEMO_DESKTOP, DEMO_MOBILE, BACKLOG]
+    required_files = [BRIEF, PROFILE, DEMO_SCRIPT, REGISTRATION, PASTE_READY, ADDITIONAL_INFO, CLEAN_CLONE, DEMO_DESKTOP, DEMO_MOBILE, DEMO_VIDEO, BACKLOG]
     for path in required_files:
         if not path.exists():
             errors.append(f"Missing Hackathon document: {path.relative_to(ROOT)}")
@@ -167,6 +168,9 @@ def main() -> None:
         width, height = struct.unpack(">II", header[16:24])
         if width < minimum_width or height < 800:
             errors.append(f"Demo image dimensions are too small: {image.relative_to(ROOT)} {width}x{height}")
+    video_header = DEMO_VIDEO.read_bytes()[:4]
+    if DEMO_VIDEO.stat().st_size < 100_000 or video_header != b"\x1aE\xdf\xa3":
+        errors.append("Fallback demo video is missing, too small, or not a valid WebM container")
 
     skill_codes = set(re.findall(r"LS-SEC-[A-Z-]+", profile))
     plugin_codes = set(re.findall(r"PLG-[A-Z-]+", profile))

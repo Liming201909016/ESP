@@ -44,7 +44,7 @@ The Hackathon MVP is done when a reviewer can clone or open the repository, run 
 | HCK-301 | End-to-end tests | Four governed scenarios pass eight desktop/mobile Chromium journeys | Done |
 | HCK-302 | Evaluation integration | Four real Router runs export candidate results and pass the Python oracle at 36/36 with Pilot blocked | Done |
 | HCK-303 | Responsive UX verification | Desktop and mobile E2E assert no horizontal clipping across all four scenarios | Done |
-| HCK-304 | Recorded fallback | Desktop/mobile screenshots are generated; demo video must use the same committed synthetic version | Video pending |
+| HCK-304 | Recorded fallback | Desktop/mobile screenshots and an automated local walkthrough recording use the committed synthetic scenario | Done |
 | HCK-305 | Submission completion | Challenge choices, team, repository, screenshots, and video links are entered | Organizer/team input |
 
 ## H4 Connected Mode, stretch
