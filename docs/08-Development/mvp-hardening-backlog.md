@@ -31,6 +31,16 @@
 | HRD-203 | Accessibility is only structurally checked | Add keyboard, focus, contrast, and accessible-name checks | Automated accessibility audit and keyboard journey pass | Done |
 | HRD-204 | Performance is not measured | Capture startup and scenario duration against Hackathon targets | Startup under 10s and local workflow under 2s are reported | Done |
 
+## Priority 3: Publication operations
+
+| ID | Gap | Required behavior | Acceptance | Status |
+|---|---|---|---|---|
+| HRD-301 | Production dependency audit was not enforced | Keep production high/critical advisories at zero and record upstream-only residuals | `npm run audit:production` passes; two `qs` moderate advisories remain until 6.16.0 is available | Done |
+| HRD-302 | Repository validation is manual | Run build, tests, evaluation, and dependency audit on proposed changes | A GitHub Actions or approved enterprise CI workflow passes on `main` and pull requests | Ready |
+| HRD-303 | GitHub repository metadata is incomplete | Set description, topics, hosted Demo homepage, and approved branch policy | Anonymous repository metadata and branch rules match the submission package | Owner input |
+| HRD-304 | Hosted Demo checks are manual | Automate health, four scenarios, security headers, and a browser smoke after deployment | A repeatable post-deployment check reports pass/fail without mutating production data beyond synthetic records | Ready |
+| HRD-305 | B1 lifecycle is not time-bounded | Record cost owner, review date, and teardown or continuation decision | Resource tags and runbook identify an accountable owner and expiry/review date | Owner input |
+
 ## Connected and enterprise work
 
 Copilot Studio, Power Automate adapters, Dataverse persistence, Identity/Policy Bindings, DLP, customer Runbooks, approved thresholds, primary TEST Agent, and enterprise second Consumer remain governed Connected Mode work. They do not block the local synthetic demo but are required before enterprise Pilot claims.

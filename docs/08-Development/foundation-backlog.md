@@ -21,7 +21,7 @@ This backlog tracks the enterprise Power Platform foundation. Hackathon executio
 | FND-003 | Environment policy template | DEV/TEST/PROD configuration parses, prohibits secrets, and restricts DEV data | None | Done |
 | FND-004 | Data authority register | Storage authorities, owners, classifications, and retention gates are explicit | Owner input | Pending Review |
 | FND-005 | Install Power Platform CLI | PAC 2.11.2 and `pac solution init` are available from the official user installation | None | Done |
-| FND-006 | Install and initialize Git | `git --version` succeeds and repository has an approved remote/branch policy | Approved source repository | Blocked |
+| FND-006 | Finalize repository governance | Git and the public GitHub remote work; approve and record the `main` branch policy | Repository owner approval | Pending Review |
 | FND-007 | Validate local Solution packaging | Seven unmanaged Solution ZIPs pack in dependency order with hashes and valid Solution.xml | FND-101 | Done |
 
 ## F1 Solution and Dataverse foundation
@@ -68,5 +68,5 @@ This backlog tracks the enterprise Power Platform foundation. Hackathon executio
 1. Continue the runnable local Hackathon backlog independently of tenant access.
 2. Obtain an explicitly authorized Dataverse DEV environment before FND-104.
 3. Complete Domain SME review for the synthetic RG and APP labels.
-4. Install Git after repository ownership and remote policy are approved.
+4. Approve and record the GitHub `main` branch policy.
 5. Hold Connected TEST integration until DG-001 through DG-008 are Approved.
