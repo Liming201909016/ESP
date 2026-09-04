@@ -1,5 +1,7 @@
 import cors from "cors";
 import express from "express";
+import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 
 import { getRegistry } from "./registry.js";
 import { generateCandidateResults, getEvaluationSummary } from "./evaluation.js";
@@ -69,6 +71,9 @@ export function createApp() {
       next(error);
     }
   });
+
+  const moduleDirectory = fileURLToPath(new URL(".", import.meta.url));
+  app.use(express.static(resolve(moduleDirectory, "../../web/dist")));
 
   app.use((error: unknown, _request: express.Request, response: express.Response, _next: express.NextFunction) => {
     const message = error instanceof Error ? error.message : "Unexpected error";

@@ -173,12 +173,22 @@ Local Hackathon implementation with synthetic, non-sensitive data is permitted. 
 
 ## Run Demo Mode
 
+One-command production-style demo:
+
+```powershell
+npm.cmd run demo
+```
+
+Open `http://127.0.0.1:8787`. This command builds the application and starts one local Express process that serves both the UI and API.
+
+Development mode with hot reload:
+
 ```powershell
 npm.cmd install
 npm.cmd run dev
 ```
 
-Open `http://127.0.0.1:5173`. The API health endpoint is available at `http://127.0.0.1:8787/api/health`.
+Open `http://127.0.0.1:5173`. The API health endpoint remains available at `http://127.0.0.1:8787/api/health`.
 
 The current walking skeleton provides the local browser shell and API boundary. Skill Router and Plugin behavior are implemented in the next Hackathon backlog slice.
 
@@ -202,6 +212,7 @@ Run application tests directly:
 
 ```powershell
 npm.cmd run test:api
+npm.cmd run test:production
 npm.cmd run test:e2e
 npm.cmd run evaluate
 ```

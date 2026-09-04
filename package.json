@@ -9,13 +9,15 @@
   "scripts": {
     "dev": "concurrently -k -n api,web -c cyan,green \"npm run dev -w @esp/api\" \"npm run dev -w @esp/web\"",
     "build": "npm run build -w @esp/api && npm run build -w @esp/web",
-    "test": "npm run test:api && npm run test:e2e",
+    "test": "npm run test:api && npm run test:production && npm run test:e2e",
     "test:api": "npm run test -w @esp/api",
+    "test:production": "node scripts/Test-OneProcessDemo.mjs",
     "test:e2e": "playwright test",
     "evaluate": "npm run export:evaluation -w @esp/api && .venv\\Scripts\\python.exe scripts\\Run-SyntheticEvaluation.py --results artifacts\\evaluation-runs\\app-candidate-results.json --output artifacts\\evaluation-runs\\ER-APP-LATEST.json",
     "capture:demo": "node scripts/Capture-DemoScreenshots.mjs",
     "record:demo": "node scripts/Record-DemoFallback.mjs",
-    "start": "npm run start -w @esp/api"
+    "start": "npm run start -w @esp/api",
+    "demo": "npm run build && npm run start"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
