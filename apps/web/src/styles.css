@@ -469,6 +469,100 @@ h1 {
   line-height: 1.5;
 }
 
+.report-preview {
+  margin-top: 30px;
+  padding: 28px;
+  border: 1px solid #aab9b0;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.report-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: start;
+  padding-bottom: 18px;
+  border-bottom: 2px solid #17201c;
+}
+
+.report-heading p {
+  margin-bottom: 4px;
+  color: #6d7c75;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.report-heading h3 {
+  margin: 0;
+  font-family: "Aptos Display", "Segoe UI Variable Display", sans-serif;
+  font-size: 1.45rem;
+}
+
+.report-heading span {
+  padding: 6px 9px;
+  border: 1px solid #769184;
+  border-radius: 3px;
+  color: #14503e;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.report-preview > p {
+  margin: 20px 0;
+  color: #496259;
+  line-height: 1.6;
+}
+
+.report-preview dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0 0 24px;
+  background: #d7ded9;
+}
+
+.report-preview dl div {
+  padding: 10px;
+  background: #f4f6f2;
+}
+
+.report-preview dt {
+  color: #6d7c75;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.report-preview dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+  font-size: 0.86rem;
+}
+
+.report-preview h4 {
+  margin: 22px 0 8px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.report-finding {
+  padding: 16px 0;
+  border-top: 1px solid #cbd5ce;
+}
+
+.report-finding p {
+  margin: 8px 0;
+  line-height: 1.55;
+}
+
+.report-finding ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #60746b;
+  font-size: 0.78rem;
+}
+
 @media (max-width: 760px) {
   .shell {
     width: min(100% - 28px, 1180px);
@@ -515,6 +609,14 @@ h1 {
     padding: 28px 0 0;
     border-top: 1px solid #9db3a7;
     border-left: 0;
+  }
+
+  .report-preview {
+    padding: 20px;
+  }
+
+  .report-preview dl {
+    grid-template-columns: 1fr;
   }
 
   .intro h2 {

@@ -21,7 +21,7 @@ interface StoredReview {
   outcome: string;
   proposedRisk: string;
   evidence: EvidenceItem[];
-  report: { reportId: string; status: string; templateVersion: string; findingIds: string[]; citationsPreserved: boolean };
+  report: ReturnType<typeof reportPlugin.render>;
   analystReviewRequired: boolean;
   analystDisposition?: { decision: AnalystDecision; rationale: string; finalRisk?: string };
   [key: string]: unknown;
@@ -93,7 +93,7 @@ export async function runSecurityReview(caseId: string) {
   evidence.push(evidencePlugin.create("ModelSuggestion", runbook.runbookCode, `risk:${proposedRisk}`));
   invoke("LS-SEC-RISK-RATING", "HumanHandoff");
 
-  const report = reportPlugin.render(caseId, [finding.findingId]);
+  const report = reportPlugin.render(selectedCase, [finding], evidence);
   invoke("LS-SEC-REPORT-GEN", "Success");
 
   const review = {
@@ -145,6 +145,7 @@ export function applyAnalystDisposition(
   review.state = transition.state;
   review.outcome = transition.outcome;
   review.report.status = transition.reportStatus;
+  review.report.analystDecision = review.analystDisposition;
   review.analystReviewRequired = false;
   return review;
 }

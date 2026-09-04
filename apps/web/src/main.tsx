@@ -17,9 +17,19 @@ interface ReviewResult {
   proposedRisk?: string;
   missingInformation?: string[];
   evidence: Array<{ evidenceId: string; type: string; sourceId: string; claimReference: string }>;
-  trace: Array<{ sequence: number; skillCode: string; skillVersion: string; pluginCodes: string[]; outcome: string }>;
+  trace: Array<{ sequence: number; skillCode: string; skillVersion: string; implementationVersion: string; pluginCodes: string[]; outcome: string }>;
   safety?: { promptInjectionDetected: boolean; promptInjectionIgnored: boolean; governanceOverrideAllowed: boolean };
-  report?: { reportId: string; status: string; citationsPreserved: boolean };
+  report?: {
+    reportId: string;
+    status: string;
+    templateVersion: string;
+    title: string;
+    summary: string;
+    scope: string;
+    runbookCode: string;
+    findings: Array<{ findingId: string; statement: string; citations: Array<{ evidenceId: string; sourceId: string; claimReference: string }> }>;
+    citationsPreserved: boolean;
+  };
   analystReviewRequired?: boolean;
   analystDisposition?: { decision: string; rationale: string; finalRisk?: string };
 }
@@ -183,7 +193,7 @@ function App() {
                 <h3>Execution trace</h3>
                 <ol className="trace-list">
                   {review.trace.map((entry) => (
-                    <li key={entry.sequence}><span>{entry.skillCode}</span><small>v{entry.skillVersion} · {entry.pluginCodes.join(" + ")} · {entry.outcome}</small></li>
+                    <li key={entry.sequence}><span>{entry.skillCode}</span><small>Skill v{entry.skillVersion} · Implementation {entry.implementationVersion} · {entry.pluginCodes.join(" + ")} · {entry.outcome}</small></li>
                   ))}
                 </ol>
               </div>
@@ -228,6 +238,31 @@ function App() {
                   <p><strong>{review.analystDisposition.decision}</strong> · {review.analystDisposition.rationale}</p>
                   <p>Final risk: {review.analystDisposition.finalRisk ?? "Not assigned"} · Report: {review.report?.status}</p>
                 </div>
+              ) : null}
+              {review.report ? (
+                <article className="report-preview" aria-labelledby="report-title">
+                  <div className="report-heading">
+                    <div><p>Security Review Report</p><h3 id="report-title">{review.report.title}</h3></div>
+                    <span>{review.report.status}</span>
+                  </div>
+                  <p>{review.report.summary}</p>
+                  <dl>
+                    <div><dt>Report</dt><dd>{review.report.reportId}</dd></div>
+                    <div><dt>Runbook</dt><dd>{review.report.runbookCode}</dd></div>
+                    <div><dt>Template</dt><dd>v{review.report.templateVersion}</dd></div>
+                    <div><dt>Citations</dt><dd>{review.report.citationsPreserved ? "Preserved" : "Missing"}</dd></div>
+                  </dl>
+                  <h4>Scope</h4>
+                  <p>{review.report.scope}</p>
+                  <h4>Findings</h4>
+                  {review.report.findings.map((finding) => (
+                    <section key={finding.findingId} className="report-finding">
+                      <strong>{finding.findingId}</strong>
+                      <p>{finding.statement}</p>
+                      <ul>{finding.citations.map((citation) => <li key={citation.evidenceId}>[{citation.claimReference}] {citation.sourceId}</li>)}</ul>
+                    </section>
+                  ))}
+                </article>
               ) : null}
             </>
           )}

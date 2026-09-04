@@ -70,12 +70,28 @@ export const evidencePlugin = {
 export const reportPlugin = {
   code: "PLG-REPORT",
   version: "1.0.0",
-  render(caseId: string, findingIds: string[]) {
+  render(
+    selectedCase: DatasetCase,
+    findings: Array<{ findingId: string; statement: string; evidenceIds: string[] }>,
+    evidence: EvidenceItem[],
+  ) {
     return {
-      reportId: `RPT-${caseId}`,
+      reportId: `RPT-${selectedCase.caseId}`,
       status: "Draft",
       templateVersion: "synthetic-1.0.0",
-      findingIds,
+      title: `${selectedCase.requestType} Security Review`,
+      summary: `Synthetic ${selectedCase.requestType} review produced ${findings.length} finding for analyst disposition.`,
+      scope: selectedCase.input.projectDescription,
+      runbookCode: selectedCase.expected.runbookCode,
+      findings: findings.map((finding) => ({
+        findingId: finding.findingId,
+        statement: finding.statement,
+        citations: finding.evidenceIds.map((evidenceId) => {
+          const item = evidence.find((candidate) => candidate.evidenceId === evidenceId);
+          return { evidenceId, sourceId: item?.sourceId ?? "unknown", claimReference: item?.claimReference ?? "unknown" };
+        }),
+      })),
+      analystDecision: null as null | { decision: string; rationale: string; finalRisk?: string },
       citationsPreserved: true,
     };
   },

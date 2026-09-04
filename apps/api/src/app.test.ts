@@ -52,7 +52,14 @@ describe("health endpoint", () => {
     expect(body.trace).toHaveLength(5);
     expect(body.trace.map((entry: { sequence: number }) => entry.sequence)).toEqual([1, 2, 3, 4, 5]);
     expect(body.evidence.length).toBeGreaterThan(0);
-    expect(body.report).toMatchObject({ status: "Draft", citationsPreserved: true });
+    expect(body.report).toMatchObject({
+      status: "Draft",
+      title: "RG Security Review",
+      runbookCode: "RB-RG-CUSTOMER-001",
+      citationsPreserved: true,
+      analystDecision: null,
+    });
+    expect(body.report.findings[0].citations).toHaveLength(4);
   });
 
   it("stops after intake when mandatory material is missing", async () => {
@@ -122,7 +129,11 @@ describe("health endpoint", () => {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ decision: "Accept", rationale: "Evidence reviewed" }),
     })).json();
 
-    expect(disposition).toMatchObject({ state: "Completed", outcome: "Success", report: { status: "Final" } });
+    expect(disposition).toMatchObject({
+      state: "Completed",
+      outcome: "Success",
+      report: { status: "Final", analystDecision: { decision: "Accept", finalRisk: "Medium" } },
+    });
     expect(disposition.evidence).toEqual(expect.arrayContaining([
       expect.objectContaining({ type: "HumanDecision", claimReference: "disposition:Accept" }),
     ]));
