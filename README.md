@@ -216,6 +216,7 @@ Run application tests directly:
 npm.cmd run test:api
 npm.cmd run test:production
 npm.cmd run test:e2e
+npm.cmd run test:hosted
 npm.cmd run evaluate
 ```
 
