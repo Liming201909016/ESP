@@ -271,13 +271,15 @@ Foundation work status and ordering are tracked in [docs/08-Development/foundati
 
 ## Repository Metadata
 
-Suggested GitHub description:
+GitHub description:
 
 > From agent-centric to capability-centric AI: governed, reusable Skills for trusted enterprise Copilots.
 
-Suggested GitHub topics:
+GitHub topics:
 
 `copilot-studio`, `power-platform`, `ai-agents`, `agentic-ai`, `responsible-ai`, `plugins`, `security-review`, `evidence-grounding`, `human-in-the-loop`, `hackathon-2026`
+
+GitHub homepage: [Hosted ESP Demo](https://app-esp-esp-demo-vw6mjjpc4xh64.azurewebsites.net/)
 
 ## Scope and Safety
 
