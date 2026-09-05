@@ -58,3 +58,25 @@ Until then, only Foundation development is authorized. TEST integration, Pilot, 
 3. Conditional approval records a condition owner and expiry date.
 4. Any changed canonical object, contract, identity boundary, evidence boundary, storage authority, or write behavior triggers Architecture Change Review.
 5. The gate status and effective date are updated only after all controls pass the decision rule.
+
+## 6. Dataverse DEV authorization intake
+
+Submit the following information to the Power Platform environment administrator and the Governance Approver before requesting Connected Mode access:
+
+| Field | Required content |
+|---|---|
+| Requestor | Named person and contact |
+| Business purpose | ESP Foundation development and synthetic Connected Mode validation |
+| Environment | Dedicated Dataverse DEV environment name, URL, environment ID, tenant, region, and owner |
+| Data boundary | Synthetic, non-sensitive data only; no customer or production content |
+| Requested roles | Environment Maker and the minimum Dataverse customization role required to deploy the ESP Solution |
+| Connections | Named non-production connection references and runtime identities; no credentials or secret values |
+| DLP and telemetry | Applicable DLP policy, approved telemetry destination, retention period, and log-access owner |
+| Governance evidence | DG-001 through DG-008 status, evidence references, approvers, conditions, and expiry dates |
+| Authorization scope | Permitted operations, prohibited operations, start date, expiry or review date, and rollback owner |
+
+Use this request text and replace each bracketed value:
+
+> Request authorization for ESP Foundation development in the dedicated Dataverse DEV environment `[environment name]` (`[environment URL]`, `[environment ID]`). The work is limited to Solution deployment, canonical schema validation, and synthetic Connected Mode testing with non-sensitive data. It excludes customer data, Connected TEST, Pilot, Production, production identities, and production connections. Requested access is `[roles]` for `[requestor]` until `[expiry or review date]`. Business Owner: `[name]`; Architecture Owner: `[name]`; Security/Data Owner: `[name]`; Governance Approver: `[name]`. Applicable DLP policy: `[reference]`; telemetry and retention authority: `[reference]`; DG evidence: `[references]`. Approval must record the authorized operations, conditions, approver, decision date, and expiry date.
+
+After approval, record only environment identifiers, owner names, decision evidence, and non-secret connection references in ESP documentation. Passwords, tokens, client secrets, connection strings, and exported authentication material must not be added to the repository.
