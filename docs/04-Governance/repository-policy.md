@@ -3,7 +3,7 @@
 **Repository:** `https://github.com/Liming201909016/ESP`  
 **Default branch:** `main`  
 **Owner:** Liming  
-**Status:** Approved for Hackathon publication
+**Status:** Enforced on `main`
 
 ## Main Branch Controls
 
@@ -19,6 +19,8 @@
 ## Validation Scope
 
 The required workflow installs pinned Node.js and Python dependencies, builds the application, runs API/production/browser tests, executes the independent synthetic evaluation, and rejects production dependency audits with high or critical advisories.
+
+The first complete required run, [`Validate ESP` #3](https://github.com/Liming201909016/ESP/actions/runs/33936413295), passed on commit `046cba9` before branch protection was enabled.
 
 ## Exceptions
 
