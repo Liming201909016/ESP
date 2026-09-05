@@ -12,6 +12,8 @@ This plan hosts the synthetic, non-sensitive ESP Demo Mode on one Linux Azure Ap
 - Runtime: Node.js 24 LTS
 - Health path: `/api/health`
 - Persistent Demo review path: `/home/data/esp`
+- Cost and lifecycle owner: Liming
+- Continue-or-teardown review date: 2026-09-18
 
 Azure CLI verified that resource group `ESP` exists in Southeast Asia with provisioning state `Succeeded` and contains no App Service Plan or Web App. The Azure extension remains signed into a different tenant; Azure extension and CLI/azd authentication contexts are isolated.
 
@@ -86,4 +88,4 @@ Keep one instance because the Demo review store uses one JSON file with a proces
 - Public endpoint contains only synthetic demonstration data.
 - B1 Always On avoids presentation cold starts.
 - The application remains explicitly non-production and not Pilot-authorized.
-- Delete the Web App and Plan after the Hackathon if the public Demo is no longer required.
+- On 2026-09-18, Liming must record a continue-or-teardown decision; delete the Web App and Plan if the public Demo is no longer required.

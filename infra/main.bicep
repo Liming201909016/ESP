@@ -21,8 +21,10 @@ var webAppName = 'app-esp-${environmentName}-${resourceToken}'
 var tags = {
   'azd-env-name': environmentName
   application: 'esp'
+  'cost-owner': 'Liming'
   environment: 'hackathon-demo'
   'data-classification': 'synthetic-non-sensitive'
+  'lifecycle-review-date': '2026-09-18'
   'production-authorized': 'false'
 }
 
