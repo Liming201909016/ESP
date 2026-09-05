@@ -22,6 +22,7 @@
 03-Solution-Design/solution-dependency-matrix.md
 03-Solution-Design/copilot-studio-skill-mapping.md
 04-Governance/architecture-baseline-v1.0.md
+04-Governance/repository-policy.md
 04-Governance/architecture-approval-record.md
 04-Governance/development-readiness-gate.md
 04-Governance/data-authority-register.md
