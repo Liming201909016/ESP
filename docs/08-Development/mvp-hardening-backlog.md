@@ -36,8 +36,8 @@
 | ID | Gap | Required behavior | Acceptance | Status |
 |---|---|---|---|---|
 | HRD-301 | Production dependency audit was not enforced | Keep production high/critical advisories at zero and record upstream-only residuals | `npm run audit:production` passes; two `qs` moderate advisories remain until 6.16.0 is available | Done |
-| HRD-302 | Repository validation is manual | Run build, tests, evaluation, and dependency audit on proposed changes | A GitHub Actions or approved enterprise CI workflow passes on `main` and pull requests | In Progress |
-| HRD-303 | GitHub repository metadata is incomplete | Set description, topics, hosted Demo homepage, and approved branch policy | Anonymous repository metadata and branch rules match the submission package | In Progress |
+| HRD-302 | Repository validation is manual | Run build, tests, evaluation, and dependency audit on proposed changes | A GitHub Actions or approved enterprise CI workflow passes on `main` and pull requests | Done |
+| HRD-303 | GitHub repository metadata is incomplete | Set description, topics, hosted Demo homepage, and approved branch policy | Anonymous repository metadata and branch rules match the submission package | Done |
 | HRD-304 | Hosted Demo checks are manual | Automate health, four scenarios, security headers, and a browser smoke after deployment | A repeatable post-deployment check reports pass/fail without mutating production data beyond synthetic records | Done |
 | HRD-305 | B1 lifecycle is not time-bounded | Record cost owner, review date, and teardown or continuation decision | Resource tags and runbook identify an accountable owner and expiry/review date | Done |
 

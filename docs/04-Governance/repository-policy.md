@@ -3,15 +3,14 @@
 **Repository:** `https://github.com/Liming201909016/ESP`  
 **Default branch:** `main`  
 **Owner:** Liming  
-**Status:** Approved for Hackathon publication
+**Status:** Enforced on `main`
 
 ## Main Branch Controls
 
 - Changes enter `main` through a pull request.
 - `Validate ESP / Build, test, evaluate, and audit` must pass before merge.
-- One approving review is required.
-- Stale approvals are dismissed when new commits are pushed.
-- The latest push must be approved by someone other than its author.
+- While the repository has only one collaborator, no approving review is required; the pull request and required CI check remain mandatory.
+- When an eligible second reviewer is added, restore one required approval, stale-approval dismissal, and approval of the latest push by someone other than its author.
 - Force pushes and branch deletion are prohibited.
 - Administrators are subject to the same controls.
 - All review conversations must be resolved before merge.
@@ -19,6 +18,8 @@
 ## Validation Scope
 
 The required workflow installs pinned Node.js and Python dependencies, builds the application, runs API/production/browser tests, executes the independent synthetic evaluation, and rejects production dependency audits with high or critical advisories.
+
+The first complete required run, [`Validate ESP` #3](https://github.com/Liming201909016/ESP/actions/runs/33936413295), passed on commit `046cba9` before branch protection was enabled.
 
 ## Exceptions
 
