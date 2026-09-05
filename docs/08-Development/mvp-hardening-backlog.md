@@ -30,12 +30,13 @@
 | HRD-202 | Local review store retains terminal records indefinitely | Apply local retention and deterministic cleanup | Expired records are removed without deleting active traces | Done |
 | HRD-203 | Accessibility is only structurally checked | Add keyboard, focus, contrast, and accessible-name checks | Automated accessibility audit and keyboard journey pass | Done |
 | HRD-204 | Performance is not measured | Capture startup and scenario duration against Hackathon targets | Startup under 10s and local workflow under 2s are reported | Done |
+| HRD-205 | File-backed reviews do not recover from store corruption | Maintain a durable last-known-good backup and repair a missing or malformed primary store | A truncated primary store reloads the retained Review and is repaired automatically | Done |
 
 ## Priority 3: Publication operations
 
 | ID | Gap | Required behavior | Acceptance | Status |
 |---|---|---|---|---|
-| HRD-301 | Production dependency audit was not enforced | Keep production high/critical advisories at zero and record upstream-only residuals | `npm run audit:production` passes; two `qs` moderate advisories remain until 6.16.0 is available | Done |
+| HRD-301 | Production dependency audit was not enforced | Keep production high/critical advisories at zero and record upstream-only residuals | `npm run audit:production` passes and Dependabot reports zero open alerts | Done |
 | HRD-302 | Repository validation is manual | Run build, tests, evaluation, and dependency audit on proposed changes | A GitHub Actions or approved enterprise CI workflow passes on `main` and pull requests | Done |
 | HRD-303 | GitHub repository metadata is incomplete | Set description, topics, hosted Demo homepage, and approved branch policy | Anonymous repository metadata and branch rules match the submission package | Done |
 | HRD-304 | Hosted Demo checks are manual | Automate health, four scenarios, security headers, and a browser smoke after deployment | A repeatable post-deployment check reports pass/fail without mutating production data beyond synthetic records | Done |

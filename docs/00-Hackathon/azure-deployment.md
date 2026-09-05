@@ -73,12 +73,12 @@ Deployment completed on 2026-09-04:
 - Correlation `06aeaad2-4bac-4d72-991d-074aa83359d5` remained Completed/Final/Accept after an App Service restart
 - Desktop and 390px mobile browser checks reported no horizontal overflow
 - Helmet CSP/HSTS/nosniff/referrer headers, same-origin browser access, and the API rate limit are active
-- Production dependency audit reports zero high or critical advisories; two moderate `qs` advisories remain upstream because a fixed 6.16.0 package is not yet published
+- Production and full dependency audits report zero known vulnerabilities
 - `npm run test:hosted` automates health, security headers, all four governed scenarios, and a 390px Chromium smoke
 
 The first remote build excluded development build tools because `NODE_ENV=production`, and the pre-deployment container also started before the Oryx manifest was active. The final configuration sets `NPM_CONFIG_INCLUDE=dev`; after successful Oryx build and a clean App Service restart, the deployed application passed all checks.
 
-Keep one instance because the Demo review store uses one JSON file with a process-local write queue.
+Keep one instance because the Demo review store uses a process-local write queue and is not a distributed datastore. Each successful write uses a synced temporary file, atomic replacement, and a last-known-good backup; a missing or malformed primary store is repaired from that backup.
 
 ## Security And Operations
 

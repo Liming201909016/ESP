@@ -1,4 +1,4 @@
-import { rm } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 
@@ -265,6 +265,20 @@ describe("health endpoint", () => {
     } finally {
       await new Promise<void>((resolveClose, reject) => secondServer.close((error) => error ? reject(error) : resolveClose()));
     }
+  });
+
+  it("recovers persisted reviews from the last-known-good backup", async () => {
+    const correlationId = "RECOVERY-CHECK";
+    await saveReview({ correlationId, state: "AwaitingAnalystDisposition", trace: [{ sequence: 1 }] });
+    const storeFile = resolve(testDataDirectory, "reviews.json");
+    await writeFile(storeFile, '{"RECOVERY-CHECK":', "utf8");
+
+    expect(await getReview(correlationId)).toMatchObject({
+      correlationId,
+      state: "AwaitingAnalystDisposition",
+      trace: [{ sequence: 1 }],
+    });
+    expect(JSON.parse(await readFile(storeFile, "utf8"))).toHaveProperty(correlationId);
   });
 
   it("removes expired terminal reviews without deleting active traces", async () => {

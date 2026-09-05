@@ -30,7 +30,7 @@ AI platform and reusable enterprise capability architecture, demonstrated throug
 - seven Power Platform Solution foundations packaging successfully;
 - public GitHub repository available;
 - local browser application, deterministic Router, four Plugins, analyst disposition, report, trace, and evaluator integration runnable;
-- 21 API integration tests and 16 desktop/mobile browser journeys passing.
+- 22 API integration tests and 16 desktop/mobile browser journeys passing.
 - clean-clone installation, build, browser tests, and 36/36 evaluation reproduced successfully.
 
 ## What We Will Demonstrate
