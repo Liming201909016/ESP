@@ -58,9 +58,8 @@ The Hackathon MVP is done when a reviewer can clone or open the repository, run 
 
 ## Immediate sequence
 
-1. Scaffold the local application.
-2. Implement registries, Router, and four deterministic Plugins.
-3. Implement the complete RG path, including analyst review and report.
-4. Add APP and failure paths.
-5. Integrate evaluation, screenshots, and recorded fallback.
-6. Treat Connected Mode as stretch work only after the local Definition of Done passes.
+1. Select the exact Innovation Studio Executive and Topic Challenges from the organizer-provided list.
+2. Enter the prepared team, repository, Hosted Demo, screenshots, and fallback-video links in Innovation Studio.
+3. Keep the Hosted Demo healthy through the 2026-09-18 lifecycle review and rerun `npm run test:hosted` before judging.
+4. Obtain named owners, Domain SME review, and DG-001 through DG-008 decisions before Connected TEST work.
+5. Start optional Copilot Studio, Power Automate, and Dataverse work only in an explicitly authorized environment.
