@@ -1,4 +1,5 @@
 import { createApp } from "./app.js";
+import { cleanupOrphanedReviewStoreFiles } from "./review-store.js";
 import { closeHttpServer } from "./server-lifecycle.js";
 
 const port = Number(process.env.PORT ?? 8787);
@@ -6,6 +7,7 @@ const host = process.env.HOST ?? "127.0.0.1";
 const configuredShutdownTimeout = Number(process.env.SHUTDOWN_TIMEOUT_MS ?? 10_000);
 const shutdownTimeoutMs = Number.isFinite(configuredShutdownTimeout) && configuredShutdownTimeout > 0 ? configuredShutdownTimeout : 10_000;
 
+const removedTemporaryFiles = await cleanupOrphanedReviewStoreFiles();
 const server = createApp().listen(port, host, () => {
   console.log(JSON.stringify({
     timestamp: new Date().toISOString(),
@@ -13,6 +15,7 @@ const server = createApp().listen(port, host, () => {
     event: "server_started",
     host,
     port,
+    removedTemporaryFiles,
   }));
 });
 

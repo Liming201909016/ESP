@@ -66,6 +66,8 @@ module webApp 'br/public:avm/res/web/site:0.24.0' = {
         name: 'appsettings'
         properties: {
           ESP_DATA_DIR: '/home/data/esp'
+          ESP_REVIEW_STORE_MAX_BYTES: '33554432'
+          ESP_REVIEW_TEMP_MAX_AGE_MS: '3600000'
           HOST: '0.0.0.0'
           NPM_CONFIG_INCLUDE: 'dev'
           NODE_ENV: 'production'
