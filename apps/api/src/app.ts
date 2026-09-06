@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
 import { getRegistry } from "./registry.js";
-import { checkReviewStore } from "./review-store.js";
+import { checkReviewStore, ReviewStoreCapacityError } from "./review-store.js";
 import { assertRouterRequest } from "./router-contract.js";
 import { generateCandidateResults, getEvaluationSummary } from "./evaluation.js";
 import { applyAnalystDisposition, getReview, runBoundDocumentIntake, runSecurityReview, type AnalystDecision } from "./workflow.js";
@@ -188,7 +188,8 @@ export function createApp(options: AppOptions = {}) {
 
   app.use((error: unknown, request: express.Request, response: express.Response, _next: express.NextFunction) => {
     const message = error instanceof Error ? error.message : "Unexpected error";
-    const status = message.startsWith("Unknown synthetic case") || message.startsWith("Review not found") ? 404
+    const status = error instanceof ReviewStoreCapacityError ? 507
+      : message.startsWith("Unknown synthetic case") || message.startsWith("Review not found") ? 404
       : message.includes("required") || message.includes("not awaiting") || message.includes("Consumer Binding") || message.includes("does not permit") || message.includes("citations do not resolve") || message.includes("request contract violation") ? 400
       : 500;
     const requestId = String(response.locals.requestId ?? "unknown");

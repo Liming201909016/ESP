@@ -1,4 +1,4 @@
-import { readFile, rm, writeFile } from "node:fs/promises";
+import { access, readFile, rm, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 
@@ -6,7 +6,7 @@ import { afterAll, describe, expect, it } from "vitest";
 
 import { createApp } from "./app.js";
 import { containsPromptInjection, documentSourcePlugin } from "./plugins.js";
-import { cleanupExpiredReviews, saveReview } from "./review-store.js";
+import { checkReviewStore, cleanupExpiredReviews, saveReview } from "./review-store.js";
 import { assertReviewEnvelope } from "./router-contract.js";
 import { closeHttpServer } from "./server-lifecycle.js";
 import { detectRuntimeViolations, getReview } from "./workflow.js";
@@ -46,7 +46,12 @@ describe("health endpoint", () => {
       ready: true,
       mode: "Demo",
       registry: { status: "healthy", skillCount: 5, pluginCount: 4 },
-      reviewStore: { status: "healthy", backend: "file", durableBackup: true },
+      reviewStore: {
+        status: "healthy",
+        backend: "file",
+        durableBackup: true,
+        capacity: { maximumBytes: 32 * 1024 * 1024 },
+      },
     });
     expect(body.uptimeSeconds).toBeGreaterThanOrEqual(0);
   });
@@ -349,15 +354,59 @@ describe("health endpoint", () => {
     expect(await getReview("AFTER-TRANSIENT-FAILURE")).toMatchObject({ state: "AwaitingAnalystDisposition" });
   });
 
+  it("removes expired orphan temporary files without touching recent writes", async () => {
+    const oldTemporaryFile = resolve(testDataDirectory, "reviews.json.100.old.tmp");
+    const recentTemporaryFile = resolve(testDataDirectory, "reviews.json.bak.200.recent.tmp");
+    await writeFile(oldTemporaryFile, "orphan", "utf8");
+    await writeFile(recentTemporaryFile, "in progress", "utf8");
+    const oldTimestamp = new Date(Date.now() - 2 * 60 * 60 * 1000);
+    await utimes(oldTemporaryFile, oldTimestamp, oldTimestamp);
+
+    const status = await checkReviewStore();
+
+    expect(status.orphanTemporaryFilesRemoved).toBeGreaterThanOrEqual(1);
+    await expect(access(oldTemporaryFile)).rejects.toThrow();
+    await expect(access(recentTemporaryFile)).resolves.toBeUndefined();
+  });
+
+  it("rejects new reviews with 507 when the store capacity is exhausted", async () => {
+    const originalMaximum = process.env.ESP_REVIEW_STORE_MAX_BYTES;
+    process.env.ESP_REVIEW_STORE_MAX_BYTES = "1";
+    try {
+      const address = server.address();
+      if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+      const healthResponse = await fetch(`http://127.0.0.1:${address.port}/api/health`);
+      expect(healthResponse.status).toBe(503);
+      await expect(healthResponse.json()).resolves.toMatchObject({
+        status: "degraded",
+        ready: false,
+        reviewStore: { status: "capacity-exceeded" },
+      });
+      const response = await fetch(`http://127.0.0.1:${address.port}/api/reviews`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: reviewBody("SYN-RG-001"),
+      });
+
+      expect(response.status).toBe(507);
+      await expect(response.json()).resolves.toMatchObject({ error: "Review store capacity exceeded" });
+    } finally {
+      if (originalMaximum === undefined) delete process.env.ESP_REVIEW_STORE_MAX_BYTES;
+      else process.env.ESP_REVIEW_STORE_MAX_BYTES = originalMaximum;
+    }
+  });
+
   it("removes expired terminal reviews without deleting active traces", async () => {
     const now = Date.now();
     await saveReview({ correlationId: "RET-TERMINAL", state: "Completed", trace: [{ sequence: 1 }] });
+    await saveReview({ correlationId: "RET-NEEDS-INFORMATION", state: "NeedsInformation", trace: [{ sequence: 1 }] });
     await saveReview({ correlationId: "RET-ACTIVE", state: "AwaitingAnalystDisposition", trace: [{ sequence: 1 }] });
 
     const removed = await cleanupExpiredReviews(now + 8 * 24 * 60 * 60 * 1000);
 
     expect(removed).toBeGreaterThanOrEqual(1);
     expect(await getReview("RET-TERMINAL")).toBeUndefined();
+    expect(await getReview("RET-NEEDS-INFORMATION")).toBeUndefined();
     expect(await getReview("RET-ACTIVE")).toMatchObject({ state: "AwaitingAnalystDisposition", trace: [{ sequence: 1 }] });
   });
 

@@ -1,4 +1,4 @@
-import { mkdir, open, readFile, rename, rm } from "node:fs/promises";
+import { mkdir, open, readFile, readdir, rename, rm, stat } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 
@@ -10,8 +10,17 @@ interface PersistedReview {
 }
 
 let writeQueue = Promise.resolve();
-const terminalStates = new Set(["Completed", "RejectedByAnalyst", "Escalated", "CannotAssess"]);
+const terminalStates = new Set(["Completed", "RejectedByAnalyst", "Escalated", "CannotAssess", "NeedsInformation"]);
 const defaultRetentionMs = 7 * 24 * 60 * 60 * 1000;
+const defaultMaxStoreBytes = 32 * 1024 * 1024;
+const defaultOrphanTempMaxAgeMs = 60 * 60 * 1000;
+
+export class ReviewStoreCapacityError extends Error {
+  constructor() {
+    super("Review store capacity exceeded");
+    this.name = "ReviewStoreCapacityError";
+  }
+}
 
 function queueStoreOperation<T>(operation: () => Promise<T>) {
   const queued = writeQueue.catch(() => undefined).then(operation);
@@ -23,6 +32,48 @@ function storePath() {
   const directory = process.env.ESP_DATA_DIR ?? resolve(process.cwd(), ".esp-data");
   const file = resolve(directory, "reviews.json");
   return { directory, file, backupFile: `${file}.bak` };
+}
+
+function configuredNonNegativeNumber(name: string, fallback: number) {
+  const configured = Number(process.env[name] ?? fallback);
+  return Number.isFinite(configured) && configured >= 0 ? configured : fallback;
+}
+
+function maxStoreBytes() {
+  return configuredNonNegativeNumber("ESP_REVIEW_STORE_MAX_BYTES", defaultMaxStoreBytes);
+}
+
+function orphanTempMaxAgeMs() {
+  return configuredNonNegativeNumber("ESP_REVIEW_TEMP_MAX_AGE_MS", defaultOrphanTempMaxAgeMs);
+}
+
+async function cleanupOrphanTemporaryFiles(directory: string, now = Date.now()) {
+  let entries;
+  try {
+    entries = await readdir(directory, { withFileTypes: true });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return 0;
+    throw error;
+  }
+
+  let removed = 0;
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.startsWith("reviews.json.") || !entry.name.endsWith(".tmp")) continue;
+    const temporaryFile = resolve(directory, entry.name);
+    try {
+      const metadata = await stat(temporaryFile);
+      if (now - metadata.mtimeMs < orphanTempMaxAgeMs()) continue;
+      await rm(temporaryFile, { force: true });
+      removed += 1;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
+  }
+  return removed;
+}
+
+export function cleanupOrphanedReviewStoreFiles(now = Date.now()) {
+  return cleanupOrphanTemporaryFiles(storePath().directory, now);
 }
 
 function parseStore(contents: string): Record<string, PersistedReview> {
@@ -87,14 +138,15 @@ async function readStore(): Promise<Record<string, PersistedReview>> {
 async function writeStore(records: Record<string, PersistedReview>) {
   const { directory, file, backupFile } = storePath();
   await mkdir(directory, { recursive: true });
+  await cleanupOrphanTemporaryFiles(directory);
   const contents = `${JSON.stringify(records, null, 2)}\n`;
+  if (Buffer.byteLength(contents, "utf8") > maxStoreBytes()) throw new ReviewStoreCapacityError();
   await replaceFile(file, contents);
   await replaceFile(backupFile, contents);
 }
 
 function retentionMs() {
-  const configured = Number(process.env.ESP_REVIEW_RETENTION_MS ?? defaultRetentionMs);
-  return Number.isFinite(configured) && configured >= 0 ? configured : defaultRetentionMs;
+  return configuredNonNegativeNumber("ESP_REVIEW_RETENTION_MS", defaultRetentionMs);
 }
 
 function removeExpiredTerminalReviews(records: Record<string, PersistedReview>, now: number) {
@@ -126,11 +178,28 @@ export async function loadReview<T extends PersistedReview>(correlationId: strin
 
 export async function checkReviewStore() {
   await writeQueue;
+  const { directory, file } = storePath();
+  const orphanTemporaryFilesRemoved = await cleanupOrphanTemporaryFiles(directory);
   const records = await readStore();
+  const bytesUsed = await stat(file).then(
+    (metadata) => metadata.size,
+    (error: NodeJS.ErrnoException) => {
+      if (error.code === "ENOENT") return Buffer.byteLength(`${JSON.stringify(records, null, 2)}\n`, "utf8");
+      throw error;
+    },
+  );
+  const maximumBytes = maxStoreBytes();
+  const withinCapacity = bytesUsed < maximumBytes;
   return {
-    status: "healthy" as const,
+    status: withinCapacity ? "healthy" as const : "capacity-exceeded" as const,
     backend: "file" as const,
     durableBackup: true,
+    capacity: {
+      bytesUsed,
+      maximumBytes,
+      utilization: maximumBytes === 0 ? 1 : Math.round((bytesUsed / maximumBytes) * 10_000) / 10_000,
+    },
+    orphanTemporaryFilesRemoved,
   };
 }
 
