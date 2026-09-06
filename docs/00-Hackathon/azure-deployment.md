@@ -62,12 +62,12 @@ The preview did not create or modify Azure resources. Azure Developer CLI 1.33.0
 
 ## Deployment Evidence
 
-Deployment completed on 2026-09-04:
+Initial deployment completed on 2026-09-04. Review-store recovery hardening from protected `main` commit `44795a2` was deployed and validated on 2026-09-06:
 
 - Public Demo: `https://app-esp-esp-demo-vw6mjjpc4xh64.azurewebsites.net/`
 - Health endpoint: HTTP 200 with `status=healthy`, `mode=Demo`, five Skills, and four Plugins
-- Active OneDeploy ID: `b8f82d2b-15da-47db-9d3a-5bcfe2d946da`, status `4` (Success)
-- Source package SHA-256: `8987edf566558acf673dbc40dbc37dc55d8607bd0975d5f4c429de73f26dcdc8`
+- Active deployment ID: `b6a88691-7215-4fe6-abd2-c3ddfe271b24`, deployer `Push-Deployer`, status `4` (Success), zero build warnings or errors
+- Previous initial OneDeploy ID: `b8f82d2b-15da-47db-9d3a-5bcfe2d946da`, status `4` (Success)
 - Four live scenarios returned their expected governed states with zero runtime violations
 - Analyst acceptance produced a Final report and one HumanDecision Evidence Item
 - Correlation `06aeaad2-4bac-4d72-991d-074aa83359d5` remained Completed/Final/Accept after an App Service restart
@@ -75,6 +75,7 @@ Deployment completed on 2026-09-04:
 - Helmet CSP/HSTS/nosniff/referrer headers, same-origin browser access, and the API rate limit are active
 - Production and full dependency audits report zero known vulnerabilities
 - `npm run test:hosted` automates health, security headers, all four governed scenarios, and a 390px Chromium smoke
+- Post-deployment `npm run test:hosted` passed against the hardened deployment on 2026-09-06
 
 The first remote build excluded development build tools because `NODE_ENV=production`, and the pre-deployment container also started before the Oryx manifest was active. The final configuration sets `NPM_CONFIG_INCLUDE=dev`; after successful Oryx build and a clean App Service restart, the deployed application passed all checks.
 
