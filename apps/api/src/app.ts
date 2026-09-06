@@ -7,8 +7,9 @@ import { resolve } from "node:path";
 
 import { getRegistry } from "./registry.js";
 import { checkReviewStore, ReviewStoreCapacityError } from "./review-store.js";
-import { assertRouterRequest } from "./router-contract.js";
+import { assertIntentResolutionRequest, assertRouterRequest } from "./router-contract.js";
 import { generateCandidateResults, getEvaluationSummary } from "./evaluation.js";
+import { resolveEmployeeIntent } from "./intent-resolution.js";
 import { applyAnalystDisposition, getReview, runBoundDocumentIntake, runSecurityReview, type AnalystDecision } from "./workflow.js";
 
 export interface RuntimeLogEntry {
@@ -128,6 +129,15 @@ export function createApp(options: AppOptions = {}) {
   app.get("/api/evaluation/summary", async (_request, response, next) => {
     try {
       response.json(await getEvaluationSummary());
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/intent-resolutions", async (request, response, next) => {
+    try {
+      assertIntentResolutionRequest(request.body);
+      response.json(await resolveEmployeeIntent(request.body.employeeIntent, request.body.evidencePackageId, request.body.consumerBindingCode));
     } catch (error) {
       next(error);
     }

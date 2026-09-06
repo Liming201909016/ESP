@@ -31,6 +31,25 @@ for (const [name, expected] of Object.entries(requiredHeaders)) {
 }
 if (healthResponse.headers.has("access-control-allow-origin")) throw new Error("Hosted Demo must not expose wildcard cross-origin access");
 
+const { body: intentResolution } = await jsonRequest("/api/intent-resolutions", {
+  method: "POST",
+  headers: { "content-type": "application/json", "x-request-id": "hosted-smoke-intent" },
+  body: JSON.stringify({
+    employeeIntent: "Create an application registration and grant permissions after a security review.",
+    evidencePackageId: "SYN-APP-001",
+    consumerBindingCode: "CB-ESP-DEMO-001",
+  }),
+});
+if (intentResolution.intent?.inferredRequestType !== "APP" || intentResolution.requiresConfirmation) {
+  throw new Error("Hosted intent understanding returned an unexpected decision");
+}
+if (intentResolution.discovery?.selectedCount !== 5 || intentResolution.discovery?.pluginCodes?.length !== 4) {
+  throw new Error("Hosted Skill discovery returned an unexpected governed path");
+}
+if (intentResolution.outcome?.requestedType !== "Action" || intentResolution.outcome?.authorizedType !== "Knowledge" || intentResolution.outcome?.actionAllowed) {
+  throw new Error("Hosted outcome governance did not constrain the requested action");
+}
+
 const expectedCases = {
   "SYN-RG-001": { state: "AwaitingAnalystDisposition", outcome: "HumanHandoff", traceCount: 5 },
   "SYN-RG-002": { state: "NeedsInformation", outcome: "NeedsInformation", traceCount: 1 },

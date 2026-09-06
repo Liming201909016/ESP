@@ -45,6 +45,26 @@ test("APP prompt injection is ignored and evidenced", async ({ page }) => {
   expect(await page.evaluate(() => document.body.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
+test("employee intent discovers an authorized governed path before execution", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("combobox", { name: "Synthetic package" }).selectOption("SYN-APP-001");
+  await page.getByRole("textbox", { name: "Request" }).fill("Create an application registration and grant permissions after a security review.");
+  await page.getByRole("button", { name: "Discover governed path" }).click();
+
+  await expect(page.getByRole("heading", { name: "Governed execution path" })).toBeVisible();
+  await expect(page.getByRole("list", { name: "Governed enterprise outcome path" }).getByRole("listitem")).toHaveCount(6);
+  await expect(page.locator(".skill-candidates button")).toHaveCount(5);
+  await page.getByRole("button", { name: /Risk Rating/ }).click();
+  await expect(page.locator(".skill-inspector")).toContainText("human approval");
+  await expect(page.locator(".outcome-contract")).toContainText("Action");
+  await expect(page.locator(".outcome-contract")).toContainText("Knowledge");
+
+  await page.getByRole("button", { name: "Run review" }).click();
+  await expect(page.locator(".outcome")).toHaveText("HumanHandoff");
+  await expect(page.locator(".trace-list li")).toHaveCount(5);
+  expect(await page.evaluate(() => document.body.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
 test("review API failure exposes an actionable retry", async ({ page }) => {
   let attempt = 0;
   await page.route("**/api/reviews", async (route) => {
@@ -91,6 +111,10 @@ test("primary review journey is keyboard operable with visible focus", async ({ 
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Tab");
   await expect(page.getByRole("textbox", { name: "Request" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  const discoverButton = page.getByRole("button", { name: "Discover governed path" });
+  await expect(discoverButton).toBeFocused();
+  expect(await discoverButton.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
   await page.keyboard.press("Tab");
   const runButton = page.getByRole("button", { name: "Run review" });
   await expect(runButton).toBeFocused();

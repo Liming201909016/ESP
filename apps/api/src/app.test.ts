@@ -154,6 +154,95 @@ describe("health endpoint", () => {
     });
   });
 
+  it("understands RG intent and discovers five authorized Skills", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/intent-resolutions`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        employeeIntent: "Review this resource group, network exposure, and managed identity for security risk.",
+        evidencePackageId: "SYN-RG-001",
+        consumerBindingCode: "CB-ESP-DEMO-001",
+      }),
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body).toMatchObject({
+      intent: { domain: "SecurityReview", inferredRequestType: "RG", selectionBasis: "EmployeeIntent" },
+      evidenceContext: { caseId: "SYN-RG-001", contextMatchesIntent: true },
+      discovery: { candidateCount: 5, selectedCount: 5 },
+      authorization: { status: "Active", allSelectedSkillsAuthorized: true, blockedSkillCodes: [] },
+      governance: { humanDecisionRequired: true, autonomousApprovalAllowed: false },
+      outcome: { requestedType: "Knowledge", authorizedType: "Knowledge", actionAllowed: false },
+      requiresConfirmation: false,
+    });
+    expect(body.discovery.pluginCodes).toEqual(["PLG-DOC-SOURCE", "PLG-EVIDENCE", "PLG-RUNBOOK", "PLG-REPORT"]);
+  });
+
+  it("constrains requested actions to a read-only Knowledge outcome", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/intent-resolutions`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        employeeIntent: "Create an application registration and grant permissions after a security review.",
+        evidencePackageId: "SYN-APP-001",
+        consumerBindingCode: "CB-ESP-DEMO-001",
+      }),
+    });
+    const body = await response.json();
+
+    expect(body).toMatchObject({
+      intent: { inferredRequestType: "APP" },
+      outcome: { requestedType: "Action", authorizedType: "Knowledge", actionAllowed: false },
+      requiresConfirmation: false,
+    });
+  });
+
+  it("requires confirmation when intent conflicts with evidence context", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/intent-resolutions`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        employeeIntent: "Review this application registration permission request.",
+        evidencePackageId: "SYN-RG-001",
+        consumerBindingCode: "CB-ESP-DEMO-001",
+      }),
+    });
+    const body = await response.json();
+
+    expect(body.requiresConfirmation).toBe(true);
+    expect(body.confirmationReason).toContain("intent appears to target APP");
+    expect(body.discovery).toMatchObject({ selectedCount: 0, pluginCodes: [] });
+    expect(body.authorization.allSelectedSkillsAuthorized).toBe(false);
+  });
+
+  it("does not select Security Review Skills for an unrelated employee intent", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/intent-resolutions`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        employeeIntent: "I need visitor parking for a customer.",
+        evidencePackageId: "SYN-RG-001",
+        consumerBindingCode: "CB-ESP-DEMO-001",
+      }),
+    });
+    const body = await response.json();
+
+    expect(body).toMatchObject({
+      intent: { domain: "Unclassified" },
+      discovery: { candidateCount: 5, selectedCount: 0, pluginCodes: [] },
+      requiresConfirmation: true,
+    });
+  });
+
   it("runs the RG happy path through five pinned Skills", async () => {
     const address = server.address();
     if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");

@@ -19,6 +19,67 @@ interface EvaluationSummary {
   pilotBlockers: string[];
 }
 
+interface IntentResolution {
+  resolutionId: string;
+  intent: {
+    raw: string;
+    normalized: string;
+    domain: "SecurityReview" | "Unclassified";
+    objective: string;
+    inferredRequestType: "RG" | "APP" | null;
+    inferredCategory: string;
+    signals: string[];
+    confidence: number;
+    selectionBasis: "EmployeeIntent" | "EvidenceContext";
+  };
+  evidenceContext: {
+    caseId: string;
+    requestType: "RG" | "APP";
+    category: string;
+    projectDescription: string;
+    contextMatchesIntent: boolean;
+  };
+  discovery: {
+    candidateCount: number;
+    selectedCount: number;
+    candidates: Array<{
+      skillCode: string;
+      name: string;
+      version: string;
+      implementationVersion: string;
+      pluginCodes: string[];
+      oversight: string;
+      decision: "Authorized" | "Blocked";
+      workflowSelected: boolean;
+      selectionReason: string;
+    }>;
+    pluginCodes: string[];
+  };
+  authorization: {
+    bindingCode: string;
+    consumerCode: string;
+    consumerName: string;
+    status: string;
+    allSelectedSkillsAuthorized: boolean;
+    blockedSkillCodes: string[];
+  };
+  governance: {
+    evidenceRequired: boolean;
+    evaluationRequired: boolean;
+    humanDecisionRequired: boolean;
+    autonomousApprovalAllowed: boolean;
+  };
+  outcome: {
+    requestedType: "Knowledge" | "Service" | "Action";
+    authorizedType: "Knowledge";
+    actionAllowed: boolean;
+    title: string;
+    reason: string;
+  };
+  requiresConfirmation: boolean;
+  confirmationReason: string | null;
+}
+
 interface ReviewResult {
   correlationId: string;
   caseId: string;
@@ -70,6 +131,9 @@ function App() {
   const [evaluation, setEvaluation] = useState<EvaluationSummary | null>(null);
   const [caseId, setCaseId] = useState("SYN-RG-001");
   const [requestText, setRequestText] = useState("Review this package and produce an evidence-grounded draft.");
+  const [intentResolution, setIntentResolution] = useState<IntentResolution | null>(null);
+  const [selectedSkillCode, setSelectedSkillCode] = useState<string | null>(null);
+  const [discovering, setDiscovering] = useState(false);
   const [review, setReview] = useState<ReviewResult | null>(null);
   const [running, setRunning] = useState(false);
   const [analystRationale, setAnalystRationale] = useState("Reviewed against the cited evidence and synthetic Runbook.");
@@ -100,6 +164,11 @@ function App() {
     setRunning(true);
     setReviewError("");
     try {
+      const resolution = intentResolution ?? await discoverIntent();
+      if (!resolution || resolution.requiresConfirmation) {
+        setReview(null);
+        return;
+      }
       const result = await fetchJson<ReviewResult>("/api/reviews", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -111,6 +180,33 @@ function App() {
     } finally {
       setRunning(false);
     }
+  }
+
+  async function discoverIntent() {
+    setDiscovering(true);
+    setReviewError("");
+    try {
+      const result = await fetchJson<IntentResolution>("/api/intent-resolutions", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ employeeIntent: requestText, evidencePackageId: caseId, consumerBindingCode: "CB-ESP-DEMO-001" }),
+      });
+      setIntentResolution(result);
+      setSelectedSkillCode(result.discovery.candidates[0]?.skillCode ?? null);
+      return result;
+    } catch (error) {
+      setReviewError(error instanceof Error ? error.message : "Unable to discover a governed path.");
+      return null;
+    } finally {
+      setDiscovering(false);
+    }
+  }
+
+  function resetDiscovery() {
+    setIntentResolution(null);
+    setSelectedSkillCode(null);
+    setReview(null);
+    setReviewError("");
   }
 
   async function submitDisposition(decision: string) {
@@ -207,7 +303,7 @@ function App() {
 
           <label>
             Synthetic package
-            <select value={caseId} onChange={(event) => setCaseId(event.target.value)}>
+            <select value={caseId} onChange={(event) => { setCaseId(event.target.value); resetDiscovery(); }}>
               <option value="SYN-RG-001">RG happy path</option>
               <option value="SYN-RG-002">RG missing information</option>
               <option value="SYN-APP-001">APP happy path</option>
@@ -217,12 +313,17 @@ function App() {
 
           <label>
             Request
-            <textarea value={requestText} onChange={(event) => setRequestText(event.target.value)} rows={4} />
+            <textarea value={requestText} onChange={(event) => { setRequestText(event.target.value); resetDiscovery(); }} rows={4} />
           </label>
 
-          <button type="button" onClick={runReview} disabled={running}>
+          <div className="primary-actions">
+            <button type="button" className="secondary-action" onClick={() => void discoverIntent()} disabled={discovering || running}>
+              {discovering ? "Discovering..." : "Discover governed path"}
+            </button>
+            <button type="button" onClick={runReview} disabled={running || discovering || intentResolution?.requiresConfirmation === true}>
             {running ? "Running review..." : "Run review"}
-          </button>
+            </button>
+          </div>
         </div>
 
         <div className="review-output" aria-live="polite">
@@ -233,8 +334,77 @@ function App() {
               <button type="button" onClick={runReview} disabled={running}>Retry review</button>
             </div>
           ) : null}
+          {intentResolution ? (
+            <section className="decision-center" aria-labelledby="decision-center-title">
+              <div className="decision-center-heading">
+                <div>
+                  <p className="section-label">Intent and Skill discovery</p>
+                  <h3 id="decision-center-title">Governed execution path</h3>
+                </div>
+                <span className={intentResolution.requiresConfirmation ? "resolution-badge warning" : "resolution-badge"}>
+                  {intentResolution.requiresConfirmation ? "Confirm context" : `${Math.round(intentResolution.intent.confidence * 100)}% match`}
+                </span>
+              </div>
+
+              <ol className="governed-path" aria-label="Governed enterprise outcome path">
+                <li><span>1</span><strong>Employee intent</strong><small>{intentResolution.intent.normalized}</small></li>
+                <li><span>2</span><strong>Intent understanding</strong><small>{intentResolution.intent.objective} · {intentResolution.intent.inferredRequestType ?? "context inferred"}</small></li>
+                <li><span>3</span><strong>Skill discovery</strong><small>{intentResolution.discovery.selectedCount}/{intentResolution.discovery.candidateCount} authorized candidates</small></li>
+                <li><span>4</span><strong>Governed Skills</strong><small>{intentResolution.authorization.bindingCode} · {intentResolution.authorization.status}</small></li>
+                <li><span>5</span><strong>Reusable Plugins</strong><small>{intentResolution.discovery.pluginCodes.length} adapters selected</small></li>
+                <li><span>6</span><strong>Enterprise outcome</strong><small>{intentResolution.outcome.authorizedType} · human accountable</small></li>
+              </ol>
+
+              {intentResolution.requiresConfirmation ? (
+                <div className="resolution-warning" role="alert">
+                  <strong>Execution paused</strong>
+                  <p>{intentResolution.confirmationReason}</p>
+                </div>
+              ) : null}
+
+              <div className="discovery-layout">
+                <div>
+                  <h4>Discovered Skills</h4>
+                  <div className="skill-candidates">
+                    {intentResolution.discovery.candidates.map((candidate) => (
+                      <button
+                        type="button"
+                        key={candidate.skillCode}
+                        className={selectedSkillCode === candidate.skillCode ? "selected" : ""}
+                        onClick={() => setSelectedSkillCode(candidate.skillCode)}
+                        aria-pressed={selectedSkillCode === candidate.skillCode}
+                      >
+                        <span>{candidate.name}</span>
+                        <small>{candidate.workflowSelected ? "Selected" : "Not selected"} · {candidate.decision} · {candidate.oversight}</small>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="skill-inspector">
+                  {intentResolution.discovery.candidates.filter((candidate) => candidate.skillCode === selectedSkillCode).map((candidate) => (
+                    <div key={candidate.skillCode}>
+                      <span className="decision-state">{candidate.decision}</span>
+                      <h4>{candidate.name}</h4>
+                      <code>{candidate.skillCode} · v{candidate.version}</code>
+                      <p>{candidate.selectionReason}</p>
+                      <dl>
+                        <div><dt>Implementation</dt><dd>{candidate.implementationVersion}</dd></div>
+                        <div><dt>Plugins</dt><dd>{candidate.pluginCodes.join(" + ")}</dd></div>
+                      </dl>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="outcome-contract">
+                <div><span>Requested</span><strong>{intentResolution.outcome.requestedType}</strong></div>
+                <div><span>Authorized</span><strong>{intentResolution.outcome.authorizedType}</strong></div>
+                <p>{intentResolution.outcome.reason}</p>
+              </div>
+            </section>
+          ) : null}
           {!review ? (
-            <div className="empty-state"><span>Awaiting request</span><p>The ordered Skill trace and evidence will appear here.</p></div>
+            !intentResolution ? <div className="empty-state"><span>Awaiting intent</span><p>Discover the governed Skill path, then execute the evidence-grounded review.</p></div> : null
           ) : (
             <>
               <div className="result-summary">

@@ -17,6 +17,17 @@ const routerRequestSchema = {
   },
 } as const;
 
+const intentResolutionRequestSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["employeeIntent", "evidencePackageId", "consumerBindingCode"],
+  properties: {
+    employeeIntent: { type: "string", minLength: 1, maxLength: 4000 },
+    evidencePackageId: { type: "string", minLength: 1 },
+    consumerBindingCode: { type: "string", minLength: 1 },
+  },
+} as const;
+
 const reviewEnvelopeSchema = {
   type: "object",
   additionalProperties: true,
@@ -95,6 +106,7 @@ const reviewEnvelopeSchema = {
 } as const;
 
 const validateRouterRequest = ajv.compile(routerRequestSchema);
+const validateIntentResolutionRequest = ajv.compile(intentResolutionRequestSchema);
 const validateReviewEnvelope = ajv.compile(reviewEnvelopeSchema);
 
 function validationMessage(errors: ErrorObject[] | null | undefined) {
@@ -103,6 +115,12 @@ function validationMessage(errors: ErrorObject[] | null | undefined) {
 
 export function assertRouterRequest(value: unknown): asserts value is { caseId: string; request: string; consumerBindingCode: string } {
   if (!validateRouterRequest(value)) throw new Error(`Router request contract violation: ${validationMessage(validateRouterRequest.errors)}`);
+}
+
+export function assertIntentResolutionRequest(value: unknown): asserts value is { employeeIntent: string; evidencePackageId: string; consumerBindingCode: string } {
+  if (!validateIntentResolutionRequest(value)) {
+    throw new Error(`Intent resolution request contract violation: ${validationMessage(validateIntentResolutionRequest.errors)}`);
+  }
 }
 
 export function assertReviewEnvelope(value: unknown): asserts value is { correlationId: string } {
