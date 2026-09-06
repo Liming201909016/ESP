@@ -274,6 +274,23 @@ h1 {
   opacity: 0.6;
 }
 
+.primary-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.primary-actions button {
+  margin-top: 0;
+}
+
+.primary-actions .secondary-action {
+  border: 1px solid #14503e;
+  color: #14503e;
+  background: transparent;
+}
+
 .review-output {
   min-height: 420px;
   padding-left: 32px;
@@ -292,6 +309,223 @@ h1 {
   font-family: "Aptos Display", "Segoe UI Variable Display", sans-serif;
   font-size: 1.4rem;
   font-weight: 600;
+}
+
+.decision-center {
+  padding-bottom: 28px;
+  border-bottom: 1px solid #9db3a7;
+}
+
+.decision-center-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 18px;
+}
+
+.decision-center-heading h3 {
+  margin: 0;
+  font-family: "Aptos Display", "Segoe UI Variable Display", sans-serif;
+  font-size: 1.35rem;
+}
+
+.resolution-badge,
+.decision-state {
+  color: #14503e;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.resolution-badge.warning {
+  color: #8a251f;
+}
+
+.governed-path {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 1px;
+  list-style: none;
+  background: #b9c8c0;
+}
+
+.governed-path li {
+  min-height: 104px;
+  padding: 14px;
+  background: #eef3ef;
+}
+
+.governed-path li > span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #126f99;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.governed-path li:nth-child(4) > span {
+  background: #6652bd;
+}
+
+.governed-path li:nth-child(5) > span,
+.governed-path li:nth-child(6) > span {
+  background: #16866a;
+}
+
+.governed-path strong,
+.governed-path small {
+  display: block;
+}
+
+.governed-path strong {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.governed-path small {
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+  color: #60746b;
+  line-height: 1.35;
+}
+
+.resolution-warning {
+  margin-top: 14px;
+  padding: 14px;
+  border-left: 4px solid #a8322a;
+  color: #7c211b;
+  background: #fff7f6;
+}
+
+.resolution-warning p {
+  margin: 4px 0 0;
+}
+
+.discovery-layout {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.75fr) minmax(0, 1.25fr);
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.discovery-layout h4 {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.skill-candidates {
+  display: grid;
+  gap: 1px;
+  background: #cbd5ce;
+}
+
+.skill-candidates button {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  min-height: 54px;
+  padding: 9px 11px;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  color: #17201c;
+  background: #f4f6f2;
+  text-align: left;
+  cursor: pointer;
+}
+
+.skill-candidates button.selected {
+  border-left-color: #126f99;
+  background: #e5eff3;
+}
+
+.skill-candidates button span {
+  font-weight: 600;
+}
+
+.skill-candidates button small {
+  color: #60746b;
+}
+
+.skill-inspector {
+  min-height: 230px;
+  padding: 18px 0 18px 22px;
+  border-left: 1px solid #9db3a7;
+}
+
+.skill-inspector h4 {
+  margin: 8px 0 5px;
+  font-size: 1.1rem;
+  text-transform: none;
+}
+
+.skill-inspector code {
+  overflow-wrap: anywhere;
+  color: #496259;
+  font-family: "Aptos", "Segoe UI Variable Text", sans-serif;
+  font-size: 0.75rem;
+}
+
+.skill-inspector p {
+  margin: 18px 0;
+  color: #384b43;
+  line-height: 1.55;
+}
+
+.skill-inspector dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.skill-inspector dt,
+.outcome-contract span {
+  color: #6d7c75;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.skill-inspector dd {
+  margin: 3px 0 0;
+  overflow-wrap: anywhere;
+  font-size: 0.82rem;
+}
+
+.outcome-contract {
+  display: grid;
+  grid-template-columns: 110px 110px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  margin-top: 20px;
+  padding: 14px 0;
+  border-top: 1px solid #cbd5ce;
+  border-bottom: 1px solid #cbd5ce;
+}
+
+.outcome-contract span,
+.outcome-contract strong {
+  display: block;
+}
+
+.outcome-contract strong {
+  margin-top: 3px;
+  color: #14503e;
+}
+
+.outcome-contract p {
+  margin: 0;
+  color: #496259;
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .result-summary {
@@ -666,6 +900,20 @@ h1 {
   .review-output {
     min-height: 260px;
     padding: 28px 0 0;
+    border-top: 1px solid #9db3a7;
+    border-left: 0;
+  }
+
+  .primary-actions,
+  .governed-path,
+  .discovery-layout,
+  .outcome-contract {
+    grid-template-columns: 1fr;
+  }
+
+  .skill-inspector {
+    min-height: 0;
+    padding: 20px 0 0;
     border-top: 1px solid #9db3a7;
     border-left: 0;
   }

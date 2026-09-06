@@ -40,6 +40,15 @@ try {
   const healthResponse = await fetch(`${baseUrl}/api/health`, { headers: { "x-request-id": "production-smoke" } });
   const health = await healthResponse.json();
   const registry = await (await fetch(`${baseUrl}/api/registry`)).json();
+  const intentResolution = await (await fetch(`${baseUrl}/api/intent-resolutions`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      employeeIntent: "Create an application registration and grant permissions after a security review.",
+      evidencePackageId: "SYN-APP-001",
+      consumerBindingCode: "CB-ESP-DEMO-001",
+    }),
+  })).json();
   const review = await (await fetch(`${baseUrl}/api/reviews`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -50,6 +59,9 @@ try {
   if (health.status !== "healthy" || !health.ready || health.reviewStore?.status !== "healthy") throw new Error("Health endpoint failed");
   if (healthResponse.headers.get("x-request-id") !== "production-smoke") throw new Error("Request ID propagation failed");
   if (registry.skills.length !== 5 || registry.plugins.length !== 4) throw new Error("Registry endpoint failed");
+  if (intentResolution.discovery.selectedCount !== 5 || intentResolution.outcome.requestedType !== "Action" || intentResolution.outcome.authorizedType !== "Knowledge") {
+    throw new Error("Intent and Skill discovery failed");
+  }
   if (review.trace.length !== 5 || review.report.status !== "Draft") throw new Error("Review endpoint failed");
   console.log(`One-process Demo: PASS (port ${port})`);
 } finally {
