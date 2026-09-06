@@ -8,11 +8,13 @@ import { createApp } from "./app.js";
 import { containsPromptInjection, documentSourcePlugin } from "./plugins.js";
 import { cleanupExpiredReviews, saveReview } from "./review-store.js";
 import { assertReviewEnvelope } from "./router-contract.js";
+import { closeHttpServer } from "./server-lifecycle.js";
 import { detectRuntimeViolations, getReview } from "./workflow.js";
 
 const testDataDirectory = resolve(tmpdir(), `esp-api-tests-${process.pid}`);
 process.env.ESP_DATA_DIR = testDataDirectory;
-const server = createApp().listen(0, "127.0.0.1");
+const runtimeLogs: Array<{ event: string; requestId: string; statusCode?: number }> = [];
+const server = createApp({ logger: (entry) => runtimeLogs.push(entry) }).listen(0, "127.0.0.1");
 const requestText = "Review this package and produce an evidence-grounded draft.";
 const reviewBody = (caseId: string, consumerBindingCode = "CB-ESP-DEMO-001") => JSON.stringify({ caseId, request: requestText, consumerBindingCode });
 
@@ -38,11 +40,63 @@ describe("health endpoint", () => {
     expect(response.headers.get("referrer-policy")).toBe("no-referrer");
     expect(response.headers.get("access-control-allow-origin")).toBeNull();
     expect(response.headers.get("ratelimit-policy")).not.toBeNull();
+    expect(response.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{36}$/);
     expect(body).toMatchObject({
       status: "healthy",
+      ready: true,
       mode: "Demo",
       registry: { status: "healthy", skillCount: 5, pluginCount: 4 },
+      reviewStore: { status: "healthy", backend: "file", durableBackup: true },
     });
+    expect(body.uptimeSeconds).toBeGreaterThanOrEqual(0);
+  });
+
+  it("propagates a valid request ID into the response and runtime log", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const requestId = "demo-request-123";
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/registry`, { headers: { "x-request-id": requestId } });
+    await response.arrayBuffer();
+
+    expect(response.headers.get("x-request-id")).toBe(requestId);
+    expect(runtimeLogs).toContainEqual(expect.objectContaining({ event: "http_request", requestId, statusCode: 200 }));
+  });
+
+  it("replaces an invalid request ID instead of logging untrusted content", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/registry`, { headers: { "x-request-id": "invalid request id" } });
+    await response.arrayBuffer();
+
+    expect(response.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{36}$/);
+    expect(runtimeLogs.some((entry) => entry.requestId === "invalid request id")).toBe(false);
+  });
+
+  it("reports not ready when the review store probe fails", async () => {
+    const readinessLogs: Array<{ event: string; error?: string }> = [];
+    const unavailableServer = createApp({
+      logger: (entry) => readinessLogs.push(entry),
+      readinessCheck: async () => { throw new Error("Store unavailable"); },
+    }).listen(0, "127.0.0.1");
+    try {
+      if (!unavailableServer.listening) await new Promise<void>((resolveListening) => unavailableServer.once("listening", resolveListening));
+      const unavailableAddress = unavailableServer.address();
+      if (!unavailableAddress || typeof unavailableAddress === "string") throw new Error("Unavailable App did not bind to a TCP port");
+      const response = await fetch(`http://127.0.0.1:${unavailableAddress.port}/api/health`);
+      expect(response.status).toBe(503);
+      await expect(response.json()).resolves.toMatchObject({ status: "degraded", ready: false, reviewStore: { status: "unavailable" } });
+      expect(readinessLogs).toContainEqual(expect.objectContaining({ event: "request_error", error: "Store unavailable" }));
+    } finally {
+      await closeHttpServer(unavailableServer, 1_000);
+    }
+  });
+
+  it("drains the HTTP server during graceful shutdown", async () => {
+    const drainingServer = createApp({ logger: () => undefined }).listen(0, "127.0.0.1");
+    if (!drainingServer.listening) await new Promise<void>((resolveListening) => drainingServer.once("listening", resolveListening));
+
+    await expect(closeHttpServer(drainingServer, 1_000)).resolves.toBe("closed");
+    expect(drainingServer.listening).toBe(false);
   });
 
   it("returns five pinned Skills and four healthy Demo Plugins", async () => {
@@ -248,7 +302,7 @@ describe("health endpoint", () => {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ decision: "Accept", rationale: "Persistence check" }),
     });
 
-    const secondServer = createApp().listen(0, "127.0.0.1");
+    const secondServer = createApp({ logger: () => undefined }).listen(0, "127.0.0.1");
     try {
       if (!secondServer.listening) {
         await new Promise<void>((resolveListening) => secondServer.once("listening", resolveListening));
@@ -279,6 +333,20 @@ describe("health endpoint", () => {
       trace: [{ sequence: 1 }],
     });
     expect(JSON.parse(await readFile(storeFile, "utf8"))).toHaveProperty(correlationId);
+  });
+
+  it("accepts later writes after a transient store failure", async () => {
+    const originalDataDirectory = process.env.ESP_DATA_DIR;
+    const blockingFile = resolve(testDataDirectory, "not-a-directory");
+    await writeFile(blockingFile, "blocks directory creation", "utf8");
+    process.env.ESP_DATA_DIR = resolve(blockingFile, "nested");
+    await expect(saveReview({ correlationId: "TRANSIENT-FAILURE" })).rejects.toThrow();
+
+    process.env.ESP_DATA_DIR = originalDataDirectory;
+    await expect(saveReview({ correlationId: "AFTER-TRANSIENT-FAILURE", state: "AwaitingAnalystDisposition" })).resolves.toMatchObject({
+      correlationId: "AFTER-TRANSIENT-FAILURE",
+    });
+    expect(await getReview("AFTER-TRANSIENT-FAILURE")).toMatchObject({ state: "AwaitingAnalystDisposition" });
   });
 
   it("removes expired terminal reviews without deleting active traces", async () => {
