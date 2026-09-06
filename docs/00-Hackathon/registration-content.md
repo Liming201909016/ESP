@@ -164,7 +164,7 @@ The project has executable validation rather than architecture slides alone:
 - the evaluator explicitly reports `pilotEligible=false` for synthetic data;
 - seven Power Platform Solution foundations package successfully for the enterprise scale-out path;
 - the local Node/Express/Ajv foundation has compiled the canonical JSON Schema and passed an HTTP runtime smoke test.
-- 21 API integration tests and 16 desktop/mobile browser journeys pass across governed scenarios, error recovery, accessibility, and keyboard operation.
+- 22 API integration tests and 16 desktop/mobile browser journeys pass across governed scenarios, persistence recovery, error recovery, accessibility, and keyboard operation.
 
 The local browser experience, Skill Router, Plugin runtime, analyst workflow, report path, execution trace, evaluator integration, and recorded fallback media are runnable. Optional Connected Mode remains gated stretch work.
 

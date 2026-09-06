@@ -229,7 +229,7 @@ Validate setup from a fresh local clone:
 Current validation covers:
 
 - 15 valid and 10 invalid Skill contract examples;
-- 21 API integration tests;
+- 22 API integration tests;
 - four versioned synthetic Security Review cases;
 - 36 mandatory evaluation assertions;
 - 16 desktop/mobile browser journeys covering governed scenarios, error recovery, accessibility, and keyboard operation;
