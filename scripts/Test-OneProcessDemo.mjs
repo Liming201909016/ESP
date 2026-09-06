@@ -27,7 +27,7 @@ try {
     const timeout = setTimeout(() => reject(new Error("One-process Demo did not start")), 10_000);
     child.once("exit", (code) => reject(new Error(`One-process Demo exited early: ${code}`)));
     child.stdout.on("data", (chunk) => {
-      if (chunk.toString().includes("ESP API listening")) {
+      if (chunk.toString().includes('"event":"server_started"')) {
         clearTimeout(timeout);
         resolveReady();
       }
@@ -37,7 +37,8 @@ try {
   const baseUrl = `http://127.0.0.1:${port}`;
   const rootResponse = await fetch(baseUrl);
   const html = await rootResponse.text();
-  const health = await (await fetch(`${baseUrl}/api/health`)).json();
+  const healthResponse = await fetch(`${baseUrl}/api/health`, { headers: { "x-request-id": "production-smoke" } });
+  const health = await healthResponse.json();
   const registry = await (await fetch(`${baseUrl}/api/registry`)).json();
   const review = await (await fetch(`${baseUrl}/api/reviews`, {
     method: "POST",
@@ -46,7 +47,8 @@ try {
   })).json();
 
   if (!rootResponse.ok || !html.includes("Enterprise Skill Platform")) throw new Error("Built UI was not served");
-  if (health.status !== "healthy") throw new Error("Health endpoint failed");
+  if (health.status !== "healthy" || !health.ready || health.reviewStore?.status !== "healthy") throw new Error("Health endpoint failed");
+  if (healthResponse.headers.get("x-request-id") !== "production-smoke") throw new Error("Request ID propagation failed");
   if (registry.skills.length !== 5 || registry.plugins.length !== 4) throw new Error("Registry endpoint failed");
   if (review.trace.length !== 5 || review.report.status !== "Draft") throw new Error("Review endpoint failed");
   console.log(`One-process Demo: PASS (port ${port})`);

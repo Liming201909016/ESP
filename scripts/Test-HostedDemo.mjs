@@ -9,9 +9,12 @@ async function jsonRequest(path, init) {
   return { response, body: JSON.parse(text) };
 }
 
-const { response: healthResponse, body: health } = await jsonRequest("/api/health");
-if (health.status !== "healthy" || health.mode !== "Demo") throw new Error("Hosted Demo health payload is invalid");
+const healthRequestId = "hosted-smoke-health";
+const { response: healthResponse, body: health } = await jsonRequest("/api/health", { headers: { "x-request-id": healthRequestId } });
+if (health.status !== "healthy" || !health.ready || health.mode !== "Demo") throw new Error("Hosted Demo health payload is invalid");
 if (health.registry.skillCount !== 5 || health.registry.pluginCount !== 4) throw new Error("Hosted registry counts are invalid");
+if (health.reviewStore?.status !== "healthy" || health.reviewStore?.durableBackup !== true) throw new Error("Hosted review store is not ready");
+if (healthResponse.headers.get("x-request-id") !== healthRequestId) throw new Error("Hosted request ID propagation failed");
 
 const requiredHeaders = {
   "content-security-policy": "default-src 'self'",

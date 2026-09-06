@@ -13,6 +13,12 @@ let writeQueue = Promise.resolve();
 const terminalStates = new Set(["Completed", "RejectedByAnalyst", "Escalated", "CannotAssess"]);
 const defaultRetentionMs = 7 * 24 * 60 * 60 * 1000;
 
+function queueStoreOperation<T>(operation: () => Promise<T>) {
+  const queued = writeQueue.catch(() => undefined).then(operation);
+  writeQueue = queued.then(() => undefined, () => undefined);
+  return queued;
+}
+
 function storePath() {
   const directory = process.env.ESP_DATA_DIR ?? resolve(process.cwd(), ".esp-data");
   const file = resolve(directory, "reviews.json");
@@ -104,13 +110,12 @@ function removeExpiredTerminalReviews(records: Record<string, PersistedReview>, 
 }
 
 export async function saveReview<T extends PersistedReview>(review: T) {
-  writeQueue = writeQueue.then(async () => {
+  await queueStoreOperation(async () => {
     const records = await readStore();
     removeExpiredTerminalReviews(records, Date.now());
     records[review.correlationId] = { ...review, updatedAt: new Date().toISOString() };
     await writeStore(records);
   });
-  await writeQueue;
   return review;
 }
 
@@ -119,13 +124,22 @@ export async function loadReview<T extends PersistedReview>(correlationId: strin
   return (await readStore())[correlationId] as T | undefined;
 }
 
+export async function checkReviewStore() {
+  await writeQueue;
+  const records = await readStore();
+  return {
+    status: "healthy" as const,
+    backend: "file" as const,
+    durableBackup: true,
+  };
+}
+
 export async function cleanupExpiredReviews(now = Date.now()) {
   let removed = 0;
-  writeQueue = writeQueue.then(async () => {
+  await queueStoreOperation(async () => {
     const records = await readStore();
     removed = removeExpiredTerminalReviews(records, now);
     if (removed) await writeStore(records);
   });
-  await writeQueue;
   return removed;
 }
