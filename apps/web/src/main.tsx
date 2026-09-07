@@ -421,7 +421,8 @@ function App() {
         <div className="catalog-heading">
           <div>
             <p className="section-label">Pinned registry</p>
-            <h2 id="catalog-title">Five Skills. Four Plugins. One contract.</h2>
+            <h2 id="catalog-title">Five governed Skills. Four reusable Plugins. One execution standard.</h2>
+            <p className="catalog-explainer">Skills define what the enterprise does. Plugins provide how systems connect. ESP keeps identity, versions, evidence, outcomes, and oversight consistent.</p>
           </div>
           <span className="health-badge">{registry?.status ?? "loading"}</span>
         </div>
@@ -439,7 +440,7 @@ function App() {
             </ul>
           </div>
           <div>
-            <h3>Demo Plugins</h3>
+            <h3>Reusable Demo Plugins</h3>
             <ul className="registry-list">
               {registry?.plugins.map((plugin) => (
                 <li key={plugin.code}>

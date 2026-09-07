@@ -155,8 +155,15 @@ h1 {
 
 .catalog-heading h2 {
   max-width: 680px;
-  margin-bottom: 0;
+  margin-bottom: 12px;
   font-size: 2rem;
+}
+
+.catalog-explainer {
+  max-width: 760px;
+  margin-bottom: 0;
+  color: #60746b;
+  line-height: 1.55;
 }
 
 .health-badge {
