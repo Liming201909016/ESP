@@ -12,7 +12,7 @@ Open the ESP Security Review Copilot in Demo Mode. Select `SYN-RG-001` and ask f
 
 ## 3. Skills and Plugins, 75 seconds
 
-Introduce the registry as **five governed Skills, four reusable Plugins, and one execution standard**. Explain: Skills define what the enterprise does; Plugins provide how systems connect; the execution standard keeps identity, versions, evidence, outcomes, errors, and oversight consistent. Open the execution trace and highlight that Document Intake and Evidence Extraction share `PLG-DOC-SOURCE`, while every Skill uses `PLG-EVIDENCE`.
+Introduce the registry as **five governed Skills, four reusable Plugins, and one execution standard**. Explain: Skills define what the enterprise does; Plugins provide how systems connect; the execution standard keeps identity, versions, evidence, outcomes, errors, and oversight consistent. Use the Governance Control Plane to show pinned versions, two active Consumer Bindings, the Risk Rating approval gate, the 84/84 Foundation evaluation, and the explicit Pilot block. Open the execution trace and highlight that Document Intake and Evidence Extraction share `PLG-DOC-SOURCE`, while every Skill uses `PLG-EVIDENCE`.
 
 ## 4. Evidence and human accountability, 75 seconds
 

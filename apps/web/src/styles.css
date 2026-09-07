@@ -219,6 +219,195 @@ h1 {
   font-size: 0.76rem;
 }
 
+.governance-plane {
+  padding: 58px 0;
+  border-top: 1px solid #cbd5ce;
+}
+
+.governance-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  align-items: end;
+}
+
+.governance-heading h2 {
+  margin-bottom: 10px;
+  font-size: 2rem;
+}
+
+.governance-heading p:last-child {
+  max-width: 720px;
+  margin: 0;
+  color: #60746b;
+  line-height: 1.55;
+}
+
+.scope-badge {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid #b17a1b;
+  border-radius: 3px;
+  color: #713f12;
+  background: #fff7dc;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.control-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 28px;
+  padding: 1px;
+  background: #9db3a7;
+}
+
+.control-strip > div {
+  min-width: 0;
+  padding: 16px;
+  background: #eef3ef;
+}
+
+.control-strip span,
+.control-strip strong,
+.control-strip small {
+  display: block;
+}
+
+.control-strip span {
+  color: #496259;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.control-strip strong {
+  margin-top: 10px;
+  color: #14503e;
+}
+
+.control-strip small {
+  margin-top: 6px;
+  color: #496259;
+  line-height: 1.4;
+}
+
+.governance-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+  gap: 40px;
+  margin-top: 30px;
+}
+
+.governance-detail h3 {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+}
+
+.binding-matrix {
+  border-top: 1px solid #9db3a7;
+}
+
+.binding-matrix h3 {
+  margin-top: 18px;
+}
+
+.binding-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 16px;
+  padding: 13px 0;
+  border-top: 1px solid #d7ded9;
+}
+
+.binding-row div strong,
+.binding-row div code,
+.binding-row small {
+  display: block;
+}
+
+.binding-row div code {
+  margin-top: 3px;
+  color: #60746b;
+  font-family: "Aptos", "Segoe UI Variable Text", sans-serif;
+  font-size: 0.72rem;
+}
+
+.binding-row > span {
+  color: #14503e;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.binding-row small {
+  grid-column: 1 / -1;
+  color: #6d7c75;
+}
+
+.governance-boundary {
+  padding: 18px;
+  color: #ffffff;
+  background: #22302a;
+}
+
+.governance-boundary dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin: 0;
+  background: #496259;
+}
+
+.governance-boundary dl div {
+  padding: 10px;
+  background: #17201c;
+}
+
+.governance-boundary dt {
+  color: #9db3a7;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+}
+
+.governance-boundary dd {
+  margin: 5px 0 0;
+  font-size: 0.78rem;
+}
+
+.governance-boundary p {
+  margin: 14px 0 0;
+  color: #b8c8c0;
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.execution-governance {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  margin-top: 22px;
+  padding: 12px 14px;
+  border-left: 4px solid #126f99;
+  background: #e5eff3;
+}
+
+.execution-governance span {
+  color: #496259;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.execution-governance small {
+  overflow-wrap: anywhere;
+  color: #60746b;
+}
+
 .reuse-proof {
   padding: 58px 0;
   border-top: 1px solid #cbd5ce;
@@ -1450,7 +1639,9 @@ h1 {
 
   .catalog-heading,
   .catalog-grid,
-  .reuse-heading {
+  .reuse-heading,
+  .governance-heading,
+  .governance-detail {
     display: grid;
     grid-template-columns: 1fr;
   }
@@ -1465,7 +1656,9 @@ h1 {
   }
 
   .reuse-comparison,
-  .reuse-empty {
+  .reuse-empty,
+  .control-strip,
+  .execution-governance {
     grid-template-columns: 1fr;
   }
 
