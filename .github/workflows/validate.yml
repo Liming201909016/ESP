@@ -56,6 +56,9 @@ jobs:
       - name: Run application tests
         run: npm test
 
+      - name: Validate committed demo media
+        run: npm run test:media
+
       - name: Run independent evaluation
         run: npm run evaluate
 

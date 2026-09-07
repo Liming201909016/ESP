@@ -17,8 +17,11 @@
     "audit:production": "npm audit --omit=dev --audit-level=high",
     "evaluate": "npm run export:evaluation -w @esp/api && .venv\\Scripts\\python.exe scripts\\Run-SyntheticEvaluation.py --results artifacts\\evaluation-runs\\app-candidate-results.json --output artifacts\\evaluation-runs\\ER-APP-LATEST.json",
     "measure:performance": "node scripts/Measure-DemoPerformance.mjs",
-    "capture:demo": "node scripts/Capture-DemoScreenshots.mjs",
-    "record:demo": "node scripts/Record-DemoFallback.mjs",
+    "capture:demo": "npm run build && node scripts/Capture-DemoScreenshots.mjs",
+    "record:demo": "npm run build && node scripts/Record-DemoFallback.mjs",
+    "test:media": "node scripts/Test-DemoMedia.mjs",
+    "voiceover:demo": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Generate-DemoVoiceover.ps1",
+    "prepare:video": "npm run build && node scripts/Capture-DemoScreenshots.mjs && node scripts/Record-DemoFallback.mjs && npm run voiceover:demo && node scripts/Test-DemoMedia.mjs",
     "start": "npm run start -w @esp/api",
     "demo": "npm run build && npm run start"
   },

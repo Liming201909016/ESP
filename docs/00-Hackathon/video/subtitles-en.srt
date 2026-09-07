@@ -1,0 +1,43 @@
+1
+00:00:00,000 --> 00:00:05,000
+Enterprise Skill Platform moves enterprise AI from copied agents to governed, reusable capabilities.
+
+2
+00:00:05,000 --> 00:00:11,000
+Employees think in intents. Enterprise capabilities remain scattered. ESP bridges the gap.
+
+3
+00:00:11,000 --> 00:00:17,000
+This public Demo uses synthetic data. A natural-language request enters one governed Review workspace.
+
+4
+00:00:17,000 --> 00:00:26,000
+The Router understands intent, validates the Consumer Binding, and executes five pinned Skills through authorized Plugins.
+
+5
+00:00:26,000 --> 00:00:35,000
+Every material claim resolves to retained Evidence. Decision Lineage preserves versions, citations, and the Correlation ID.
+
+6
+00:00:35,000 --> 00:00:44,000
+The model proposes risk. The accountable analyst changes the rating and creates Human Decision evidence.
+
+7
+00:00:44,000 --> 00:00:54,000
+Policy denial stops the responsible Skill and Plugin. ESP does not bypass policy or invent a result.
+
+8
+00:00:54,000 --> 00:01:04,000
+The Governance Control Plane shows versions, Bindings, authorization, oversight, and the Pilot boundary.
+
+9
+00:01:04,000 --> 00:01:14,000
+Seven synthetic cases pass all 84 mandatory assertions. Synthetic evidence does not establish Pilot approval.
+
+10
+00:01:14,000 --> 00:01:22,000
+Two Consumers resolve the same pinned Skill and Plugins with no copied implementation.
+
+11
+00:01:22,000 --> 00:01:28,000
+Build once. Govern once. Reuse everywhere.

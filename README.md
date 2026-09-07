@@ -130,7 +130,11 @@ The Security Review path is an explicit state machine. Generative orchestration 
 
 ![ESP Demo Mode showing the governed Skill and Plugin execution experience](docs/00-Hackathon/assets/esp-demo-desktop.png)
 
-[Download the automated fallback demo recording](docs/00-Hackathon/assets/esp-demo-fallback.webm)
+[Download the two-minute Demo picture track](docs/00-Hackathon/assets/esp-demo-fallback.webm)
+
+[Download the English voiceover](docs/00-Hackathon/video/voiceover-en.wav) · [Download the English subtitles](docs/00-Hackathon/video/subtitles-en.srt)
+
+[Use the five-minute video production guide](docs/00-Hackathon/video-production-guide.md)
 
 ## Demo Scenarios
 
@@ -140,6 +144,9 @@ The committed synthetic dataset covers:
 - missing mandatory resource and permission information;
 - application-registration happy path;
 - prompt injection embedded in an untrusted source document.
+- policy denial before restricted source access;
+- authorized but unreadable evidence;
+- bounded Runbook dependency failure.
 
 Expected governed outcomes include `Success`, `NeedsInformation`, `CannotAssess`, `RejectedByPolicy`, `HumanHandoff`, and `Failed`.
 

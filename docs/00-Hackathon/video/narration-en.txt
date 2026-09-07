@@ -1,0 +1,21 @@
+Enterprise Skill Platform turns copied agent logic into governed, reusable capabilities.
+
+Employees think in intents. Enterprise capabilities remain scattered. ESP bridges the gap through one trusted Copilot.
+
+This public Demo uses synthetic data. A natural-language request enters the Review workspace.
+
+The Router understands intent, validates the Binding, and executes five pinned Skills through authorized Plugins.
+
+Every claim resolves to retained Evidence. Decision Lineage preserves versions, citations, and the Correlation ID.
+
+The model proposes risk. The accountable analyst changes the rating and creates Human Decision evidence.
+
+Policy denial stops the responsible Skill and Plugin. ESP does not bypass policy or invent a result.
+
+The control plane shows versions, Bindings, authorization, human oversight, and the Pilot boundary.
+
+Seven synthetic cases pass all eighty-four mandatory assertions. Synthetic evidence does not establish Pilot approval.
+
+Two Consumers resolve the same pinned Skill and Plugins with no copied implementation.
+
+Build once. Govern once. Reuse everywhere.
