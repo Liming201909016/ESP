@@ -326,6 +326,45 @@ describe("health endpoint", () => {
     expect(body.safety).toMatchObject({ promptInjectionDetected: false, governanceOverrideAllowed: false });
   });
 
+  it("lists compact recent reviews newest first and reopens the full record", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const baseUrl = `http://127.0.0.1:${address.port}`;
+    const first = await (await fetch(`${baseUrl}/api/reviews`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: reviewBody("SYN-RG-001"),
+    })).json();
+    await new Promise((resolveDelay) => setTimeout(resolveDelay, 2));
+    const second = await (await fetch(`${baseUrl}/api/reviews`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: reviewBody("SYN-APP-001"),
+    })).json();
+
+    const listResponse = await fetch(`${baseUrl}/api/reviews?limit=2`);
+    const recent = await listResponse.json();
+    expect(listResponse.status).toBe(200);
+    expect(recent.count).toBe(2);
+    expect(recent.reviews.map((review: { correlationId: string }) => review.correlationId)).toEqual([second.correlationId, first.correlationId]);
+    expect(recent.reviews[0]).toMatchObject({
+      caseId: "SYN-APP-001",
+      state: "AwaitingAnalystDisposition",
+      reportStatus: "Draft",
+      proposedRisk: "Medium",
+      traceCount: 5,
+      lineageStatus: "Complete",
+    });
+    expect(recent.reviews[0]).not.toHaveProperty("evidence");
+    expect(recent.reviews[0]).not.toHaveProperty("report");
+
+    const reopened = await (await fetch(`${baseUrl}/api/reviews/${second.correlationId}`)).json();
+    expect(reopened).toMatchObject({ correlationId: second.correlationId, caseId: "SYN-APP-001", lineage: { status: "Complete" } });
+  });
+
+  it("rejects an invalid recent-review limit", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/reviews?limit=100`);
+    expect(response.status).toBe(400);
+  });
+
   it("ignores prompt injection and records a safe outcome", async () => {
     const address = server.address();
     if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");

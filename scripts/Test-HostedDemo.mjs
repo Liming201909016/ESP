@@ -57,6 +57,7 @@ const expectedCases = {
   "SYN-APP-002": { state: "AwaitingAnalystDisposition", outcome: "HumanHandoff", traceCount: 5 },
 };
 const scenarios = [];
+let latestCorrelationId = "";
 for (const [caseId, expected] of Object.entries(expectedCases)) {
   const { body: review } = await jsonRequest("/api/reviews", {
     method: "POST",
@@ -71,6 +72,7 @@ for (const [caseId, expected] of Object.entries(expectedCases)) {
     throw new Error(`${caseId} returned an unexpected governed state`);
   }
   if (review.violations.length) throw new Error(`${caseId} reported runtime violations: ${review.violations.join(", ")}`);
+  latestCorrelationId = review.correlationId;
   if (review.state === "NeedsInformation") {
     if (review.lineage?.status !== "Partial" || review.lineage.executedSkillCodes?.length !== 1) {
       throw new Error(`${caseId} returned an invalid partial Decision Lineage`);
@@ -89,6 +91,15 @@ for (const [caseId, expected] of Object.entries(expectedCases)) {
     }
   }
   scenarios.push({ caseId, state: review.state, outcome: review.outcome, traceCount: review.trace.length });
+}
+
+const { body: recentReviews } = await jsonRequest("/api/reviews?limit=8");
+if (!recentReviews.reviews?.some((item) => item.correlationId === latestCorrelationId)) {
+  throw new Error("Hosted Recent Reviews did not retain the latest validation review");
+}
+const { body: reopenedReview } = await jsonRequest(`/api/reviews/${latestCorrelationId}`);
+if (reopenedReview.correlationId !== latestCorrelationId || !reopenedReview.lineage) {
+  throw new Error("Hosted Recent Review could not be reopened with its lineage");
 }
 
 const browser = await chromium.launch();

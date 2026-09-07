@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
 import { getRegistry } from "./registry.js";
-import { checkReviewStore, ReviewStoreCapacityError } from "./review-store.js";
+import { checkReviewStore, listReviewSummaries, ReviewStoreCapacityError } from "./review-store.js";
 import { assertIntentResolutionRequest, assertRouterRequest } from "./router-contract.js";
 import { generateCandidateResults, getEvaluationSummary } from "./evaluation.js";
 import { resolveEmployeeIntent } from "./intent-resolution.js";
@@ -30,6 +30,11 @@ interface AppOptions {
 }
 
 const validRequestId = /^[A-Za-z0-9._:-]{1,128}$/;
+
+function rateLimitValue() {
+  const configured = Number(process.env.ESP_API_RATE_LIMIT ?? 120);
+  return Number.isInteger(configured) && configured > 0 ? configured : 120;
+}
 
 export function createApp(options: AppOptions = {}) {
   const app = express();
@@ -69,7 +74,7 @@ export function createApp(options: AppOptions = {}) {
   }));
   app.use("/api", rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 120,
+    limit: rateLimitValue(),
     standardHeaders: "draft-8",
     legacyHeaders: false,
     message: { error: "Too many Demo API requests; retry later." },
@@ -147,6 +152,20 @@ export function createApp(options: AppOptions = {}) {
     try {
       assertRouterRequest(request.body);
       response.json(await runSecurityReview(request.body.caseId, request.body.request, request.body.consumerBindingCode, request.body.resolutionId));
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/reviews", async (request, response, next) => {
+    try {
+      const requestedLimit = request.query.limit === undefined ? 8 : Number(request.query.limit);
+      if (!Number.isInteger(requestedLimit) || requestedLimit < 1 || requestedLimit > 50) {
+        response.status(400).json({ error: "limit must be an integer from 1 to 50" });
+        return;
+      }
+      const reviews = await listReviewSummaries(requestedLimit);
+      response.json({ reviews, count: reviews.length });
     } catch (error) {
       next(error);
     }

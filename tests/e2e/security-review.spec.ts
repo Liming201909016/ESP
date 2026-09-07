@@ -75,6 +75,26 @@ test("employee intent discovers an authorized governed path before execution", a
   expect(await page.evaluate(() => document.body.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
+test("recent review queue reopens and resumes the same persisted review", async ({ page }) => {
+  await runCase(page, "SYN-APP-001");
+  await expect(page.locator(".outcome")).toHaveText("HumanHandoff");
+  const correlationText = await page.locator(".result-summary small").filter({ hasText: "Correlation" }).textContent();
+  const correlationId = correlationText?.replace("Correlation ", "");
+  expect(correlationId).toBeTruthy();
+
+  await page.reload();
+  const recentItem = page.locator(`[data-correlation-id="${correlationId}"]`);
+  await expect(recentItem).toBeVisible();
+  await recentItem.click();
+  await expect(page.locator(".result-summary")).toContainText(correlationId!);
+  await expect(page.getByRole("heading", { name: "Analyst disposition" })).toBeVisible();
+  await page.getByRole("button", { name: "Accept", exact: true }).click();
+  await expect(page.locator(".report-heading span")).toHaveText("Final");
+  await expect(page.locator(".lineage-chain")).toContainText("Accept");
+  await expect(recentItem).toContainText("Completed");
+  await expect(recentItem).toContainText("Accept");
+});
+
 test("review API failure exposes an actionable retry", async ({ page }) => {
   let attempt = 0;
   await page.route("**/api/reviews", async (route) => {
