@@ -155,6 +155,45 @@ describe("health endpoint", () => {
     });
   });
 
+  it("exposes an inspectable Evaluation Run without creating operational reviews", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const baseUrl = `http://127.0.0.1:${address.port}`;
+    const before = await (await fetch(`${baseUrl}/api/reviews?limit=50`)).json();
+
+    await fetch(`${baseUrl}/api/evaluation/candidate-results`);
+    await fetch(`${baseUrl}/api/evaluation/summary`);
+    const response = await fetch(`${baseUrl}/api/evaluation/run`);
+    const run = await response.json();
+    const after = await (await fetch(`${baseUrl}/api/reviews?limit=50`)).json();
+
+    expect(response.status).toBe(200);
+    expect(run.runId).toMatch(/^ER-APP-/);
+    expect(run).toMatchObject({
+      status: "Completed",
+      pins: {
+        logicalSkillVersion: "1.0.0",
+        implementationVersion: "demo-1.0.0",
+        packageVersion: "0.1.0",
+        consumerBindingCode: "CB-ESP-DEMO-001",
+        evaluatorVersion: "1.0.0",
+        thresholdVersion: "foundation-1.0.0",
+      },
+      aggregateMeasures: {
+        caseCount: 4,
+        passedCaseCount: 4,
+        mandatoryAssertionCount: 36,
+        passedMandatoryAssertionCount: 36,
+        mandatoryAssertionPassRate: 1,
+      },
+      decision: { foundationStatus: "FoundationPass", pilotGateEligible: false },
+    });
+    expect(run.caseResults).toHaveLength(4);
+    expect(run.caseResults.every((item: { assertions: unknown[]; passed: boolean }) => item.passed && item.assertions.length === 9)).toBe(true);
+    expect(run.decision.pilotBlockers).toHaveLength(2);
+    expect(after).toEqual(before);
+  });
+
   it("understands RG intent and discovers five authorized Skills", async () => {
     const address = server.address();
     if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");

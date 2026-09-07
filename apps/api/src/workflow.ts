@@ -123,6 +123,11 @@ function persistValidatedReview<T extends { correlationId: string }>(review: T) 
   return saveReview(review);
 }
 
+function validatedReview<T extends { correlationId: string }>(review: T) {
+  assertReviewEnvelope(review);
+  return review;
+}
+
 export class IntentConfirmationRequiredError extends Error {
   constructor(message: string) {
     super(message);
@@ -130,7 +135,7 @@ export class IntentConfirmationRequiredError extends Error {
   }
 }
 
-export async function runSecurityReview(caseId: string, requestText: string, bindingCode: string, resolutionId?: string) {
+export async function executeSecurityReview(caseId: string, requestText: string, bindingCode: string, resolutionId?: string) {
   const normalizedRequest = requestText.trim();
   if (!normalizedRequest) throw new Error("request is required");
   const intentResolution = await resolveEmployeeIntent(normalizedRequest, caseId, bindingCode);
@@ -160,7 +165,7 @@ export async function runSecurityReview(caseId: string, requestText: string, bin
   if (!source.materialComplete) {
     invoke("LS-SEC-DOC-INTAKE", "NeedsInformation");
     const lineage = buildDecisionLineage(intentResolution, trace, evidence);
-    return persistValidatedReview({
+    return validatedReview({
       correlationId,
       caseId,
       request: { text: normalizedRequest },
@@ -260,7 +265,11 @@ export async function runSecurityReview(caseId: string, requestText: string, bin
     },
     lineage: buildDecisionLineage(intentResolution, trace, evidence, report),
   };
-  return persistValidatedReview(review);
+  return validatedReview(review);
+}
+
+export async function runSecurityReview(caseId: string, requestText: string, bindingCode: string, resolutionId?: string) {
+  return persistValidatedReview(await executeSecurityReview(caseId, requestText, bindingCode, resolutionId));
 }
 
 export async function applyAnalystDisposition(

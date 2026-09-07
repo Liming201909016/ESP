@@ -31,6 +31,18 @@ for (const [name, expected] of Object.entries(requiredHeaders)) {
 }
 if (healthResponse.headers.has("access-control-allow-origin")) throw new Error("Hosted Demo must not expose wildcard cross-origin access");
 
+const { body: reviewsBeforeEvaluation } = await jsonRequest("/api/reviews?limit=50");
+const { body: evaluationRun } = await jsonRequest("/api/evaluation/run");
+const { body: reviewsAfterEvaluation } = await jsonRequest("/api/reviews?limit=50");
+if (evaluationRun.decision?.foundationStatus !== "FoundationPass"
+  || evaluationRun.aggregateMeasures?.passedMandatoryAssertionCount !== 36
+  || evaluationRun.caseResults?.length !== 4) {
+  throw new Error("Hosted inspectable Evaluation Run is invalid");
+}
+if (JSON.stringify(reviewsAfterEvaluation.reviews) !== JSON.stringify(reviewsBeforeEvaluation.reviews)) {
+  throw new Error("Hosted Evaluation Run polluted operational reviews");
+}
+
 const { body: intentResolution } = await jsonRequest("/api/intent-resolutions", {
   method: "POST",
   headers: { "content-type": "application/json", "x-request-id": "hosted-smoke-intent" },
@@ -123,6 +135,10 @@ try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   if (await page.title() !== "Enterprise Skill Platform") throw new Error("Hosted browser title is invalid");
+  const evaluation = page.getByRole("region", { name: "FoundationPass" });
+  if (await evaluation.locator("details").count() !== 4 || !(await evaluation.textContent())?.includes("36/36")) {
+    throw new Error("Hosted Evaluation Run is not inspectable in the browser");
+  }
   await page.getByRole("button", { name: "Prove governed reuse" }).click();
   await page.getByRole("heading", { name: "Architecture Review Workflow" }).waitFor();
   if (!(await page.getByRole("region", { name: "One Skill, two Consumers." }).textContent())?.includes("No copied implementation")) {

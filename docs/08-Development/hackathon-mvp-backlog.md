@@ -47,6 +47,7 @@ The Hackathon MVP is done when a reviewer can clone or open the repository, run 
 | HCK-303 | Responsive UX verification | Desktop and mobile E2E assert no horizontal clipping across all four scenarios | Done |
 | HCK-304 | Recorded fallback | Desktop/mobile screenshots and an automated local walkthrough recording use the committed synthetic scenario | Done |
 | HCK-305 | Submission completion | Challenge choices, team, repository, screenshots, and video links are entered | Partial; exact Challenge choices and Innovation Studio form entry require organizer input |
+| HCK-306 | Inspectable isolated Evaluation Run | UI exposes Run ID, version pins, four cases, and 36 assertions; evaluation execution does not create operational Reviews | Done |
 
 ## H4 Connected Mode, stretch
 

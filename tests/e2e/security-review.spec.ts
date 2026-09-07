@@ -39,7 +39,7 @@ test("RG missing-input path stops after Document Intake", async ({ page }) => {
 
 test("APP happy path can be marked Cannot Assess without final risk", async ({ page }) => {
   await runCase(page, "SYN-APP-001");
-  await page.getByRole("button", { name: "Cannot assess" }).click();
+  await page.getByRole("button", { name: "Cannot assess", exact: true }).click();
   await expect(page.locator(".outcome")).toHaveText("CannotAssess");
   await expect(page.locator(".completed-disposition")).toContainText("Final risk: Not assigned");
   await expect(page.locator(".report-heading span")).toHaveText("Draft");
@@ -148,6 +148,19 @@ test("page passes automated WCAG A and AA checks", async ({ page }) => {
   await page.goto("/");
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(results.violations).toEqual([]);
+});
+
+test("Evaluation Run is inspectable without polluting Recent Reviews", async ({ page, request }) => {
+  const before = await (await request.get("/api/reviews?limit=50")).json() as { reviews: Array<{ correlationId: string }> };
+  await page.goto("/");
+  const evaluation = page.getByRole("region", { name: "FoundationPass" });
+  await expect(evaluation.locator("code")).toContainText("ER-APP-");
+  await expect(evaluation).toContainText("36/36");
+  await expect(evaluation).toContainText("CB-ESP-DEMO-001");
+  await expect(evaluation.locator("details")).toHaveCount(4);
+  await expect(evaluation.locator("details").first().locator("li")).toHaveCount(9);
+  const after = await (await request.get("/api/reviews?limit=50")).json() as { reviews: Array<{ correlationId: string }> };
+  expect(after.reviews.map((item) => item.correlationId)).toEqual(before.reviews.map((item) => item.correlationId));
 });
 
 test("primary review journey is keyboard operable with visible focus", async ({ page }) => {

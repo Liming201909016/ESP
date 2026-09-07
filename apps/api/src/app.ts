@@ -8,7 +8,7 @@ import { resolve } from "node:path";
 import { getRegistry } from "./registry.js";
 import { checkReviewStore, listReviewSummaries, ReviewStoreCapacityError } from "./review-store.js";
 import { assertDocumentIntakeInvocationRequest, assertDocumentIntakeInvocationResponse, assertIntentResolutionRequest, assertRouterRequest } from "./router-contract.js";
-import { generateCandidateResults, getEvaluationSummary } from "./evaluation.js";
+import { generateCandidateResults, getEvaluationRun, getEvaluationSummary } from "./evaluation.js";
 import { resolveEmployeeIntent } from "./intent-resolution.js";
 import { applyAnalystDisposition, getReview, IntentConfirmationRequiredError, runBoundDocumentIntake, runSecurityReview, type AnalystDecision } from "./workflow.js";
 
@@ -134,6 +134,14 @@ export function createApp(options: AppOptions = {}) {
   app.get("/api/evaluation/summary", async (_request, response, next) => {
     try {
       response.json(await getEvaluationSummary());
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/evaluation/run", async (_request, response, next) => {
+    try {
+      response.json(await getEvaluationRun());
     } catch (error) {
       next(error);
     }

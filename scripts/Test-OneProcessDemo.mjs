@@ -40,6 +40,9 @@ try {
   const healthResponse = await fetch(`${baseUrl}/api/health`, { headers: { "x-request-id": "production-smoke" } });
   const health = await healthResponse.json();
   const registry = await (await fetch(`${baseUrl}/api/registry`)).json();
+  const reviewsBeforeEvaluation = await (await fetch(`${baseUrl}/api/reviews?limit=50`)).json();
+  const evaluationRun = await (await fetch(`${baseUrl}/api/evaluation/run`)).json();
+  const reviewsAfterEvaluation = await (await fetch(`${baseUrl}/api/reviews?limit=50`)).json();
   const intentResolution = await (await fetch(`${baseUrl}/api/intent-resolutions`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -68,6 +71,14 @@ try {
   if (health.status !== "healthy" || !health.ready || health.reviewStore?.status !== "healthy") throw new Error("Health endpoint failed");
   if (healthResponse.headers.get("x-request-id") !== "production-smoke") throw new Error("Request ID propagation failed");
   if (registry.skills.length !== 5 || registry.plugins.length !== 4) throw new Error("Registry endpoint failed");
+  if (evaluationRun.decision?.foundationStatus !== "FoundationPass"
+    || evaluationRun.aggregateMeasures?.passedMandatoryAssertionCount !== 36
+    || evaluationRun.caseResults?.length !== 4) {
+    throw new Error("Inspectable Evaluation Run failed");
+  }
+  if (JSON.stringify(reviewsAfterEvaluation.reviews) !== JSON.stringify(reviewsBeforeEvaluation.reviews)) {
+    throw new Error("Evaluation Run polluted operational reviews");
+  }
   if (intentResolution.discovery.selectedCount !== 5 || intentResolution.outcome.requestedType !== "Action" || intentResolution.outcome.authorizedType !== "Knowledge") {
     throw new Error("Intent and Skill discovery failed");
   }
