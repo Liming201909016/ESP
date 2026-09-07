@@ -71,13 +71,22 @@ for (const [caseId, expected] of Object.entries(expectedCases)) {
     throw new Error(`${caseId} returned an unexpected governed state`);
   }
   if (review.violations.length) throw new Error(`${caseId} reported runtime violations: ${review.violations.join(", ")}`);
+  if (review.state === "NeedsInformation") {
+    if (review.lineage?.status !== "Partial" || review.lineage.executedSkillCodes?.length !== 1) {
+      throw new Error(`${caseId} returned an invalid partial Decision Lineage`);
+    }
+  } else if (!review.lineage?.reconciled?.selectedSkillsExecuted || !review.lineage?.reconciled?.citationsResolveToEvidence) {
+    throw new Error(`${caseId} returned an unreconciled Decision Lineage`);
+  }
   if (review.state === "AwaitingAnalystDisposition") {
     const { body: finalizedReview } = await jsonRequest(`/api/reviews/${review.correlationId}/disposition`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ decision: "CannotAssess", rationale: "Automated Hosted Demo validation cleanup." }),
     });
-    if (finalizedReview.state !== "CannotAssess") throw new Error(`${caseId} could not be finalized after validation`);
+    if (finalizedReview.state !== "CannotAssess" || !finalizedReview.lineage?.reconciled?.humanDecisionRetained) {
+      throw new Error(`${caseId} could not retain the validation decision`);
+    }
   }
   scenarios.push({ caseId, state: review.state, outcome: review.outcome, traceCount: review.trace.length });
 }

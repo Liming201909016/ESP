@@ -146,7 +146,7 @@ export function createApp(options: AppOptions = {}) {
   app.post("/api/reviews", async (request, response, next) => {
     try {
       assertRouterRequest(request.body);
-      response.json(await runSecurityReview(request.body.caseId, request.body.request, request.body.consumerBindingCode));
+      response.json(await runSecurityReview(request.body.caseId, request.body.request, request.body.consumerBindingCode, request.body.resolutionId));
     } catch (error) {
       next(error);
     }

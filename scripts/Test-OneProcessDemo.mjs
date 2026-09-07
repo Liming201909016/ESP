@@ -63,6 +63,9 @@ try {
     throw new Error("Intent and Skill discovery failed");
   }
   if (review.trace.length !== 5 || review.report.status !== "Draft") throw new Error("Review endpoint failed");
+  if (!review.lineage?.reconciled?.selectedSkillsExecuted || !review.lineage?.reconciled?.citationsResolveToEvidence) {
+    throw new Error("Decision Lineage reconciliation failed");
+  }
   console.log(`One-process Demo: PASS (port ${port})`);
 } finally {
   child.kill();

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 
+import { resolveEmployeeIntent } from "./intent-resolution.js";
 import { resolveBinding, skills } from "./registry.js";
 import { containsPromptInjection, documentSourcePlugin, evidencePlugin, loadCase, reportPlugin, runbookPlugin, type EvidenceItem } from "./plugins.js";
 import { loadReview, saveReview } from "./review-store.js";
@@ -55,7 +56,60 @@ export interface StoredReview {
   report: ReturnType<typeof reportPlugin.render>;
   analystReviewRequired: boolean;
   analystDisposition?: { decision: AnalystDecision; rationale: string; finalRisk?: string };
+  lineage: DecisionLineage;
   [key: string]: unknown;
+}
+
+interface DecisionLineage {
+  resolutionId: string;
+  status: "Partial" | "Complete";
+  selectedSkillCodes: string[];
+  executedSkillCodes: string[];
+  evidenceIds: string[];
+  citationEvidenceIds: string[];
+  humanDecisionEvidenceId?: string;
+  reconciled: {
+    selectedSkillsExecuted: boolean;
+    citationsResolveToEvidence: boolean;
+    humanDecisionRetained: boolean;
+    outcomeConstrained: boolean;
+  };
+}
+
+type IntentResolution = Awaited<ReturnType<typeof resolveEmployeeIntent>>;
+
+function buildDecisionLineage(
+  resolution: IntentResolution,
+  trace: TraceEntry[],
+  evidence: EvidenceItem[],
+  report?: ReturnType<typeof reportPlugin.render>,
+): DecisionLineage {
+  const selectedSkillCodes = resolution.discovery.candidates
+    .filter((candidate) => candidate.workflowSelected)
+    .map((candidate) => candidate.skillCode);
+  const executedSkillCodes = trace.map((entry) => entry.skillCode);
+  const evidenceIds = evidence.map((item) => item.evidenceId);
+  const evidenceIdSet = new Set(evidenceIds);
+  const citationEvidenceIds = report?.findings.flatMap((finding) => finding.citations.map((citation) => citation.evidenceId)) ?? [];
+  const humanDecisionEvidenceId = evidence.find((item) => item.type === "HumanDecision")?.evidenceId;
+  const selectedSkillsExecuted = selectedSkillCodes.length > 0 && selectedSkillCodes.every((skillCode) => executedSkillCodes.includes(skillCode));
+  const citationsResolveToEvidence = Boolean(report) && citationEvidenceIds.every((evidenceId) => evidenceIdSet.has(evidenceId));
+
+  return {
+    resolutionId: resolution.resolutionId,
+    status: selectedSkillsExecuted && citationsResolveToEvidence ? "Complete" : "Partial",
+    selectedSkillCodes,
+    executedSkillCodes,
+    evidenceIds,
+    citationEvidenceIds,
+    ...(humanDecisionEvidenceId ? { humanDecisionEvidenceId } : {}),
+    reconciled: {
+      selectedSkillsExecuted,
+      citationsResolveToEvidence,
+      humanDecisionRetained: Boolean(humanDecisionEvidenceId),
+      outcomeConstrained: resolution.outcome.authorizedType === "Knowledge" && !resolution.outcome.actionAllowed,
+    },
+  };
 }
 
 function registration(skillCode: string) {
@@ -69,9 +123,12 @@ function persistValidatedReview<T extends { correlationId: string }>(review: T) 
   return saveReview(review);
 }
 
-export async function runSecurityReview(caseId: string, requestText: string, bindingCode: string) {
+export async function runSecurityReview(caseId: string, requestText: string, bindingCode: string, resolutionId?: string) {
   const normalizedRequest = requestText.trim();
   if (!normalizedRequest) throw new Error("request is required");
+  const intentResolution = await resolveEmployeeIntent(normalizedRequest, caseId, bindingCode);
+  if (resolutionId) intentResolution.resolutionId = resolutionId;
+  if (intentResolution.requiresConfirmation) throw new Error(intentResolution.confirmationReason ?? "Intent confirmation is required");
   const selectedCase = await loadCase(caseId);
   const { binding, consumer } = resolveBinding(bindingCode, skills.map((skill) => skill.code));
   const correlationId = randomUUID();
@@ -93,6 +150,7 @@ export async function runSecurityReview(caseId: string, requestText: string, bin
   const source = await documentSourcePlugin.read(selectedCase);
   if (!source.materialComplete) {
     invoke("LS-SEC-DOC-INTAKE", "NeedsInformation");
+    const lineage = buildDecisionLineage(intentResolution, trace, evidence);
     return persistValidatedReview({
       correlationId,
       caseId,
@@ -107,6 +165,14 @@ export async function runSecurityReview(caseId: string, requestText: string, bin
       violations: [],
       metrics: { materialClaimCitationCoverage: 1, unsupportedMaterialClaims: 0, authorizationBypassCount: 0, secretDistributionCount: 0 },
       analystReviewRequired: true,
+      intentResolution: {
+        resolutionId: intentResolution.resolutionId,
+        domain: intentResolution.intent.domain,
+        inferredRequestType: intentResolution.intent.inferredRequestType,
+        requestedOutcome: intentResolution.outcome.requestedType,
+        authorizedOutcome: intentResolution.outcome.authorizedType,
+      },
+      lineage,
     });
   }
   invoke("LS-SEC-DOC-INTAKE", "Success");
@@ -176,6 +242,14 @@ export async function runSecurityReview(caseId: string, requestText: string, bin
     evidence,
     trace,
     analystReviewRequired: true,
+    intentResolution: {
+      resolutionId: intentResolution.resolutionId,
+      domain: intentResolution.intent.domain,
+      inferredRequestType: intentResolution.intent.inferredRequestType,
+      requestedOutcome: intentResolution.outcome.requestedType,
+      authorizedOutcome: intentResolution.outcome.authorizedType,
+    },
+    lineage: buildDecisionLineage(intentResolution, trace, evidence, report),
   };
   return persistValidatedReview(review);
 }
@@ -215,6 +289,10 @@ export async function applyAnalystDisposition(
   review.report.status = transition.reportStatus;
   review.report.analystDecision = review.analystDisposition;
   review.analystReviewRequired = false;
+  const humanDecisionEvidenceId = review.evidence.find((item) => item.type === "HumanDecision")?.evidenceId;
+  review.lineage.evidenceIds = review.evidence.map((item) => item.evidenceId);
+  review.lineage.humanDecisionEvidenceId = humanDecisionEvidenceId;
+  review.lineage.reconciled.humanDecisionRetained = Boolean(humanDecisionEvidenceId);
   return persistValidatedReview(review);
 }
 
