@@ -7,7 +7,7 @@ import { resolve } from "node:path";
 
 import { getRegistry } from "./registry.js";
 import { checkReviewStore, listReviewSummaries, ReviewStoreCapacityError } from "./review-store.js";
-import { assertIntentResolutionRequest, assertRouterRequest } from "./router-contract.js";
+import { assertDocumentIntakeInvocationRequest, assertDocumentIntakeInvocationResponse, assertIntentResolutionRequest, assertRouterRequest } from "./router-contract.js";
 import { generateCandidateResults, getEvaluationSummary } from "./evaluation.js";
 import { resolveEmployeeIntent } from "./intent-resolution.js";
 import { applyAnalystDisposition, getReview, IntentConfirmationRequiredError, runBoundDocumentIntake, runSecurityReview, type AnalystDecision } from "./workflow.js";
@@ -173,12 +173,10 @@ export function createApp(options: AppOptions = {}) {
 
   app.post("/api/skill-invocations/document-intake", async (request, response, next) => {
     try {
-      const { caseId, request: requestText, consumerBindingCode } = request.body ?? {};
-      if (typeof caseId !== "string" || typeof requestText !== "string" || typeof consumerBindingCode !== "string") {
-        response.status(400).json({ error: "caseId, request, and consumerBindingCode are required" });
-        return;
-      }
-      response.json(await runBoundDocumentIntake(caseId, requestText, consumerBindingCode));
+      assertDocumentIntakeInvocationRequest(request.body);
+      const invocation = await runBoundDocumentIntake(request.body.caseId, request.body.request, request.body.consumerBindingCode);
+      assertDocumentIntakeInvocationResponse(invocation);
+      response.json(invocation);
     } catch (error) {
       next(error);
     }

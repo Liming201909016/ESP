@@ -618,23 +618,46 @@ describe("health endpoint", () => {
     expect(response.status).toBe(400);
   });
 
-  it("reuses the same Document Intake Skill and Plugins through a second Consumer Binding", async () => {
+  it("reuses the same pinned Document Intake Skill and Plugins through two Consumer Bindings", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const invoke = async (consumerBindingCode: string) => {
+      const response = await fetch(`http://127.0.0.1:${address.port}/api/skill-invocations/document-intake`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ caseId: "SYN-RG-001", request: requestText, consumerBindingCode }),
+      });
+      expect(response.status).toBe(200);
+      return response.json();
+    };
+
+    const primary = await invoke("CB-ESP-DEMO-001");
+    const secondary = await invoke("CB-ARCH-DEMO-001");
+
+    expect(primary.consumer).toMatchObject({ code: "CON-SEC-REVIEW-AGENT", type: "Copilot" });
+    expect(secondary.consumer).toMatchObject({ code: "CON-ARCH-REVIEW", type: "Workflow" });
+    expect(primary.consumerBinding.code).toBe("CB-ESP-DEMO-001");
+    expect(secondary.consumerBinding.code).toBe("CB-ARCH-DEMO-001");
+    expect(primary.correlationId).not.toBe(secondary.correlationId);
+    expect(primary.invocationId).not.toBe(secondary.invocationId);
+    expect(secondary.skill).toEqual(primary.skill);
+    expect(secondary.pluginInvocations.map((item: { pluginCode: string; pluginVersion: string }) => [item.pluginCode, item.pluginVersion]))
+      .toEqual(primary.pluginInvocations.map((item: { pluginCode: string; pluginVersion: string }) => [item.pluginCode, item.pluginVersion]));
+    expect(secondary.pluginInvocations.map((item: { pluginCode: string }) => item.pluginCode)).toEqual(["PLG-DOC-SOURCE", "PLG-EVIDENCE"]);
+    expect(secondary.evidence).toHaveLength(1);
+    expect(secondary).toMatchObject({ contractVersion: "1.0.0", outcome: "Success", oversight: "ReviewRequired", errors: [] });
+  });
+
+  it("rejects additional fields at the reusable Skill invocation boundary", async () => {
     const address = server.address();
     if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
     const response = await fetch(`http://127.0.0.1:${address.port}/api/skill-invocations/document-intake`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ caseId: "SYN-RG-001", request: requestText, consumerBindingCode: "CB-ARCH-DEMO-001" }),
+      body: JSON.stringify({ caseId: "SYN-RG-001", request: requestText, consumerBindingCode: "CB-ARCH-DEMO-001", bypassPolicy: true }),
     });
-    const body = await response.json();
 
-    expect(body).toMatchObject({
-      consumer: { code: "CON-ARCH-REVIEW" },
-      consumerBinding: { code: "CB-ARCH-DEMO-001", status: "Active" },
-      skill: { code: "LS-SEC-DOC-INTAKE", version: "1.0.0", implementationVersion: "demo-1.0.0" },
-      plugins: ["PLG-DOC-SOURCE", "PLG-EVIDENCE"],
-      outcome: "Success",
-    });
+    expect(response.status).toBe(400);
   });
 
   it("detects governance override instructions under arbitrary nested keys", () => {

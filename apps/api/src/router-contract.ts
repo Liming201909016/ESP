@@ -29,6 +29,87 @@ const intentResolutionRequestSchema = {
   },
 } as const;
 
+const documentIntakeInvocationRequestSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["caseId", "request", "consumerBindingCode"],
+  properties: {
+    caseId: { type: "string", minLength: 1 },
+    request: { type: "string", minLength: 1, maxLength: 4000 },
+    consumerBindingCode: { type: "string", minLength: 1 },
+  },
+} as const;
+
+const documentIntakeInvocationResponseSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["contractVersion", "correlationId", "invocationId", "consumer", "consumerBinding", "skill", "pluginInvocations", "outcome", "payload", "evidence", "oversight", "errors"],
+  properties: {
+    contractVersion: { const: "1.0.0" },
+    correlationId: { type: "string", minLength: 1 },
+    invocationId: { type: "string", minLength: 1 },
+    consumer: {
+      type: "object", additionalProperties: false, required: ["code", "name", "type"],
+      properties: { code: { type: "string", minLength: 1 }, name: { type: "string", minLength: 1 }, type: { enum: ["Copilot", "Workflow"] } },
+    },
+    consumerBinding: {
+      type: "object", additionalProperties: false, required: ["code", "status"],
+      properties: { code: { type: "string", minLength: 1 }, status: { const: "Active" } },
+    },
+    skill: {
+      type: "object", additionalProperties: false, required: ["code", "version", "implementationVersion"],
+      properties: { code: { const: "LS-SEC-DOC-INTAKE" }, version: { type: "string", minLength: 1 }, implementationVersion: { type: "string", minLength: 1 } },
+    },
+    pluginInvocations: {
+      type: "array", minItems: 2,
+      items: {
+        type: "object", additionalProperties: false, required: ["invocationId", "pluginCode", "pluginVersion", "mode", "outcome", "evidenceIds"],
+        properties: {
+          invocationId: { type: "string", minLength: 1 },
+          pluginCode: { type: "string", minLength: 1 },
+          pluginVersion: { type: "string", minLength: 1 },
+          mode: { const: "Demo" },
+          outcome: { enum: ["Success", "NeedsInformation", "CannotAssess", "RejectedByPolicy", "Failed"] },
+          evidenceIds: { type: "array", items: { type: "string", minLength: 1 } },
+        },
+      },
+    },
+    outcome: { enum: ["Success", "NeedsInformation", "CannotAssess", "RejectedByPolicy", "Failed"] },
+    payload: {
+      type: "object", additionalProperties: false, required: ["materialComplete", "sourceIds", "dataGaps"],
+      properties: {
+        materialComplete: { type: "boolean" },
+        sourceIds: { type: "array", items: { type: "string", minLength: 1 } },
+        dataGaps: { type: "array", items: { type: "string", minLength: 1 } },
+      },
+    },
+    evidence: {
+      type: "array",
+      items: {
+        type: "object", additionalProperties: false, required: ["evidenceId", "type", "sourceId", "claimReference"],
+        properties: {
+          evidenceId: { type: "string", minLength: 1 },
+          type: { enum: ["Fact", "RuleResult", "ToolResult", "ModelSuggestion", "HumanDecision"] },
+          sourceId: { type: "string", minLength: 1 },
+          claimReference: { type: "string", minLength: 1 },
+        },
+      },
+    },
+    oversight: { const: "ReviewRequired" },
+    errors: {
+      type: "array",
+      items: {
+        type: "object", additionalProperties: false, required: ["category", "message", "retryable"],
+        properties: {
+          category: { enum: ["InvalidInput", "MissingEvidence", "DependencyFailure", "PolicyDenial", "Timeout", "InternalFailure"] },
+          message: { type: "string", minLength: 1 },
+          retryable: { type: "boolean" },
+        },
+      },
+    },
+  },
+} as const;
+
 const reviewEnvelopeSchema = {
   type: "object",
   additionalProperties: true,
@@ -133,6 +214,8 @@ const reviewEnvelopeSchema = {
 
 const validateRouterRequest = ajv.compile(routerRequestSchema);
 const validateIntentResolutionRequest = ajv.compile(intentResolutionRequestSchema);
+const validateDocumentIntakeInvocationRequest = ajv.compile(documentIntakeInvocationRequestSchema);
+const validateDocumentIntakeInvocationResponse = ajv.compile(documentIntakeInvocationResponseSchema);
 const validateReviewEnvelope = ajv.compile(reviewEnvelopeSchema);
 
 function validationMessage(errors: ErrorObject[] | null | undefined) {
@@ -146,6 +229,18 @@ export function assertRouterRequest(value: unknown): asserts value is { caseId: 
 export function assertIntentResolutionRequest(value: unknown): asserts value is { employeeIntent: string; evidencePackageId: string; consumerBindingCode: string } {
   if (!validateIntentResolutionRequest(value)) {
     throw new Error(`Intent resolution request contract violation: ${validationMessage(validateIntentResolutionRequest.errors)}`);
+  }
+}
+
+export function assertDocumentIntakeInvocationRequest(value: unknown): asserts value is { caseId: string; request: string; consumerBindingCode: string } {
+  if (!validateDocumentIntakeInvocationRequest(value)) {
+    throw new Error(`Skill invocation request contract violation: ${validationMessage(validateDocumentIntakeInvocationRequest.errors)}`);
+  }
+}
+
+export function assertDocumentIntakeInvocationResponse(value: unknown): void {
+  if (!validateDocumentIntakeInvocationResponse(value)) {
+    throw new Error(`Skill invocation response contract violation: ${validationMessage(validateDocumentIntakeInvocationResponse.errors)}`);
   }
 }
 

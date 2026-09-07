@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { resolveEmployeeIntent } from "./intent-resolution.js";
-import { resolveBinding, skills } from "./registry.js";
+import { plugins, resolveBinding, skills } from "./registry.js";
 import { containsPromptInjection, documentSourcePlugin, evidencePlugin, loadCase, reportPlugin, runbookPlugin, type EvidenceItem } from "./plugins.js";
 import { loadReview, saveReview } from "./review-store.js";
 import { assertReviewEnvelope } from "./router-contract.js";
@@ -316,14 +316,52 @@ export async function runBoundDocumentIntake(caseId: string, requestText: string
   const skill = registration("LS-SEC-DOC-INTAKE");
   const { binding, consumer } = resolveBinding(bindingCode, [skill.code]);
   const source = await documentSourcePlugin.read(selectedCase);
+  const correlationId = randomUUID();
+  const invocationId = `INV-${randomUUID()}`;
+  const outcome = source.materialComplete ? "Success" : "NeedsInformation";
+  const evidence = source.sourceIds.length
+    ? source.sourceIds.map((sourceId) => evidencePlugin.create("ToolResult", sourceId, "document-source-accessed"))
+    : [evidencePlugin.create("ToolResult", caseId, "document-source-material-incomplete")];
+  const pluginRegistration = (pluginCode: string) => {
+    const plugin = plugins.find((candidate) => candidate.code === pluginCode);
+    if (!plugin) throw new Error(`Plugin is not registered: ${pluginCode}`);
+    return plugin;
+  };
+  const documentSource = pluginRegistration(documentSourcePlugin.code);
+  const evidenceStore = pluginRegistration(evidencePlugin.code);
   return {
-    correlationId: randomUUID(),
-    consumer: { code: consumer.code, name: consumer.name },
+    contractVersion: "1.0.0",
+    correlationId,
+    invocationId,
+    consumer: { code: consumer.code, name: consumer.name, type: consumer.type },
     consumerBinding: { code: binding.code, status: binding.status },
     skill: { code: skill.code, version: skill.version, implementationVersion: skill.implementationVersion },
-    plugins: skill.plugins,
-    outcome: source.materialComplete ? "Success" : "NeedsInformation",
-    sourceIds: source.sourceIds,
-    request: { text: normalizedRequest },
+    pluginInvocations: [
+      {
+        invocationId: `PINV-${randomUUID()}`,
+        pluginCode: documentSource.code,
+        pluginVersion: documentSource.version,
+        mode: documentSource.mode,
+        outcome,
+        evidenceIds: [],
+      },
+      {
+        invocationId: `PINV-${randomUUID()}`,
+        pluginCode: evidenceStore.code,
+        pluginVersion: evidenceStore.version,
+        mode: evidenceStore.mode,
+        outcome: "Success",
+        evidenceIds: evidence.map((item) => item.evidenceId),
+      },
+    ],
+    outcome,
+    payload: {
+      materialComplete: source.materialComplete,
+      sourceIds: source.sourceIds,
+      dataGaps: source.materialComplete ? [] : ["resource list", "permission list"],
+    },
+    evidence,
+    oversight: skill.oversight,
+    errors: source.materialComplete ? [] : [{ category: "MissingEvidence", message: "Mandatory review material is missing.", retryable: true }],
   };
 }
