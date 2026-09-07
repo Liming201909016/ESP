@@ -11,11 +11,18 @@ test("RG happy path supports analyst acceptance and Final report", async ({ page
   await runCase(page, "SYN-RG-001");
   await expect(page.locator(".outcome")).toHaveText("HumanHandoff");
   await expect(page.locator(".trace-list li")).toHaveCount(5);
+  await expect(page.getByRole("heading", { name: "From selected capability to accountable outcome" })).toBeVisible();
+  await expect(page.locator(".lineage-chain")).toContainText("5/5 Skills");
+  await expect(page.locator(".lineage-chain")).toContainText("All references retained");
+  await page.locator(".lineage-citations button").first().click();
+  await expect(page.locator(".evidence-list li.selected")).toHaveCount(1);
   await expect(page.getByRole("heading", { name: "RG Security Review" })).toBeVisible();
   await page.getByRole("button", { name: "Accept", exact: true }).click();
   await expect(page.locator(".outcome")).toHaveText("Success");
   await expect(page.locator(".report-heading span")).toHaveText("Final");
   await expect(page.locator(".evidence-list li").filter({ hasText: "HumanDecision" })).toHaveCount(1);
+  await expect(page.locator(".lineage-chain")).toContainText("Accept");
+  await expect(page.locator(".lineage-chain")).toContainText("Final");
   expect(await page.evaluate(() => document.body.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
@@ -23,6 +30,9 @@ test("RG missing-input path stops after Document Intake", async ({ page }) => {
   await runCase(page, "SYN-RG-002");
   await expect(page.locator(".outcome")).toHaveText("NeedsInformation");
   await expect(page.locator(".trace-list li")).toHaveCount(1);
+  await expect(page.locator(".lineage-status")).toHaveText("Partial");
+  await expect(page.locator(".lineage-chain")).toContainText("1/5 Skills");
+  await expect(page.locator(".lineage-chain")).toContainText("No report at governed stop");
   await expect(page.getByRole("heading", { name: "Needs information" })).toBeVisible();
   expect(await page.evaluate(() => document.body.scrollWidth <= window.innerWidth)).toBe(true);
 });

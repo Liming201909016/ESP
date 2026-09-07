@@ -14,6 +14,7 @@ const routerRequestSchema = {
     caseId: { type: "string", minLength: 1 },
     request: { type: "string", minLength: 1 },
     consumerBindingCode: { type: "string", minLength: 1 },
+    resolutionId: { type: "string", pattern: "^IR-[0-9a-f-]{36}$" },
   },
 } as const;
 
@@ -31,7 +32,7 @@ const intentResolutionRequestSchema = {
 const reviewEnvelopeSchema = {
   type: "object",
   additionalProperties: true,
-  required: ["correlationId", "caseId", "request", "consumer", "consumerBinding", "state", "outcome", "evidence", "trace", "violations", "metrics", "analystReviewRequired"],
+  required: ["correlationId", "caseId", "request", "consumer", "consumerBinding", "state", "outcome", "evidence", "trace", "violations", "metrics", "analystReviewRequired", "lineage"],
   properties: {
     correlationId: { type: "string", minLength: 1 },
     caseId: { type: "string", minLength: 1 },
@@ -77,6 +78,31 @@ const reviewEnvelopeSchema = {
       },
     },
     analystReviewRequired: { type: "boolean" },
+    lineage: {
+      type: "object",
+      additionalProperties: false,
+      required: ["resolutionId", "status", "selectedSkillCodes", "executedSkillCodes", "evidenceIds", "citationEvidenceIds", "reconciled"],
+      properties: {
+        resolutionId: { type: "string", minLength: 1 },
+        status: { enum: ["Partial", "Complete"] },
+        selectedSkillCodes: { type: "array", items: { type: "string", minLength: 1 } },
+        executedSkillCodes: { type: "array", items: { type: "string", minLength: 1 } },
+        evidenceIds: { type: "array", items: { type: "string", minLength: 1 } },
+        citationEvidenceIds: { type: "array", items: { type: "string", minLength: 1 } },
+        humanDecisionEvidenceId: { type: "string", minLength: 1 },
+        reconciled: {
+          type: "object",
+          additionalProperties: false,
+          required: ["selectedSkillsExecuted", "citationsResolveToEvidence", "humanDecisionRetained", "outcomeConstrained"],
+          properties: {
+            selectedSkillsExecuted: { type: "boolean" },
+            citationsResolveToEvidence: { type: "boolean" },
+            humanDecisionRetained: { type: "boolean" },
+            outcomeConstrained: { type: "boolean" },
+          },
+        },
+      },
+    },
     report: {
       type: "object", additionalProperties: true, required: ["status", "findings"],
       properties: {
@@ -113,7 +139,7 @@ function validationMessage(errors: ErrorObject[] | null | undefined) {
   return errors?.map((error) => `${error.instancePath || "/"} ${error.message}`).join("; ") ?? "unknown validation error";
 }
 
-export function assertRouterRequest(value: unknown): asserts value is { caseId: string; request: string; consumerBindingCode: string } {
+export function assertRouterRequest(value: unknown): asserts value is { caseId: string; request: string; consumerBindingCode: string; resolutionId?: string } {
   if (!validateRouterRequest(value)) throw new Error(`Router request contract violation: ${validationMessage(validateRouterRequest.errors)}`);
 }
 

@@ -6,6 +6,7 @@ import { afterAll, describe, expect, it } from "vitest";
 
 import { createApp } from "./app.js";
 import { containsPromptInjection, documentSourcePlugin } from "./plugins.js";
+import { skills } from "./registry.js";
 import { checkReviewStore, cleanupExpiredReviews, saveReview } from "./review-store.js";
 import { assertReviewEnvelope } from "./router-contract.js";
 import { closeHttpServer } from "./server-lifecycle.js";
@@ -250,7 +251,12 @@ describe("health endpoint", () => {
     const response = await fetch(`http://127.0.0.1:${address.port}/api/reviews`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: reviewBody("SYN-RG-001"),
+      body: JSON.stringify({
+        caseId: "SYN-RG-001",
+        request: requestText,
+        consumerBindingCode: "CB-ESP-DEMO-001",
+        resolutionId: "IR-00000000-0000-4000-8000-000000000001",
+      }),
     });
     const body = await response.json();
 
@@ -267,6 +273,18 @@ describe("health endpoint", () => {
       analystDecision: null,
     });
     expect(body.report.findings[0].citations).toHaveLength(4);
+    expect(body.lineage).toMatchObject({
+      resolutionId: "IR-00000000-0000-4000-8000-000000000001",
+      status: "Complete",
+      selectedSkillCodes: skills.map((skill) => skill.code),
+      executedSkillCodes: skills.map((skill) => skill.code),
+      reconciled: {
+        selectedSkillsExecuted: true,
+        citationsResolveToEvidence: true,
+        humanDecisionRetained: false,
+        outcomeConstrained: true,
+      },
+    });
   });
 
   it("stops after intake when mandatory material is missing", async () => {
@@ -283,6 +301,12 @@ describe("health endpoint", () => {
     expect(body.outcome).toBe("NeedsInformation");
     expect(body.trace).toHaveLength(1);
     expect(body.trace[0]).toMatchObject({ skillCode: "LS-SEC-DOC-INTAKE", outcome: "NeedsInformation" });
+    expect(body.lineage).toMatchObject({
+      status: "Partial",
+      executedSkillCodes: ["LS-SEC-DOC-INTAKE"],
+      citationEvidenceIds: [],
+      reconciled: { selectedSkillsExecuted: false, citationsResolveToEvidence: false, humanDecisionRetained: false },
+    });
   });
 
   it("runs the APP happy path with cited permission evidence", async () => {
@@ -344,6 +368,11 @@ describe("health endpoint", () => {
     expect(disposition.evidence).toEqual(expect.arrayContaining([
       expect.objectContaining({ type: "HumanDecision", claimReference: "disposition:Accept" }),
     ]));
+    expect(disposition.lineage).toMatchObject({
+      status: "Complete",
+      reconciled: { selectedSkillsExecuted: true, citationsResolveToEvidence: true, humanDecisionRetained: true },
+    });
+    expect(disposition.lineage.humanDecisionEvidenceId).toMatch(/^EV-/);
   });
 
   it("blocks report completion when a citation does not resolve to retained Evidence", async () => {

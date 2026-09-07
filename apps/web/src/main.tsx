@@ -105,6 +105,21 @@ interface ReviewResult {
   };
   analystReviewRequired?: boolean;
   analystDisposition?: { decision: string; rationale: string; finalRisk?: string };
+  lineage: {
+    resolutionId: string;
+    status: "Partial" | "Complete";
+    selectedSkillCodes: string[];
+    executedSkillCodes: string[];
+    evidenceIds: string[];
+    citationEvidenceIds: string[];
+    humanDecisionEvidenceId?: string;
+    reconciled: {
+      selectedSkillsExecuted: boolean;
+      citationsResolveToEvidence: boolean;
+      humanDecisionRetained: boolean;
+      outcomeConstrained: boolean;
+    };
+  };
 }
 
 async function fetchJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
@@ -133,6 +148,7 @@ function App() {
   const [requestText, setRequestText] = useState("Review this package and produce an evidence-grounded draft.");
   const [intentResolution, setIntentResolution] = useState<IntentResolution | null>(null);
   const [selectedSkillCode, setSelectedSkillCode] = useState<string | null>(null);
+  const [selectedEvidenceId, setSelectedEvidenceId] = useState<string | null>(null);
   const [discovering, setDiscovering] = useState(false);
   const [review, setReview] = useState<ReviewResult | null>(null);
   const [running, setRunning] = useState(false);
@@ -172,9 +188,15 @@ function App() {
       const result = await fetchJson<ReviewResult>("/api/reviews", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ caseId, request: requestText, consumerBindingCode: "CB-ESP-DEMO-001" }),
+        body: JSON.stringify({
+          caseId,
+          request: requestText,
+          consumerBindingCode: "CB-ESP-DEMO-001",
+          resolutionId: resolution.resolutionId,
+        }),
       });
       setReview(result);
+      setSelectedEvidenceId(result.lineage.citationEvidenceIds[0] ?? result.lineage.evidenceIds[0] ?? null);
     } catch (error) {
       setReviewError(error instanceof Error ? error.message : "Unable to run the review.");
     } finally {
@@ -205,6 +227,7 @@ function App() {
   function resetDiscovery() {
     setIntentResolution(null);
     setSelectedSkillCode(null);
+    setSelectedEvidenceId(null);
     setReview(null);
     setReviewError("");
   }
@@ -415,6 +438,64 @@ function App() {
                   <small>Correlation {review.correlationId}</small>
                 </div>
               </div>
+              <section className="decision-lineage" aria-labelledby="lineage-title">
+                <div className="lineage-heading">
+                  <div>
+                    <p className="section-label">Decision lineage</p>
+                    <h3 id="lineage-title">From selected capability to accountable outcome</h3>
+                  </div>
+                  <span className={`lineage-status ${review.lineage.status.toLowerCase()}`}>{review.lineage.status}</span>
+                </div>
+                <ol className="lineage-chain">
+                  <li className={review.lineage.reconciled.selectedSkillsExecuted ? "verified" : "partial"}>
+                    <span>Discover</span>
+                    <strong>{review.lineage.selectedSkillCodes.length} selected</strong>
+                    <small>{review.lineage.resolutionId}</small>
+                  </li>
+                  <li className={review.lineage.reconciled.selectedSkillsExecuted ? "verified" : "partial"}>
+                    <span>Execute</span>
+                    <strong>{review.lineage.executedSkillCodes.length}/{review.lineage.selectedSkillCodes.length} Skills</strong>
+                    <small>{review.lineage.reconciled.selectedSkillsExecuted ? "Selection reconciled" : "Governed partial stop"}</small>
+                  </li>
+                  <li className={review.lineage.evidenceIds.length ? "verified" : "partial"}>
+                    <span>Evidence</span>
+                    <strong>{review.lineage.evidenceIds.length} retained</strong>
+                    <small>Facts, rules, tools, model, human</small>
+                  </li>
+                  <li className={review.lineage.reconciled.citationsResolveToEvidence ? "verified" : "partial"}>
+                    <span>Citations</span>
+                    <strong>{review.lineage.citationEvidenceIds.length} resolved</strong>
+                    <small>{review.lineage.reconciled.citationsResolveToEvidence ? "All references retained" : "No report at governed stop"}</small>
+                  </li>
+                  <li className={review.lineage.reconciled.humanDecisionRetained ? "verified" : "pending"}>
+                    <span>Human</span>
+                    <strong>{review.lineage.reconciled.humanDecisionRetained ? review.analystDisposition?.decision : "Pending"}</strong>
+                    <small>{review.lineage.humanDecisionEvidenceId ?? "Decision required"}</small>
+                  </li>
+                  <li className={review.lineage.reconciled.outcomeConstrained ? "verified" : "partial"}>
+                    <span>Outcome</span>
+                    <strong>{review.report?.status ?? review.outcome}</strong>
+                    <small>{review.lineage.reconciled.outcomeConstrained ? "Policy constrained" : "Review required"}</small>
+                  </li>
+                </ol>
+                {review.report?.findings.length ? (
+                  <div className="lineage-citations">
+                    <h4>Finding citations</h4>
+                    {review.report.findings.flatMap((finding) => finding.citations.map((citation) => (
+                      <button
+                        type="button"
+                        key={`${finding.findingId}-${citation.evidenceId}`}
+                        className={selectedEvidenceId === citation.evidenceId ? "selected" : ""}
+                        onClick={() => setSelectedEvidenceId(citation.evidenceId)}
+                      >
+                        <strong>{finding.findingId}</strong>
+                        <span>{citation.claimReference}</span>
+                        <small>{citation.evidenceId}</small>
+                      </button>
+                    )))}
+                  </div>
+                ) : null}
+              </section>
               {review.missingInformation?.length ? <div className="result-block"><h3>Needs information</h3><p>{review.missingInformation.join(", ")}</p></div> : null}
               {review.proposedRisk ? <div className="result-block"><h3>Proposed risk</h3><p>{review.proposedRisk} · analyst confirmation required</p></div> : null}
               {review.safety?.promptInjectionDetected ? (
@@ -436,10 +517,12 @@ function App() {
                 {review.evidence.length ? (
                   <ul className="evidence-list">
                     {review.evidence.map((item) => (
-                      <li key={item.evidenceId}>
-                        <strong>{item.type}</strong>
-                        <span>{item.claimReference}</span>
-                        <small>Source {item.sourceId}</small>
+                      <li key={item.evidenceId} className={selectedEvidenceId === item.evidenceId ? "selected" : ""}>
+                        <button type="button" onClick={() => setSelectedEvidenceId(item.evidenceId)}>
+                          <strong>{item.type}</strong>
+                          <span>{item.claimReference}</span>
+                          <small>Source {item.sourceId} · {item.evidenceId}</small>
+                        </button>
                       </li>
                     ))}
                   </ul>
