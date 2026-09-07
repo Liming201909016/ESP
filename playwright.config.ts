@@ -8,6 +8,7 @@ process.env.ESP_E2E_DATA_DIR = e2eDataDirectory;
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: false,
+  workers: 1,
   globalTeardown: "./tests/e2e/global-teardown.ts",
   reporter: "line",
   use: {
