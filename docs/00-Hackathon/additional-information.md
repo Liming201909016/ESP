@@ -25,8 +25,8 @@ AI platform and reusable enterprise capability architecture, demonstrated throug
 - enterprise and Hackathon architecture documented;
 - five Skill contracts and four Plugin responsibilities defined;
 - 15 valid and 10 invalid contract fixtures passing;
-- four versioned synthetic Security Review cases available;
-- 36 of 36 mandatory synthetic evaluation assertions passing;
+- seven versioned synthetic Security Review cases available;
+- 84 of 84 mandatory synthetic evaluation assertions passing;
 - seven Power Platform Solution foundations packaging successfully;
 - public GitHub repository available;
 - local browser application, deterministic Router, four Plugins, analyst disposition, report, trace, and evaluator integration runnable;

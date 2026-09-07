@@ -159,8 +159,8 @@ The public project repository contains the canonical contracts, positive and neg
 The project has executable validation rather than architecture slides alone:
 
 - 15 valid and 10 invalid Skill contract fixtures pass automated validation;
-- four versioned synthetic RG and APP scenarios cover happy path, missing input, and prompt injection;
-- 36 of 36 mandatory Foundation evaluation assertions pass;
+- seven versioned synthetic RG and APP scenarios cover happy path, missing input, prompt injection, policy denial, unreadable evidence, and dependency failure;
+- 84 of 84 mandatory Foundation evaluation assertions pass;
 - the evaluator explicitly reports `pilotEligible=false` for synthetic data;
 - seven Power Platform Solution foundations package successfully for the enterprise scale-out path;
 - the local Node/Express/Ajv foundation has compiled the canonical JSON Schema and passed an HTTP runtime smoke test.

@@ -12,7 +12,7 @@ from jsonschema import Draft202012Validator
 ROOT = Path(__file__).resolve().parents[1]
 DATASET_ROOT = ROOT / "test-data" / "security-review"
 SCHEMA_PATH = DATASET_ROOT / "dataset.schema.json"
-DATASET_PATH = DATASET_ROOT / "v1.0.0" / "dataset.json"
+DATASET_PATH = DATASET_ROOT / "v1.1.0" / "dataset.json"
 MANIFEST_PATH = DATASET_PATH.parent / "manifest.json"
 
 

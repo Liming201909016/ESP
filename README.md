@@ -160,7 +160,7 @@ Start with:
 |---|---|
 | Architecture and contracts | Ready |
 | Synthetic RG/APP dataset | Ready, pending Domain SME approval for Pilot use |
-| Foundation evaluation | 36/36 mandatory synthetic assertions passing |
+| Foundation evaluation | 84/84 mandatory synthetic assertions passing |
 | Power Platform ALM foundation | Seven Solution projects package successfully |
 | Local browser application | Runnable Demo Mode |
 | Hosted synthetic Demo | [Azure App Service](https://app-esp-esp-demo-vw6mjjpc4xh64.azurewebsites.net/) |
@@ -230,8 +230,8 @@ Current validation covers:
 
 - 15 valid and 10 invalid Skill contract examples;
 - 22 API integration tests;
-- four versioned synthetic Security Review cases;
-- 36 mandatory evaluation assertions;
+- seven versioned synthetic Security Review cases;
+- 84 mandatory evaluation assertions;
 - 16 desktop/mobile browser journeys covering governed scenarios, error recovery, accessibility, and keyboard operation;
 - Hackathon registration and documentation consistency;
 - Dataverse workbook hash and semantic checks;

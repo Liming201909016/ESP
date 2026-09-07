@@ -31,7 +31,7 @@ The Hackathon MVP is done when a reviewer can clone or open the repository, run 
 | ID | Work item | Acceptance | Status |
 |---|---|---|---|
 | HCK-201 | Copilot-style entry | User selects a synthetic package and submits a validated natural-language review request | Done |
-| HCK-202 | Review workflow | Four synthetic scenarios execute through content-derived evidence and runtime governance controls | Done |
+| HCK-202 | Review workflow | Seven synthetic scenarios execute through content-derived evidence and runtime governance controls, including three standard governed stops | Done |
 | HCK-203 | Evidence experience | Evidence type, claim, source, Runbook authority, and versioned execution context are inspectable | Done |
 | HCK-204 | Analyst disposition | Analyst accepts, modifies, rejects, escalates, or marks Cannot Assess; HumanDecision evidence is retained | Done |
 | HCK-205 | Draft report | Structured report preserves scope, Runbook, template, citations, analyst decisions, and governed Draft/Final status | Done |
@@ -43,7 +43,7 @@ The Hackathon MVP is done when a reviewer can clone or open the repository, run 
 | ID | Work item | Acceptance | Status |
 |---|---|---|---|
 | HCK-301 | End-to-end tests | Governed scenarios, error recovery, accessibility, and keyboard operation pass 16 desktop/mobile Chromium journeys | Done |
-| HCK-302 | Evaluation integration | Four real Router runs export candidate results and pass the Python oracle at 36/36 with Pilot blocked | Done |
+| HCK-302 | Evaluation integration | Seven real Router runs export candidate results and pass the Python oracle at 84/84 with Pilot blocked | Done |
 | HCK-303 | Responsive UX verification | Desktop and mobile E2E assert no horizontal clipping across all four scenarios | Done |
 | HCK-304 | Recorded fallback | Desktop/mobile screenshots and an automated local walkthrough recording use the committed synthetic scenario | Done |
 | HCK-305 | Submission completion | Challenge choices, team, repository, screenshots, and video links are entered | Partial; exact Challenge choices and Innovation Studio form entry require organizer input |

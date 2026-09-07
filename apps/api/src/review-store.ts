@@ -35,7 +35,7 @@ export interface ReviewSummary {
 }
 
 let writeQueue = Promise.resolve();
-const terminalStates = new Set(["Completed", "RejectedByAnalyst", "Escalated", "CannotAssess", "NeedsInformation"]);
+const terminalStates = new Set(["Completed", "RejectedByAnalyst", "Escalated", "CannotAssess", "NeedsInformation", "RejectedByPolicy", "Failed"]);
 const defaultRetentionMs = 7 * 24 * 60 * 60 * 1000;
 const defaultMaxStoreBytes = 32 * 1024 * 1024;
 const defaultOrphanTempMaxAgeMs = 60 * 60 * 1000;

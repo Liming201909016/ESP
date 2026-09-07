@@ -20,11 +20,11 @@ Open a finding and its Evidence Item. Show the pinned source and Runbook version
 
 ## 5. Failure behavior, 45 seconds
 
-Run `SYN-RG-002` or `SYN-APP-002`. Show `NeedsInformation` for missing material or demonstrate that the prompt-injection text is ignored and recorded as a safe outcome.
+Run one standard governed-stop scenario: `SYN-RG-003` for `RejectedByPolicy`, `SYN-APP-003` for execution-time `CannotAssess`, or `SYN-APP-004` for bounded `DependencyFailure`. Show the responsible Skill, Plugin, retryability, retained Evidence, and Partial Decision Lineage. Use `SYN-RG-002` for `NeedsInformation` or `SYN-APP-002` for prompt-injection handling when more time is available.
 
 ## 6. Evaluation and reuse, 45 seconds
 
-Open the independent Evaluation Run, point out its Run ID and pinned Skill, implementation, package, Binding, Deployment, and threshold versions, then expand a Case to show all nine mandatory assertions. Emphasize that Evaluation execution is isolated and does not create operational Reviews. Select **Prove governed reuse** and compare the Security Review Copilot with the Architecture Review Workflow. Point out that each has a distinct Consumer Binding, Correlation ID, and Invocation ID while both resolve `LS-SEC-DOC-INTAKE` v1.0.0, the same implementation, and the same pinned Document Source and Evidence Plugin versions without copying assets.
+Open the independent Evaluation Run, point out its Run ID and pinned Skill, implementation, package, Binding, Deployment, and threshold versions, then expand a Case to show all twelve mandatory assertions. Emphasize that Evaluation execution is isolated and does not create operational Reviews. Select **Prove governed reuse** and compare the Security Review Copilot with the Architecture Review Workflow as the secondary Consumer. Point out that each has a distinct Consumer Binding, Correlation ID, and Invocation ID while both resolve `LS-SEC-DOC-INTAKE` v1.0.0, the same implementation, and the same pinned Document Source and Evidence Plugin versions without copying assets.
 
 ## 7. Close, 25 seconds
 

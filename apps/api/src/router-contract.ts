@@ -113,7 +113,7 @@ const documentIntakeInvocationResponseSchema = {
 const reviewEnvelopeSchema = {
   type: "object",
   additionalProperties: true,
-  required: ["correlationId", "caseId", "request", "consumer", "consumerBinding", "state", "outcome", "evidence", "trace", "violations", "metrics", "analystReviewRequired", "lineage"],
+    required: ["correlationId", "caseId", "request", "consumer", "consumerBinding", "state", "outcome", "errors", "evidence", "trace", "violations", "metrics", "analystReviewRequired", "lineage"],
   properties: {
     correlationId: { type: "string", minLength: 1 },
     caseId: { type: "string", minLength: 1 },
@@ -122,6 +122,25 @@ const reviewEnvelopeSchema = {
     consumerBinding: { type: "object", additionalProperties: false, required: ["code", "status"], properties: { code: { type: "string", minLength: 1 }, status: { const: "Active" } } },
     state: { type: "string", minLength: 1 },
     outcome: { enum: ["Success", "NeedsInformation", "CannotAssess", "HumanHandoff", "RejectedByPolicy", "Failed"] },
+        errors: {
+          type: "array",
+          items: {
+            type: "object", additionalProperties: false, required: ["category", "message", "retryable"],
+            properties: {
+              category: { enum: ["InvalidInput", "MissingEvidence", "DependencyFailure", "PolicyDenial", "Timeout", "InternalFailure"] },
+              message: { type: "string", minLength: 1 },
+              retryable: { type: "boolean" },
+            },
+          },
+        },
+        terminalAttribution: {
+          type: "object", additionalProperties: false, required: ["skillCode", "pluginCode", "evidenceId"],
+          properties: {
+            skillCode: { type: "string", minLength: 1 },
+            pluginCode: { type: "string", minLength: 1 },
+            evidenceId: { type: "string", minLength: 1 },
+          },
+        },
     evidence: {
       type: "array",
       items: {
@@ -209,7 +228,7 @@ const reviewEnvelopeSchema = {
       },
     },
   },
-  allOf: [{ if: { properties: { state: { const: "NeedsInformation" } } }, else: { required: ["report"] } }],
+  allOf: [{ if: { properties: { outcome: { enum: ["Success", "HumanHandoff"] } } }, then: { required: ["report"] } }],
 } as const;
 
 const validateRouterRequest = ajv.compile(routerRequestSchema);

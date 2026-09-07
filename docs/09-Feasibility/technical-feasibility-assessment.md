@@ -12,7 +12,7 @@ The proposed architecture is technically feasible, and the repository contains a
 |---|---|---|
 | Architecture and contracts | Go | Five Skill contracts, Plugin standard, version pinning, evidence rules, and local/connected boundaries are defined and validated |
 | Local toolchain | Go | Node 24.19.0, npm 11.17.0, Python 3.12.10, Vite 8.2.2, Express 5.2.1, Ajv 8.20.0, and Ajv Formats 3.0.1 are available or resolvable |
-| Synthetic data and evaluation | Go | Four synthetic RG/APP cases validate; Foundation evaluation passes 36/36 mandatory assertions while correctly setting Pilot eligibility to false |
+| Synthetic data and evaluation | Go | Seven synthetic RG/APP cases validate; Foundation evaluation passes 84/84 mandatory assertions while correctly setting Pilot eligibility to false |
 | Power Platform ALM foundation | Go | PAC 2.11.2 is installed; seven Solution source projects and unmanaged packages validate locally |
 | Runnable local application | Go | React/Vite and Express provide one-command Demo Mode with five Skills, four Plugins, evidence, analyst disposition, structured report, trace, and evaluation |
 | Copilot Studio Connected Mode | Conditional Go | The platform supports Agent flows, connectors, REST APIs, MCP, and explicit topic calls; tenant connectivity, identity, DLP, and deployment remain gated |
@@ -34,7 +34,7 @@ Use a TypeScript monorepo with a browser client and local API:
 
 This stack is suitable because the local Node/npm toolchain and package registry access were verified. It supports one-command startup, a browser UI, shared contracts, deterministic Plugins, and later replacement of local adapters with connected adapters.
 
-The implementation now passes 22 API integration tests and 16 Playwright desktop/mobile journeys across governed scenarios, persistence recovery, error recovery, accessibility, and keyboard operation. Four real Router runs export evaluator-compatible candidate results and pass the independent Python oracle at 36/36 mandatory assertions with `pilotEligible=false`.
+The implementation now passes 41 API integration tests and 26 Playwright desktop/mobile journeys across governed scenarios, persistence recovery, error recovery, accessibility, and keyboard operation. Seven real Router runs export evaluator-compatible candidate results and pass the independent Python oracle at 84/84 mandatory assertions with `pilotEligible=false`.
 
 Python remains the source of the existing workbook, dataset-manifest, documentation, and Foundation evaluation tooling. The application must emit candidate results compatible with `Run-SyntheticEvaluation.py`; it must not duplicate the evaluator in a divergent format.
 

@@ -10,7 +10,7 @@
 | HRD-001 | Natural-language request is ignored | API validates, stores, traces, and returns the user request; empty request is rejected | Request round-trip and missing-request rejection pass | Done |
 | HRD-002 | Facts come from expected labels | Evidence Extraction derives facts from authorized synthetic document content | Content mutation changes extracted claims independently of labels | Done |
 | HRD-003 | Prompt-injection detection is field-name based | Recursively inspect untrusted string content and apply explicit policy patterns independent of JSON key | Injection under arbitrary nested keys is detected, ignored, and evidenced | Done |
-| HRD-004 | Prohibited behaviors are always empty | Runtime controls emit detected violations and evaluator consumes actual runtime results | Missing citation and unhandled injection produce violations; normal runs remain 36/36 | Done |
+| HRD-004 | Prohibited behaviors are always empty | Runtime controls emit detected violations and evaluator consumes actual runtime results | Missing citation and unhandled injection produce violations; governed runs pass 84/84 | Done |
 | HRD-005 | Review state is memory-only | Persist review, trace, evidence, and disposition using atomic local file replacement | A new App instance reloads the completed Review by Correlation ID | Done |
 
 ## Priority 1: Governance proof
