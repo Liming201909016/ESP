@@ -110,8 +110,9 @@ for (const [caseId, expected] of Object.entries(expectedCases)) {
     throw new Error(`${caseId} returned an invalid governed stop`);
   }
   latestCorrelationId = review.correlationId;
-  if (review.state === "NeedsInformation") {
-    if (review.lineage?.status !== "Partial" || review.lineage.executedSkillCodes?.length !== 1) {
+  if (review.state === "NeedsInformation" || expected.errorCategory) {
+    const expectedExecutedSkills = expected.errorCategory ? expected.traceCount : 1;
+    if (review.lineage?.status !== "Partial" || review.lineage.executedSkillCodes?.length !== expectedExecutedSkills) {
       throw new Error(`${caseId} returned an invalid partial Decision Lineage`);
     }
   } else if (!review.lineage?.reconciled?.selectedSkillsExecuted || !review.lineage?.reconciled?.citationsResolveToEvidence) {
@@ -144,15 +145,21 @@ try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   if (await page.title() !== "Enterprise Skill Platform") throw new Error("Hosted browser title is invalid");
+  if (!(await page.getByRole("tab", { name: "Review", exact: true }).getAttribute("aria-selected"))?.includes("true")) {
+    throw new Error("Hosted Review workspace is not selected by default");
+  }
+  await page.getByRole("tab", { name: "Evaluation", exact: true }).click();
   const evaluation = page.getByRole("region", { name: "FoundationPass" });
   if (await evaluation.locator("details").count() !== 7 || !(await evaluation.textContent())?.includes("84/84")) {
     throw new Error("Hosted Evaluation Run is not inspectable in the browser");
   }
+  await page.getByRole("tab", { name: "Reuse", exact: true }).click();
   await page.getByRole("button", { name: "Prove governed reuse" }).click();
   await page.getByRole("heading", { name: "Architecture Review Workflow" }).waitFor();
   if (!(await page.getByRole("region", { name: "One Skill, two Consumers." }).textContent())?.includes("No copied implementation")) {
     throw new Error("Hosted governed reuse proof is not visible");
   }
+  await page.getByRole("tab", { name: "Review", exact: true }).click();
   await page.getByRole("button", { name: "Run review" }).click();
   await page.locator(".outcome").waitFor();
   if (await page.locator(".outcome").textContent() !== "HumanHandoff") throw new Error("Hosted browser workflow did not reach HumanHandoff");
