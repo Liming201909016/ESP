@@ -39,7 +39,7 @@ test("RG missing-input path stops after Document Intake", async ({ page }) => {
 
 test("APP happy path can be marked Cannot Assess without final risk", async ({ page }) => {
   await runCase(page, "SYN-APP-001");
-  await page.getByRole("button", { name: "Cannot assess" }).click();
+  await page.getByRole("button", { name: "Cannot assess", exact: true }).click();
   await expect(page.locator(".outcome")).toHaveText("CannotAssess");
   await expect(page.locator(".completed-disposition")).toContainText("Final risk: Not assigned");
   await expect(page.locator(".report-heading span")).toHaveText("Draft");
