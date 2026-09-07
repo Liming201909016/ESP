@@ -24,7 +24,7 @@ Run `SYN-RG-002` or `SYN-APP-002`. Show `NeedsInformation` for missing material 
 
 ## 6. Evaluation and reuse, 45 seconds
 
-Show the automated Evaluation Run and mandatory assertion result. Select **Prove governed reuse** and compare the Security Review Copilot with the Architecture Review Workflow. Point out that each has a distinct Consumer Binding, Correlation ID, and Invocation ID while both resolve `LS-SEC-DOC-INTAKE` v1.0.0, the same implementation, and the same pinned Document Source and Evidence Plugin versions without copying assets.
+Open the independent Evaluation Run, point out its Run ID and pinned Skill, implementation, package, Binding, Deployment, and threshold versions, then expand a Case to show all nine mandatory assertions. Emphasize that Evaluation execution is isolated and does not create operational Reviews. Select **Prove governed reuse** and compare the Security Review Copilot with the Architecture Review Workflow. Point out that each has a distinct Consumer Binding, Correlation ID, and Invocation ID while both resolve `LS-SEC-DOC-INTAKE` v1.0.0, the same implementation, and the same pinned Document Source and Evidence Plugin versions without copying assets.
 
 ## 7. Close, 25 seconds
 

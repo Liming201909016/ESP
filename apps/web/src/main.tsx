@@ -9,14 +9,40 @@ interface Registry {
   plugins: Array<{ code: string; name: string; version: string; status: string }>;
 }
 
-interface EvaluationSummary {
+interface EvaluationRun {
+  runId: string;
   status: string;
-  caseCount: number;
-  passedCaseCount: number;
-  mandatoryAssertionCount: number;
-  passedMandatoryAssertionCount: number;
-  pilotEligible: boolean;
-  pilotBlockers: string[];
+  pins: {
+    logicalSkillVersion: string;
+    implementationVersion: string;
+    packageVersion: string;
+    dependencySnapshotHash: string;
+    deploymentCode: string;
+    consumerBindingCode: string;
+    evaluatorVersion: string;
+    runtimeConfigurationHash: string;
+    thresholdVersion: string;
+  };
+  caseResults: Array<{
+    caseId: string;
+    requestType: string;
+    category: string;
+    passed: boolean;
+    assertions: Array<{ name: string; mandatory: boolean; passed: boolean; detail: string }>;
+  }>;
+  aggregateMeasures: {
+    caseCount: number;
+    passedCaseCount: number;
+    mandatoryAssertionCount: number;
+    passedMandatoryAssertionCount: number;
+    mandatoryAssertionPassRate: number;
+  };
+  decision: {
+    foundationStatus: string;
+    pilotGateEligible: boolean;
+    pilotBlockers: string[];
+  };
+  evaluator: string;
 }
 
 interface IntentResolution {
@@ -182,7 +208,7 @@ async function fetchJson<T>(input: RequestInfo | URL, init?: RequestInit): Promi
 
 function App() {
   const [registry, setRegistry] = useState<Registry | null>(null);
-  const [evaluation, setEvaluation] = useState<EvaluationSummary | null>(null);
+  const [evaluation, setEvaluation] = useState<EvaluationRun | null>(null);
   const [caseId, setCaseId] = useState("SYN-RG-001");
   const [requestText, setRequestText] = useState("Review this package and produce an evidence-grounded draft.");
   const [intentResolution, setIntentResolution] = useState<IntentResolution | null>(null);
@@ -214,7 +240,7 @@ function App() {
     try {
       const [nextRegistry, nextEvaluation] = await Promise.all([
         fetchJson<Registry>("/api/registry"),
-        fetchJson<EvaluationSummary>("/api/evaluation/summary"),
+        fetchJson<EvaluationRun>("/api/evaluation/run"),
       ]);
       setRegistry(nextRegistry);
       setEvaluation(nextEvaluation);
@@ -779,17 +805,50 @@ function App() {
       </section>
 
       <section className="evaluation-band" aria-labelledby="evaluation-title">
-        <div>
+        <div className="evaluation-heading">
           <p className="section-label">Independent evaluation</p>
-          <h2 id="evaluation-title">{evaluation?.status ?? "Evaluating application"}</h2>
-          <p>Application results are exported to the existing Python acceptance oracle.</p>
+          <h2 id="evaluation-title">{evaluation?.decision.foundationStatus ?? "Evaluating application"}</h2>
+          <p>Runtime projection of the same nine mandatory assertions per case enforced by the Python release oracle.</p>
+          {evaluation ? <code>{evaluation.runId}</code> : null}
         </div>
-        <dl>
-          <div><dt>Scenarios</dt><dd>{evaluation ? `${evaluation.passedCaseCount}/${evaluation.caseCount}` : "—"}</dd></div>
-          <div><dt>Assertions</dt><dd>{evaluation ? `${evaluation.passedMandatoryAssertionCount}/${evaluation.mandatoryAssertionCount}` : "—"}</dd></div>
-          <div><dt>Pilot eligible</dt><dd>{evaluation?.pilotEligible ? "Yes" : "No"}</dd></div>
+        <dl className="evaluation-measures">
+          <div><dt>Scenarios</dt><dd>{evaluation ? `${evaluation.aggregateMeasures.passedCaseCount}/${evaluation.aggregateMeasures.caseCount}` : "—"}</dd></div>
+          <div><dt>Assertions</dt><dd>{evaluation ? `${evaluation.aggregateMeasures.passedMandatoryAssertionCount}/${evaluation.aggregateMeasures.mandatoryAssertionCount}` : "—"}</dd></div>
+          <div><dt>Pilot eligible</dt><dd>{evaluation?.decision.pilotGateEligible ? "Yes" : "No"}</dd></div>
         </dl>
-        {evaluation?.pilotBlockers?.length ? <p className="evaluation-note">{evaluation.pilotBlockers.join(" · ")}</p> : null}
+        {evaluation ? (
+          <dl className="evaluation-pins">
+            <div><dt>Skill</dt><dd>v{evaluation.pins.logicalSkillVersion}</dd></div>
+            <div><dt>Implementation</dt><dd>{evaluation.pins.implementationVersion}</dd></div>
+            <div><dt>Package</dt><dd>v{evaluation.pins.packageVersion}</dd></div>
+            <div><dt>Binding</dt><dd>{evaluation.pins.consumerBindingCode}</dd></div>
+            <div><dt>Deployment</dt><dd>{evaluation.pins.deploymentCode}</dd></div>
+            <div><dt>Threshold</dt><dd>{evaluation.pins.thresholdVersion}</dd></div>
+          </dl>
+        ) : null}
+        {evaluation ? (
+          <div className="evaluation-cases">
+            {evaluation.caseResults.map((caseResult, index) => (
+              <details key={caseResult.caseId} open={index === 0}>
+                <summary>
+                  <span>{caseResult.passed ? "Pass" : "Fail"}</span>
+                  <strong>{caseResult.caseId}</strong>
+                  <small>{caseResult.requestType} · {caseResult.category} · {caseResult.assertions.filter((item) => item.passed).length}/{caseResult.assertions.length}</small>
+                </summary>
+                <ul>
+                  {caseResult.assertions.map((item) => (
+                    <li key={item.name} className={item.passed ? "passed" : "failed"}>
+                      <strong>{item.name}</strong>
+                      <span>{item.passed ? "Passed" : "Failed"}</span>
+                      <small>{item.detail}</small>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ))}
+          </div>
+        ) : null}
+        {evaluation?.decision.pilotBlockers?.length ? <p className="evaluation-note">{evaluation.decision.pilotBlockers.join(" · ")}</p> : null}
       </section>
     </main>
   );
