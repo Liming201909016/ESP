@@ -968,6 +968,54 @@ h1 {
   border-bottom: 1px solid #d7ded9;
 }
 
+.governed-stop {
+  margin: 22px 0 0;
+  padding: 20px;
+  border: 1px solid #c8756f;
+  border-left: 5px solid #a8322a;
+  color: #5f1915;
+  background: #fff7f6;
+}
+
+.governed-stop h3 {
+  margin: 0 0 8px;
+  font-size: 1.08rem;
+}
+
+.governed-stop > div > p:last-child {
+  margin: 0;
+  color: #7c211b;
+  line-height: 1.5;
+}
+
+.governed-stop dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 18px 0 0;
+  background: #ddb4b0;
+}
+
+.governed-stop dl div {
+  min-width: 0;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.governed-stop dt {
+  color: #8a514c;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.governed-stop dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+  color: #5f1915;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .result-block h3 {
   margin: 0 0 8px;
   font-size: 0.88rem;
@@ -1445,6 +1493,10 @@ h1 {
   }
 
   .report-preview dl {
+    grid-template-columns: 1fr;
+  }
+
+  .governed-stop dl {
     grid-template-columns: 1fr;
   }
 

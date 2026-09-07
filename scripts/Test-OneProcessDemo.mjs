@@ -72,8 +72,8 @@ try {
   if (healthResponse.headers.get("x-request-id") !== "production-smoke") throw new Error("Request ID propagation failed");
   if (registry.skills.length !== 5 || registry.plugins.length !== 4) throw new Error("Registry endpoint failed");
   if (evaluationRun.decision?.foundationStatus !== "FoundationPass"
-    || evaluationRun.aggregateMeasures?.passedMandatoryAssertionCount !== 36
-    || evaluationRun.caseResults?.length !== 4) {
+    || evaluationRun.aggregateMeasures?.passedMandatoryAssertionCount !== 84
+    || evaluationRun.caseResults?.length !== 7) {
     throw new Error("Inspectable Evaluation Run failed");
   }
   if (JSON.stringify(reviewsAfterEvaluation.reviews) !== JSON.stringify(reviewsBeforeEvaluation.reviews)) {

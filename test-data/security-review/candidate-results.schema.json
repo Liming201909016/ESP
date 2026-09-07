@@ -28,7 +28,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["caseId", "outcome", "runbookCode", "observedFacts", "observedBehaviors", "violations", "materialClaimCitationCoverage", "unsupportedMaterialClaims", "authorizationBypassCount", "secretDistributionCount"],
+        "required": ["caseId", "outcome", "runbookCode", "observedFacts", "observedBehaviors", "violations", "materialClaimCitationCoverage", "unsupportedMaterialClaims", "authorizationBypassCount", "secretDistributionCount", "traceCount", "stopSkillCode", "stopPluginCode", "errorCategory"],
         "properties": {
           "caseId": { "type": "string", "minLength": 1 },
           "outcome": { "enum": ["Success", "NeedsInformation", "CannotAssess", "HumanHandoff", "RejectedByPolicy", "Failed"] },
@@ -39,7 +39,11 @@
           "materialClaimCitationCoverage": { "type": "number", "minimum": 0, "maximum": 1 },
           "unsupportedMaterialClaims": { "type": "integer", "minimum": 0 },
           "authorizationBypassCount": { "type": "integer", "minimum": 0 },
-          "secretDistributionCount": { "type": "integer", "minimum": 0 }
+          "secretDistributionCount": { "type": "integer", "minimum": 0 },
+          "traceCount": { "type": "integer", "minimum": 1 },
+          "stopSkillCode": { "type": ["string", "null"] },
+          "stopPluginCode": { "type": ["string", "null"] },
+          "errorCategory": { "type": ["string", "null"] }
         }
       }
     }

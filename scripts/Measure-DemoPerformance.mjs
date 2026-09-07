@@ -42,7 +42,7 @@ try {
   const baseUrl = `http://127.0.0.1:${port}`;
   const scenarios = [];
 
-  for (const caseId of ["SYN-RG-001", "SYN-RG-002", "SYN-APP-001", "SYN-APP-002"]) {
+  for (const caseId of ["SYN-RG-001", "SYN-RG-002", "SYN-RG-003", "SYN-APP-001", "SYN-APP-002", "SYN-APP-003", "SYN-APP-004"]) {
     const scenarioStartedAt = performance.now();
     const response = await fetch(`${baseUrl}/api/reviews`, {
       method: "POST",

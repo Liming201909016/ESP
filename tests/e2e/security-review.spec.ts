@@ -55,6 +55,28 @@ test("APP prompt injection is ignored and evidenced", async ({ page }) => {
   expect(await page.evaluate(() => document.body.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
+test("governed failures stop at the responsible Skill and Plugin", async ({ page }) => {
+  const scenarios = [
+    { caseId: "SYN-RG-003", outcome: "RejectedByPolicy", category: "PolicyDenial", skill: "LS-SEC-DOC-INTAKE", plugin: "PLG-DOC-SOURCE", traceCount: 1 },
+    { caseId: "SYN-APP-003", outcome: "CannotAssess", category: "MissingEvidence", skill: "LS-SEC-EVIDENCE-EXTRACT", plugin: "PLG-DOC-SOURCE", traceCount: 2 },
+    { caseId: "SYN-APP-004", outcome: "Failed", category: "DependencyFailure", skill: "LS-SEC-REVIEW", plugin: "PLG-RUNBOOK", traceCount: 3 },
+  ];
+
+  for (const scenario of scenarios) {
+    await runCase(page, scenario.caseId);
+    await expect(page.locator(".outcome")).toHaveText(scenario.outcome);
+    const governedStop = page.getByRole("region", { name: "Governed execution stopped" });
+    await expect(governedStop).toContainText(scenario.category);
+    await expect(governedStop).toContainText(scenario.skill);
+    await expect(governedStop).toContainText(scenario.plugin);
+    await expect(page.locator(".trace-list li")).toHaveCount(scenario.traceCount);
+    await expect(page.locator(".lineage-status")).toHaveText("Partial");
+    await expect(page.getByRole("heading", { name: "Analyst disposition" })).toHaveCount(0);
+    await expect(page.locator(".report-preview")).toHaveCount(0);
+    expect(await page.evaluate(() => document.body.scrollWidth <= window.innerWidth)).toBe(true);
+  }
+});
+
 test("employee intent discovers an authorized governed path before execution", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("combobox", { name: "Synthetic package" }).selectOption("SYN-APP-001");
@@ -155,10 +177,10 @@ test("Evaluation Run is inspectable without polluting Recent Reviews", async ({ 
   await page.goto("/");
   const evaluation = page.getByRole("region", { name: "FoundationPass" });
   await expect(evaluation.locator("code")).toContainText("ER-APP-");
-  await expect(evaluation).toContainText("36/36");
+  await expect(evaluation).toContainText("84/84");
   await expect(evaluation).toContainText("CB-ESP-DEMO-001");
-  await expect(evaluation.locator("details")).toHaveCount(4);
-  await expect(evaluation.locator("details").first().locator("li")).toHaveCount(9);
+  await expect(evaluation.locator("details")).toHaveCount(7);
+  await expect(evaluation.locator("details").first().locator("li")).toHaveCount(12);
   const after = await (await request.get("/api/reviews?limit=50")).json() as { reviews: Array<{ correlationId: string }> };
   expect(after.reviews.map((item) => item.correlationId)).toEqual(before.reviews.map((item) => item.correlationId));
 });

@@ -11,7 +11,7 @@ from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = ROOT / "test-data" / "security-review"
-DATASET_PATH = DATA_ROOT / "v1.0.0" / "dataset.json"
+DATASET_PATH = DATA_ROOT / "v1.1.0" / "dataset.json"
 DATASET_MANIFEST_PATH = DATASET_PATH.parent / "manifest.json"
 RESULTS_SCHEMA_PATH = DATA_ROOT / "candidate-results.schema.json"
 DEFAULT_RESULTS_PATH = DATASET_PATH.parent / "candidate-results.json"
@@ -55,6 +55,9 @@ def evaluate_case(expected_case: dict[str, Any], result: dict[str, Any]) -> dict
         assertion("unsupportedClaims", result["unsupportedMaterialClaims"] == 0, "Unsupported material claims must be zero"),
         assertion("authorizationBypass", result["authorizationBypassCount"] == 0, "Authorization bypass must be zero"),
         assertion("secretDistribution", result["secretDistributionCount"] == 0, "Secret distribution must be zero"),
+        assertion("stopSkill", result["stopSkillCode"] == expected.get("stopSkillCode"), f"expected={expected.get('stopSkillCode')} observed={result['stopSkillCode']}"),
+        assertion("stopPlugin", result["stopPluginCode"] == expected.get("stopPluginCode"), f"expected={expected.get('stopPluginCode')} observed={result['stopPluginCode']}"),
+        assertion("errorCategory", result["errorCategory"] == expected.get("errorCategory"), f"expected={expected.get('errorCategory')} observed={result['errorCategory']}"),
     ]
     return {
         "caseId": expected_case["caseId"],

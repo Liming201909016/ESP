@@ -15,6 +15,12 @@ interface TraceEntry {
   outcome: string;
 }
 
+interface StandardError {
+  category: "InvalidInput" | "MissingEvidence" | "DependencyFailure" | "PolicyDenial" | "Timeout" | "InternalFailure";
+  message: string;
+  retryable: boolean;
+}
+
 export function detectRuntimeViolations(input: {
   sourceIds: string[];
   evidence: EvidenceItem[];
@@ -37,6 +43,7 @@ export function detectRuntimeViolations(input: {
 }
 
 function unresolvedReportCitationIds(review: StoredReview) {
+  if (!review.report) return [];
   const evidenceIds = new Set(review.evidence.map((item) => item.evidenceId));
   return review.report.findings
     .flatMap((finding) => finding.citations)
@@ -51,9 +58,10 @@ export interface StoredReview {
   caseId: string;
   state: string;
   outcome: string;
-  proposedRisk: string;
+  proposedRisk?: string;
   evidence: EvidenceItem[];
-  report: ReturnType<typeof reportPlugin.render>;
+  report?: ReturnType<typeof reportPlugin.render>;
+  errors: StandardError[];
   analystReviewRequired: boolean;
   analystDisposition?: { decision: AnalystDecision; rationale: string; finalRisk?: string };
   lineage: DecisionLineage;
@@ -161,6 +169,48 @@ export async function executeSecurityReview(caseId: string, requestText: string,
     });
   };
 
+  const governedStop = (fault: NonNullable<typeof selectedCase.input.syntheticFault>) => {
+    const failureEvidence = evidencePlugin.create(
+      "ToolResult",
+      selectedCase.input.documents[0]?.documentId ?? caseId,
+      fault.evidenceClaimReference,
+    );
+    evidence.push(failureEvidence);
+    invoke(fault.targetSkillCode, fault.outcome);
+    return validatedReview({
+      correlationId,
+      caseId,
+      request: { text: normalizedRequest },
+      consumer: { code: consumer.code, name: consumer.name },
+      consumerBinding: { code: binding.code, status: binding.status },
+      state: fault.outcome,
+      outcome: fault.outcome,
+      errors: [fault.error],
+      terminalAttribution: {
+        skillCode: fault.targetSkillCode,
+        pluginCode: fault.targetPluginCode,
+        evidenceId: failureEvidence.evidenceId,
+      },
+      requiredBehaviors: selectedCase.expected.requiredBehaviors,
+      evidence,
+      trace,
+      violations: [],
+      metrics: { materialClaimCitationCoverage: 1, unsupportedMaterialClaims: 0, authorizationBypassCount: 0, secretDistributionCount: 0 },
+      analystReviewRequired: false,
+      intentResolution: {
+        resolutionId: intentResolution.resolutionId,
+        domain: intentResolution.intent.domain,
+        inferredRequestType: intentResolution.intent.inferredRequestType,
+        requestedOutcome: intentResolution.outcome.requestedType,
+        authorizedOutcome: intentResolution.outcome.authorizedType,
+      },
+      lineage: buildDecisionLineage(intentResolution, trace, evidence),
+    });
+  };
+
+  const syntheticFault = selectedCase.input.syntheticFault;
+  if (syntheticFault?.targetSkillCode === "LS-SEC-DOC-INTAKE") return governedStop(syntheticFault);
+
   const source = await documentSourcePlugin.read(selectedCase);
   if (!source.materialComplete) {
     invoke("LS-SEC-DOC-INTAKE", "NeedsInformation");
@@ -173,6 +223,7 @@ export async function executeSecurityReview(caseId: string, requestText: string,
       consumerBinding: { code: binding.code, status: binding.status },
       state: "NeedsInformation",
       outcome: "NeedsInformation",
+      errors: [{ category: "MissingEvidence", message: "Mandatory review material is missing.", retryable: true }],
       missingInformation: ["resource list", "permission list"],
       evidence,
       trace,
@@ -191,6 +242,8 @@ export async function executeSecurityReview(caseId: string, requestText: string,
   }
   invoke("LS-SEC-DOC-INTAKE", "Success");
 
+  if (syntheticFault?.targetSkillCode === "LS-SEC-EVIDENCE-EXTRACT") return governedStop(syntheticFault);
+
   const promptInjectionDetected = containsPromptInjection(source.documents);
   if (promptInjectionDetected) {
     evidence.push(evidencePlugin.create("ToolResult", source.sourceIds[0] ?? caseId, "prompt-injection-ignored"));
@@ -200,6 +253,8 @@ export async function executeSecurityReview(caseId: string, requestText: string,
     evidence.push(evidencePlugin.create("Fact", fact.sourceId, fact.claimReference));
   }
   invoke("LS-SEC-EVIDENCE-EXTRACT", "Success");
+
+  if (syntheticFault?.targetSkillCode === "LS-SEC-REVIEW") return governedStop(syntheticFault);
 
   const runbook = runbookPlugin.resolve(selectedCase.expected.runbookCode);
   const finding = {
@@ -246,6 +301,7 @@ export async function executeSecurityReview(caseId: string, requestText: string,
       governanceOverrideAllowed: false,
     },
     violations,
+      errors: [],
     metrics: {
       materialClaimCitationCoverage: factCount === 0 ? 1 : citedFactCount / factCount,
       unsupportedMaterialClaims: violations.includes("unsupported material claim") ? 1 : 0,
@@ -281,6 +337,7 @@ export async function applyAnalystDisposition(
   const review = await loadReview<StoredReview>(correlationId);
   if (!review) throw new Error(`Review not found: ${correlationId}`);
   if (review.state !== "AwaitingAnalystDisposition") throw new Error(`Review is not awaiting disposition: ${correlationId}`);
+    if (!review.report) throw new Error(`Review report is unavailable: ${correlationId}`);
   if (decision === "Modify" && !finalRisk) throw new Error("finalRisk is required when modifying a rating");
 
   const transitions: Record<AnalystDecision, { state: string; outcome: string; reportStatus: "Draft" | "Final" }> = {

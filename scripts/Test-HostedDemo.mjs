@@ -35,8 +35,8 @@ const { body: reviewsBeforeEvaluation } = await jsonRequest("/api/reviews?limit=
 const { body: evaluationRun } = await jsonRequest("/api/evaluation/run");
 const { body: reviewsAfterEvaluation } = await jsonRequest("/api/reviews?limit=50");
 if (evaluationRun.decision?.foundationStatus !== "FoundationPass"
-  || evaluationRun.aggregateMeasures?.passedMandatoryAssertionCount !== 36
-  || evaluationRun.caseResults?.length !== 4) {
+  || evaluationRun.aggregateMeasures?.passedMandatoryAssertionCount !== 84
+  || evaluationRun.caseResults?.length !== 7) {
   throw new Error("Hosted inspectable Evaluation Run is invalid");
 }
 if (JSON.stringify(reviewsAfterEvaluation.reviews) !== JSON.stringify(reviewsBeforeEvaluation.reviews)) {
@@ -81,8 +81,11 @@ if (JSON.stringify(primaryIntake.skill) !== JSON.stringify(secondaryIntake.skill
 const expectedCases = {
   "SYN-RG-001": { state: "AwaitingAnalystDisposition", outcome: "HumanHandoff", traceCount: 5 },
   "SYN-RG-002": { state: "NeedsInformation", outcome: "NeedsInformation", traceCount: 1 },
+  "SYN-RG-003": { state: "RejectedByPolicy", outcome: "RejectedByPolicy", traceCount: 1, errorCategory: "PolicyDenial", stopSkillCode: "LS-SEC-DOC-INTAKE", stopPluginCode: "PLG-DOC-SOURCE" },
   "SYN-APP-001": { state: "AwaitingAnalystDisposition", outcome: "HumanHandoff", traceCount: 5 },
   "SYN-APP-002": { state: "AwaitingAnalystDisposition", outcome: "HumanHandoff", traceCount: 5 },
+  "SYN-APP-003": { state: "CannotAssess", outcome: "CannotAssess", traceCount: 2, errorCategory: "MissingEvidence", stopSkillCode: "LS-SEC-EVIDENCE-EXTRACT", stopPluginCode: "PLG-DOC-SOURCE" },
+  "SYN-APP-004": { state: "Failed", outcome: "Failed", traceCount: 3, errorCategory: "DependencyFailure", stopSkillCode: "LS-SEC-REVIEW", stopPluginCode: "PLG-RUNBOOK" },
 };
 const scenarios = [];
 let latestCorrelationId = "";
@@ -100,6 +103,12 @@ for (const [caseId, expected] of Object.entries(expectedCases)) {
     throw new Error(`${caseId} returned an unexpected governed state`);
   }
   if (review.violations.length) throw new Error(`${caseId} reported runtime violations: ${review.violations.join(", ")}`);
+  if (expected.errorCategory && (review.errors?.[0]?.category !== expected.errorCategory
+    || review.terminalAttribution?.skillCode !== expected.stopSkillCode
+    || review.terminalAttribution?.pluginCode !== expected.stopPluginCode
+    || review.report)) {
+    throw new Error(`${caseId} returned an invalid governed stop`);
+  }
   latestCorrelationId = review.correlationId;
   if (review.state === "NeedsInformation") {
     if (review.lineage?.status !== "Partial" || review.lineage.executedSkillCodes?.length !== 1) {
@@ -136,7 +145,7 @@ try {
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   if (await page.title() !== "Enterprise Skill Platform") throw new Error("Hosted browser title is invalid");
   const evaluation = page.getByRole("region", { name: "FoundationPass" });
-  if (await evaluation.locator("details").count() !== 4 || !(await evaluation.textContent())?.includes("36/36")) {
+  if (await evaluation.locator("details").count() !== 7 || !(await evaluation.textContent())?.includes("84/84")) {
     throw new Error("Hosted Evaluation Run is not inspectable in the browser");
   }
   await page.getByRole("button", { name: "Prove governed reuse" }).click();

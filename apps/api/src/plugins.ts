@@ -8,6 +8,13 @@ export interface DatasetCase {
   input: {
     projectDescription: string;
     documents: Array<{ documentId: string; documentType: string; content: Record<string, unknown> }>;
+    syntheticFault?: {
+      targetSkillCode: string;
+      targetPluginCode: string;
+      outcome: "CannotAssess" | "RejectedByPolicy" | "Failed";
+      error: { category: "MissingEvidence" | "DependencyFailure" | "PolicyDenial"; message: string; retryable: boolean };
+      evidenceClaimReference: string;
+    };
   };
   expected: {
     outcome: string;
@@ -15,6 +22,9 @@ export interface DatasetCase {
     requiredFacts: string[];
     requiredBehaviors: string[];
     prohibitedBehaviors: string[];
+    stopSkillCode?: string | null;
+    stopPluginCode?: string | null;
+    errorCategory?: string | null;
   };
 }
 
@@ -30,10 +40,20 @@ export interface ExtractedFact {
   sourceId: string;
 }
 
-const datasetUrl = new URL("../../../test-data/security-review/v1.0.0/dataset.json", import.meta.url);
+const datasetUrl = new URL("../../../test-data/security-review/v1.1.0/dataset.json", import.meta.url);
+
+export async function loadDataset() {
+  return JSON.parse(await readFile(datasetUrl, "utf8")) as {
+    datasetCode: string;
+    version: string;
+    classification: string;
+    synthetic: true;
+    cases: DatasetCase[];
+  };
+}
 
 export async function loadCase(caseId: string): Promise<DatasetCase> {
-  const dataset = JSON.parse(await readFile(datasetUrl, "utf8")) as { cases: DatasetCase[] };
+  const dataset = await loadDataset();
   const selectedCase = dataset.cases.find((item) => item.caseId === caseId);
   if (!selectedCase) throw new Error(`Unknown synthetic case: ${caseId}`);
   return selectedCase;

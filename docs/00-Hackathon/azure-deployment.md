@@ -74,7 +74,7 @@ Initial deployment completed on 2026-09-04. Review-store recovery hardening from
 - Desktop and 390px mobile browser checks reported no horizontal overflow
 - Helmet CSP/HSTS/nosniff/referrer headers, same-origin browser access, and the API rate limit are active
 - Production and full dependency audits report zero known vulnerabilities
-- `npm run test:hosted` automates health, security headers, all four governed scenarios, and a 390px Chromium smoke
+- `npm run test:hosted` automates health, security headers, all seven governed scenarios, and a 390px Chromium smoke
 - Post-deployment `npm run test:hosted` passed against the hardened deployment on 2026-09-06
 
 The first remote build excluded development build tools because `NODE_ENV=production`, and the pre-deployment container also started before the Oryx manifest was active. The final configuration sets `NPM_CONFIG_INCLUDE=dev`; after successful Oryx build and a clean App Service restart, the deployed application passed all checks.

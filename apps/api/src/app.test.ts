@@ -120,14 +120,14 @@ describe("health endpoint", () => {
     expect(body.plugins.every((plugin: { status: string; mode: string }) => plugin.status === "healthy" && plugin.mode === "Demo")).toBe(true);
   });
 
-  it("exports four application candidate results with reproducible pins", async () => {
+  it("exports seven application candidate results with reproducible pins", async () => {
     const address = server.address();
     if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
 
     const response = await fetch(`http://127.0.0.1:${address.port}/api/evaluation/candidate-results`);
     const body = await response.json();
 
-    expect(body.results).toHaveLength(4);
+    expect(body.results).toHaveLength(7);
     expect(body.pins).toMatchObject({
       logicalSkillVersion: "1.0.0",
       implementationVersion: "demo-1.0.0",
@@ -146,10 +146,10 @@ describe("health endpoint", () => {
 
     expect(body).toMatchObject({
       status: "FoundationPass",
-      caseCount: 4,
-      passedCaseCount: 4,
-      mandatoryAssertionCount: 36,
-      passedMandatoryAssertionCount: 36,
+      caseCount: 7,
+      passedCaseCount: 7,
+      mandatoryAssertionCount: 84,
+      passedMandatoryAssertionCount: 84,
       mandatoryAssertionPassRate: 1,
       pilotEligible: false,
     });
@@ -180,16 +180,16 @@ describe("health endpoint", () => {
         thresholdVersion: "foundation-1.0.0",
       },
       aggregateMeasures: {
-        caseCount: 4,
-        passedCaseCount: 4,
-        mandatoryAssertionCount: 36,
-        passedMandatoryAssertionCount: 36,
+        caseCount: 7,
+        passedCaseCount: 7,
+        mandatoryAssertionCount: 84,
+        passedMandatoryAssertionCount: 84,
         mandatoryAssertionPassRate: 1,
       },
       decision: { foundationStatus: "FoundationPass", pilotGateEligible: false },
     });
-    expect(run.caseResults).toHaveLength(4);
-    expect(run.caseResults.every((item: { assertions: unknown[]; passed: boolean }) => item.passed && item.assertions.length === 9)).toBe(true);
+    expect(run.caseResults).toHaveLength(7);
+    expect(run.caseResults.every((item: { assertions: unknown[]; passed: boolean }) => item.passed && item.assertions.length === 12)).toBe(true);
     expect(run.decision.pilotBlockers).toHaveLength(2);
     expect(after).toEqual(before);
   });
@@ -445,6 +445,70 @@ describe("health endpoint", () => {
     expect(body.trace).toHaveLength(5);
   });
 
+  it("stops Document Intake when source access is rejected by policy", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/reviews`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: reviewBody("SYN-RG-003"),
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body).toMatchObject({
+      state: "RejectedByPolicy",
+      outcome: "RejectedByPolicy",
+      analystReviewRequired: false,
+      errors: [{ category: "PolicyDenial", retryable: false }],
+      terminalAttribution: { skillCode: "LS-SEC-DOC-INTAKE", pluginCode: "PLG-DOC-SOURCE" },
+      lineage: { status: "Partial" },
+    });
+    expect(body.trace).toHaveLength(1);
+    expect(body.evidence).toHaveLength(1);
+    expect(body.report).toBeUndefined();
+  });
+
+  it("stops Evidence Extraction when authorized evidence is unreadable", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/reviews`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: reviewBody("SYN-APP-003"),
+    });
+    const body = await response.json();
+
+    expect(body).toMatchObject({
+      state: "CannotAssess",
+      outcome: "CannotAssess",
+      analystReviewRequired: false,
+      errors: [{ category: "MissingEvidence", retryable: false }],
+      terminalAttribution: { skillCode: "LS-SEC-EVIDENCE-EXTRACT", pluginCode: "PLG-DOC-SOURCE" },
+      lineage: { status: "Partial" },
+    });
+    expect(body.trace.map((item: { skillCode: string }) => item.skillCode)).toEqual(["LS-SEC-DOC-INTAKE", "LS-SEC-EVIDENCE-EXTRACT"]);
+    expect(body.evidence).toHaveLength(1);
+    expect(body.report).toBeUndefined();
+  });
+
+  it("stops Security Review after a bounded Runbook dependency failure", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/reviews`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: reviewBody("SYN-APP-004"),
+    });
+    const body = await response.json();
+
+    expect(body).toMatchObject({
+      state: "Failed",
+      outcome: "Failed",
+      analystReviewRequired: false,
+      errors: [{ category: "DependencyFailure", retryable: true }],
+      terminalAttribution: { skillCode: "LS-SEC-REVIEW", pluginCode: "PLG-RUNBOOK" },
+      lineage: { status: "Partial" },
+    });
+    expect(body.trace.map((item: { skillCode: string }) => item.skillCode)).toEqual(["LS-SEC-DOC-INTAKE", "LS-SEC-EVIDENCE-EXTRACT", "LS-SEC-REVIEW"]);
+    expect(body.evidence).toHaveLength(4);
+    expect(body.report).toBeUndefined();
+  });
+
   it("accepts the proposed risk and finalizes the report with HumanDecision evidence", async () => {
     const address = server.address();
     if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
@@ -480,7 +544,7 @@ describe("health endpoint", () => {
     })).json();
     const review = await getReview(created.correlationId);
     if (!review) throw new Error("Created review was not persisted");
-    const citation = review.report.findings[0]?.citations[0];
+    const citation = review.report!.findings[0]?.citations[0];
     if (!citation) throw new Error("Created review did not contain a citation");
     citation.evidenceId = "EV-MISSING";
     await saveReview(review);

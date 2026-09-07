@@ -132,6 +132,8 @@ interface ReviewResult {
   };
   analystReviewRequired?: boolean;
   analystDisposition?: { decision: string; rationale: string; finalRisk?: string };
+  errors: Array<{ category: string; message: string; retryable: boolean }>;
+  terminalAttribution?: { skillCode: string; pluginCode: string; evidenceId: string };
   lineage: {
     resolutionId: string;
     status: "Partial" | "Complete";
@@ -409,7 +411,7 @@ function App() {
           <span className="status-dot" aria-hidden="true" />
           <div>
             <strong>{startupError ? "Demo status unavailable" : "Demo workflow ready"}</strong>
-            <p>{startupError || "Four governed scenarios, analyst review, reports, traces, and evaluation run locally."}</p>
+            <p>{startupError || "Seven governed scenarios, analyst review, controlled stops, reports, traces, and evaluation run locally."}</p>
             {startupError ? <button type="button" onClick={loadDashboard}>Retry status</button> : null}
           </div>
         </div>
@@ -513,8 +515,11 @@ function App() {
             <select value={caseId} onChange={(event) => { setCaseId(event.target.value); resetDiscovery(); }}>
               <option value="SYN-RG-001">RG happy path</option>
               <option value="SYN-RG-002">RG missing information</option>
+              <option value="SYN-RG-003">RG policy denial</option>
               <option value="SYN-APP-001">APP happy path</option>
               <option value="SYN-APP-002">APP prompt injection</option>
+              <option value="SYN-APP-003">APP unreadable evidence</option>
+              <option value="SYN-APP-004">APP dependency failure</option>
             </select>
           </label>
 
@@ -714,6 +719,23 @@ function App() {
                   </div>
                 ) : null}
               </section>
+              {review.terminalAttribution && review.errors.length ? (
+                <section className="governed-stop" aria-labelledby="governed-stop-title">
+                  <div>
+                    <p className="section-label">Standard outcome</p>
+                    <h3 id="governed-stop-title">Governed execution stopped</h3>
+                    <p>{review.errors[0].message}</p>
+                  </div>
+                  <dl>
+                    <div><dt>Outcome</dt><dd>{review.outcome}</dd></div>
+                    <div><dt>Error category</dt><dd>{review.errors[0].category}</dd></div>
+                    <div><dt>Stopped Skill</dt><dd>{review.terminalAttribution.skillCode}</dd></div>
+                    <div><dt>Responsible Plugin</dt><dd>{review.terminalAttribution.pluginCode}</dd></div>
+                    <div><dt>Retryable</dt><dd>{review.errors[0].retryable ? "Yes, bounded retry" : "No"}</dd></div>
+                    <div><dt>Evidence</dt><dd>{review.terminalAttribution.evidenceId}</dd></div>
+                  </dl>
+                </section>
+              ) : null}
               {review.missingInformation?.length ? <div className="result-block"><h3>Needs information</h3><p>{review.missingInformation.join(", ")}</p></div> : null}
               {review.proposedRisk ? <div className="result-block"><h3>Proposed risk</h3><p>{review.proposedRisk} · analyst confirmation required</p></div> : null}
               {review.safety?.promptInjectionDetected ? (
@@ -808,7 +830,7 @@ function App() {
         <div className="evaluation-heading">
           <p className="section-label">Independent evaluation</p>
           <h2 id="evaluation-title">{evaluation?.decision.foundationStatus ?? "Evaluating application"}</h2>
-          <p>Runtime projection of the same nine mandatory assertions per case enforced by the Python release oracle.</p>
+          <p>Runtime projection of the same twelve mandatory assertions per case enforced by the Python release oracle.</p>
           {evaluation ? <code>{evaluation.runId}</code> : null}
         </div>
         <dl className="evaluation-measures">
