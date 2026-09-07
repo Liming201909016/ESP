@@ -10,7 +10,7 @@ import { checkReviewStore, listReviewSummaries, ReviewStoreCapacityError } from 
 import { assertIntentResolutionRequest, assertRouterRequest } from "./router-contract.js";
 import { generateCandidateResults, getEvaluationSummary } from "./evaluation.js";
 import { resolveEmployeeIntent } from "./intent-resolution.js";
-import { applyAnalystDisposition, getReview, runBoundDocumentIntake, runSecurityReview, type AnalystDecision } from "./workflow.js";
+import { applyAnalystDisposition, getReview, IntentConfirmationRequiredError, runBoundDocumentIntake, runSecurityReview, type AnalystDecision } from "./workflow.js";
 
 export interface RuntimeLogEntry {
   timestamp: string;
@@ -218,6 +218,7 @@ export function createApp(options: AppOptions = {}) {
   app.use((error: unknown, request: express.Request, response: express.Response, _next: express.NextFunction) => {
     const message = error instanceof Error ? error.message : "Unexpected error";
     const status = error instanceof ReviewStoreCapacityError ? 507
+      : error instanceof IntentConfirmationRequiredError ? 400
       : message.startsWith("Unknown synthetic case") || message.startsWith("Review not found") ? 404
       : message.includes("required") || message.includes("not awaiting") || message.includes("Consumer Binding") || message.includes("does not permit") || message.includes("citations do not resolve") || message.includes("request contract violation") ? 400
       : 500;

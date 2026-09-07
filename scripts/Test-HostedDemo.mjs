@@ -64,7 +64,7 @@ for (const [caseId, expected] of Object.entries(expectedCases)) {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       caseId,
-      request: "Run the automated Hosted Demo validation.",
+      request: "Run the automated security review for this evidence package.",
       consumerBindingCode: "CB-ESP-DEMO-001",
     }),
   });
