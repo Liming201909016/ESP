@@ -244,6 +244,24 @@ describe("health endpoint", () => {
     });
   });
 
+  it("returns a client error when review intent requires confirmation", async () => {
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/reviews`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        caseId: "SYN-RG-001",
+        request: "I need visitor parking for a customer.",
+        consumerBindingCode: "CB-ESP-DEMO-001",
+      }),
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toContain("State a review, assessment, audit, security, risk, or compliance objective");
+  });
+
   it("runs the RG happy path through five pinned Skills", async () => {
     const address = server.address();
     if (!address || typeof address === "string") throw new Error("Test server did not bind to a TCP port");

@@ -123,12 +123,21 @@ function persistValidatedReview<T extends { correlationId: string }>(review: T) 
   return saveReview(review);
 }
 
+export class IntentConfirmationRequiredError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "IntentConfirmationRequiredError";
+  }
+}
+
 export async function runSecurityReview(caseId: string, requestText: string, bindingCode: string, resolutionId?: string) {
   const normalizedRequest = requestText.trim();
   if (!normalizedRequest) throw new Error("request is required");
   const intentResolution = await resolveEmployeeIntent(normalizedRequest, caseId, bindingCode);
   if (resolutionId) intentResolution.resolutionId = resolutionId;
-  if (intentResolution.requiresConfirmation) throw new Error(intentResolution.confirmationReason ?? "Intent confirmation is required");
+  if (intentResolution.requiresConfirmation) {
+    throw new IntentConfirmationRequiredError(intentResolution.confirmationReason ?? "Intent confirmation is required");
+  }
   const selectedCase = await loadCase(caseId);
   const { binding, consumer } = resolveBinding(bindingCode, skills.map((skill) => skill.code));
   const correlationId = randomUUID();
