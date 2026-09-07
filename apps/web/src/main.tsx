@@ -83,6 +83,7 @@ interface IntentResolution {
 interface ReviewResult {
   correlationId: string;
   caseId: string;
+  request?: { text: string };
   consumer: { code: string; name: string };
   consumerBinding: { code: string; status: string };
   state: string;
@@ -122,6 +123,22 @@ interface ReviewResult {
   };
 }
 
+interface RecentReviewSummary {
+  correlationId: string;
+  caseId: string | null;
+  state: string | null;
+  outcome: string | null;
+  updatedAt: string | null;
+  consumerBindingCode: string | null;
+  reportStatus: string | null;
+  analystDecision: string | null;
+  proposedRisk: string | null;
+  finalRisk: string | null;
+  traceCount: number;
+  evidenceCount: number;
+  lineageStatus: string | null;
+}
+
 async function fetchJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
   const response = await fetch(input, init);
   const text = await response.text();
@@ -157,9 +174,14 @@ function App() {
   const [dispositionRunning, setDispositionRunning] = useState(false);
   const [startupError, setStartupError] = useState("");
   const [reviewError, setReviewError] = useState("");
+  const [recentReviews, setRecentReviews] = useState<RecentReviewSummary[]>([]);
+  const [recentLoading, setRecentLoading] = useState(true);
+  const [recentError, setRecentError] = useState("");
+  const [openingReviewId, setOpeningReviewId] = useState<string | null>(null);
 
   useEffect(() => {
     void loadDashboard();
+    void loadRecentReviews();
   }, []);
 
   async function loadDashboard() {
@@ -173,6 +195,19 @@ function App() {
       setEvaluation(nextEvaluation);
     } catch (error) {
       setStartupError(error instanceof Error ? error.message : "Unable to load Demo status.");
+    }
+  }
+
+  async function loadRecentReviews() {
+    setRecentLoading(true);
+    setRecentError("");
+    try {
+      const result = await fetchJson<{ reviews: RecentReviewSummary[] }>("/api/reviews?limit=8");
+      setRecentReviews(result.reviews);
+    } catch (error) {
+      setRecentError(error instanceof Error ? error.message : "Unable to load recent reviews.");
+    } finally {
+      setRecentLoading(false);
     }
   }
 
@@ -197,6 +232,7 @@ function App() {
       });
       setReview(result);
       setSelectedEvidenceId(result.lineage.citationEvidenceIds[0] ?? result.lineage.evidenceIds[0] ?? null);
+      void loadRecentReviews();
     } catch (error) {
       setReviewError(error instanceof Error ? error.message : "Unable to run the review.");
     } finally {
@@ -243,11 +279,41 @@ function App() {
         body: JSON.stringify({ decision, rationale: analystRationale, finalRisk }),
       });
       setReview(result);
+      void loadRecentReviews();
     } catch (error) {
       setReviewError(error instanceof Error ? error.message : "Unable to save the analyst disposition.");
     } finally {
       setDispositionRunning(false);
     }
+  }
+
+  async function openRecentReview(correlationId: string) {
+    setOpeningReviewId(correlationId);
+    setReviewError("");
+    try {
+      const result = await fetchJson<ReviewResult>(`/api/reviews/${correlationId}`);
+      setIntentResolution(null);
+      setSelectedSkillCode(null);
+      setReview(result);
+      setCaseId(result.caseId);
+      if (result.request?.text) setRequestText(result.request.text);
+      setSelectedEvidenceId(result.lineage.citationEvidenceIds[0] ?? result.lineage.evidenceIds[0] ?? null);
+    } catch (error) {
+      setReviewError(error instanceof Error ? error.message : "Unable to reopen the review.");
+    } finally {
+      setOpeningReviewId(null);
+    }
+  }
+
+  function formatUpdatedAt(value: string | null) {
+    if (!value) return "Unknown time";
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.valueOf()) ? "Unknown time" : parsed.toLocaleString([], { dateStyle: "short", timeStyle: "short" });
+  }
+
+  function formatState(value: string | null) {
+    if (!value) return "Unknown";
+    return value.replace(/([a-z])([A-Z])/g, "$1 $2");
   }
 
   return (
@@ -347,6 +413,40 @@ function App() {
             {running ? "Running review..." : "Run review"}
             </button>
           </div>
+
+          <section className="recent-reviews" aria-labelledby="recent-reviews-title">
+            <div className="recent-heading">
+              <div>
+                <p className="section-label">Persistent work queue</p>
+                <h3 id="recent-reviews-title">Recent reviews</h3>
+              </div>
+              <button type="button" className="refresh-reviews" onClick={() => void loadRecentReviews()} disabled={recentLoading}>
+                Refresh
+              </button>
+            </div>
+            {recentError ? <p className="recent-error" role="alert">{recentError}</p> : null}
+            {recentLoading && recentReviews.length === 0 ? <p className="recent-empty">Loading retained reviews...</p> : null}
+            {!recentLoading && recentReviews.length === 0 && !recentError ? <p className="recent-empty">No retained reviews yet.</p> : null}
+            <div className="recent-list">
+              {recentReviews.map((item) => (
+                <button
+                  type="button"
+                  key={item.correlationId}
+                  data-correlation-id={item.correlationId}
+                  className={`recent-review-item${review?.correlationId === item.correlationId ? " selected" : ""}`}
+                  onClick={() => void openRecentReview(item.correlationId)}
+                  disabled={openingReviewId === item.correlationId}
+                  aria-current={review?.correlationId === item.correlationId ? "true" : undefined}
+                >
+                  <span className="recent-state">{formatState(item.state)}</span>
+                  <strong>{item.caseId ?? "Unknown case"}</strong>
+                  <small>{item.reportStatus ?? "No report"} · {item.analystDecision ?? "Decision pending"}</small>
+                  <small>{item.finalRisk ?? item.proposedRisk ?? "No risk"} · {item.traceCount} Skill{item.traceCount === 1 ? "" : "s"} · {item.evidenceCount} Evidence</small>
+                  <span className="recent-meta"><code>{item.correlationId.slice(0, 8)}</code><time dateTime={item.updatedAt ?? undefined}>{formatUpdatedAt(item.updatedAt)}</time></span>
+                </button>
+              ))}
+            </div>
+          </section>
         </div>
 
         <div className="review-output" aria-live="polite">

@@ -4,9 +4,34 @@ import { resolve } from "node:path";
 
 interface PersistedReview {
   correlationId: string;
+  caseId?: string;
   state?: string;
+  outcome?: string;
+  proposedRisk?: string;
   updatedAt?: string;
+  consumerBinding?: { code?: string };
+  report?: { status?: string };
+  analystDisposition?: { decision?: string; finalRisk?: string };
+  lineage?: { status?: string };
+  trace?: unknown[];
+  evidence?: unknown[];
   [key: string]: unknown;
+}
+
+export interface ReviewSummary {
+  correlationId: string;
+  caseId: string | null;
+  state: string | null;
+  outcome: string | null;
+  updatedAt: string | null;
+  consumerBindingCode: string | null;
+  reportStatus: string | null;
+  analystDecision: string | null;
+  proposedRisk: string | null;
+  finalRisk: string | null;
+  traceCount: number;
+  evidenceCount: number;
+  lineageStatus: string | null;
 }
 
 let writeQueue = Promise.resolve();
@@ -174,6 +199,38 @@ export async function saveReview<T extends PersistedReview>(review: T) {
 export async function loadReview<T extends PersistedReview>(correlationId: string): Promise<T | undefined> {
   await writeQueue;
   return (await readStore())[correlationId] as T | undefined;
+}
+
+export async function listReviewSummaries(limit = 10): Promise<ReviewSummary[]> {
+  return queueStoreOperation(async () => {
+    const records = await readStore();
+    const removed = removeExpiredTerminalReviews(records, Date.now());
+    if (removed) await writeStore(records);
+
+    return Object.values(records)
+      .sort((left, right) => {
+        const updatedDifference = Date.parse(right.updatedAt ?? "") - Date.parse(left.updatedAt ?? "");
+        return Number.isFinite(updatedDifference) && updatedDifference !== 0
+          ? updatedDifference
+          : right.correlationId.localeCompare(left.correlationId);
+      })
+      .slice(0, limit)
+      .map((review) => ({
+        correlationId: review.correlationId,
+        caseId: review.caseId ?? null,
+        state: review.state ?? null,
+        outcome: review.outcome ?? null,
+        updatedAt: review.updatedAt ?? null,
+        consumerBindingCode: review.consumerBinding?.code ?? null,
+        reportStatus: review.report?.status ?? null,
+        analystDecision: review.analystDisposition?.decision ?? null,
+        proposedRisk: review.proposedRisk ?? null,
+        finalRisk: review.analystDisposition?.finalRisk ?? null,
+        traceCount: review.trace?.length ?? 0,
+        evidenceCount: review.evidence?.length ?? 0,
+        lineageStatus: review.lineage?.status ?? null,
+      }));
+  });
 }
 
 export async function checkReviewStore() {

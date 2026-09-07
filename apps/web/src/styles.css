@@ -291,6 +291,109 @@ h1 {
   background: transparent;
 }
 
+.recent-reviews {
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid #9db3a7;
+}
+
+.recent-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.recent-heading h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.recent-heading .refresh-reviews {
+  min-height: 32px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid #769184;
+  color: #14503e;
+  background: transparent;
+  font-size: 0.76rem;
+}
+
+.recent-list {
+  display: grid;
+  max-height: 390px;
+  overflow-y: auto;
+  border-top: 1px solid #cbd5ce;
+}
+
+.review-controls .recent-review-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  width: 100%;
+  min-height: 92px;
+  margin: 0;
+  padding: 11px 10px;
+  border: 0;
+  border-bottom: 1px solid #d7ded9;
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  color: #17201c;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.review-controls .recent-review-item:hover,
+.review-controls .recent-review-item.selected {
+  border-left-color: #126f99;
+  background: #e5eff3;
+}
+
+.recent-review-item strong,
+.recent-review-item small,
+.recent-review-item .recent-meta {
+  grid-column: 1 / -1;
+}
+
+.recent-review-item small {
+  color: #60746b;
+  line-height: 1.35;
+}
+
+.recent-state {
+  color: #14503e;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.recent-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 3px;
+  color: #6d7c75;
+  font-size: 0.7rem;
+}
+
+.recent-meta code {
+  color: inherit;
+  font-family: "Aptos", "Segoe UI Variable Text", sans-serif;
+}
+
+.recent-empty,
+.recent-error {
+  margin: 12px 0 0;
+  color: #60746b;
+  font-size: 0.8rem;
+}
+
+.recent-error {
+  color: #8a251f;
+}
+
 .review-output {
   min-height: 420px;
   padding-left: 32px;

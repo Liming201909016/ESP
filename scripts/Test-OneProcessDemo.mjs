@@ -54,6 +54,8 @@ try {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ caseId: "SYN-RG-001", request: "Perform an evidence-grounded security review.", consumerBindingCode: "CB-ESP-DEMO-001" }),
   })).json();
+  const recentReviews = await (await fetch(`${baseUrl}/api/reviews?limit=1`)).json();
+  const reopenedReview = await (await fetch(`${baseUrl}/api/reviews/${review.correlationId}`)).json();
 
   if (!rootResponse.ok || !html.includes("Enterprise Skill Platform")) throw new Error("Built UI was not served");
   if (health.status !== "healthy" || !health.ready || health.reviewStore?.status !== "healthy") throw new Error("Health endpoint failed");
@@ -65,6 +67,9 @@ try {
   if (review.trace.length !== 5 || review.report.status !== "Draft") throw new Error("Review endpoint failed");
   if (!review.lineage?.reconciled?.selectedSkillsExecuted || !review.lineage?.reconciled?.citationsResolveToEvidence) {
     throw new Error("Decision Lineage reconciliation failed");
+  }
+  if (recentReviews.reviews?.[0]?.correlationId !== review.correlationId || reopenedReview.correlationId !== review.correlationId) {
+    throw new Error("Recent Review reopen failed");
   }
   console.log(`One-process Demo: PASS (port ${port})`);
 } finally {
