@@ -139,6 +139,28 @@ interface RecentReviewSummary {
   lineageStatus: string | null;
 }
 
+interface DocumentIntakeInvocation {
+  contractVersion: string;
+  correlationId: string;
+  invocationId: string;
+  consumer: { code: string; name: string; type: "Copilot" | "Workflow" };
+  consumerBinding: { code: string; status: string };
+  skill: { code: string; version: string; implementationVersion: string };
+  pluginInvocations: Array<{
+    invocationId: string;
+    pluginCode: string;
+    pluginVersion: string;
+    mode: "Demo";
+    outcome: string;
+    evidenceIds: string[];
+  }>;
+  outcome: string;
+  payload: { materialComplete: boolean; sourceIds: string[]; dataGaps: string[] };
+  evidence: Array<{ evidenceId: string; type: string; sourceId: string; claimReference: string }>;
+  oversight: string;
+  errors: Array<{ category: string; message: string; retryable: boolean }>;
+}
+
 async function fetchJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
   const response = await fetch(input, init);
   const text = await response.text();
@@ -178,6 +200,9 @@ function App() {
   const [recentLoading, setRecentLoading] = useState(true);
   const [recentError, setRecentError] = useState("");
   const [openingReviewId, setOpeningReviewId] = useState<string | null>(null);
+  const [reuseProof, setReuseProof] = useState<DocumentIntakeInvocation[]>([]);
+  const [reuseRunning, setReuseRunning] = useState(false);
+  const [reuseError, setReuseError] = useState("");
 
   useEffect(() => {
     void loadDashboard();
@@ -305,6 +330,23 @@ function App() {
     }
   }
 
+  async function runReuseProof() {
+    setReuseRunning(true);
+    setReuseError("");
+    try {
+      const invoke = (consumerBindingCode: string) => fetchJson<DocumentIntakeInvocation>("/api/skill-invocations/document-intake", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ caseId, request: requestText, consumerBindingCode }),
+      });
+      setReuseProof(await Promise.all([invoke("CB-ESP-DEMO-001"), invoke("CB-ARCH-DEMO-001")]));
+    } catch (error) {
+      setReuseError(error instanceof Error ? error.message : "Unable to prove governed reuse.");
+    } finally {
+      setReuseRunning(false);
+    }
+  }
+
   function formatUpdatedAt(value: string | null) {
     if (!value) return "Unknown time";
     const parsed = new Date(value);
@@ -380,6 +422,56 @@ function App() {
             </ul>
           </div>
         </div>
+      </section>
+
+      <section className="reuse-proof" aria-labelledby="reuse-title">
+        <div className="reuse-heading">
+          <div>
+            <p className="section-label">Governed reuse proof</p>
+            <h2 id="reuse-title">One Skill, two Consumers.</h2>
+            <p>Each Consumer receives its own invocation identity through a distinct Binding while resolving the same pinned Skill and Plugin versions.</p>
+          </div>
+          <button type="button" onClick={() => void runReuseProof()} disabled={reuseRunning}>
+            {reuseRunning ? "Invoking both..." : "Prove governed reuse"}
+          </button>
+        </div>
+        {reuseError ? <p className="reuse-error" role="alert">{reuseError}</p> : null}
+        {reuseProof.length === 2 ? (
+          <div className="reuse-comparison">
+            {reuseProof.map((invocation, index) => (
+              <div key={invocation.consumerBinding.code} className="reuse-consumer">
+                <span>{invocation.consumer.type}</span>
+                <h3>{invocation.consumer.name}</h3>
+                <code>{invocation.consumerBinding.code}</code>
+                <dl>
+                  <div><dt>Invocation</dt><dd>{invocation.invocationId.slice(0, 16)}</dd></div>
+                  <div><dt>Outcome</dt><dd>{invocation.outcome}</dd></div>
+                  <div><dt>Evidence</dt><dd>{invocation.evidence.length} retained</dd></div>
+                </dl>
+                <small>Correlation {invocation.correlationId}</small>
+                {index === 0 ? null : <span className="visually-hidden">Second governed Consumer</span>}
+              </div>
+            ))}
+            <div className="shared-asset">
+              <span>Same pinned asset</span>
+              <strong>{reuseProof[0].skill.code}</strong>
+              <code>Skill v{reuseProof[0].skill.version}</code>
+              <code>Implementation {reuseProof[0].skill.implementationVersion}</code>
+              <ul>
+                {reuseProof[0].pluginInvocations.map((plugin) => (
+                  <li key={plugin.pluginCode}>{plugin.pluginCode} v{plugin.pluginVersion}</li>
+                ))}
+              </ul>
+              <small>No copied implementation</small>
+            </div>
+          </div>
+        ) : (
+          <div className="reuse-empty">
+            <span>Security Review Copilot</span>
+            <strong>LS-SEC-DOC-INTAKE</strong>
+            <span>Architecture Review Workflow</span>
+          </div>
+        )}
       </section>
 
       <section className="review-console" aria-labelledby="review-title">

@@ -36,6 +36,7 @@ The Hackathon MVP is done when a reviewer can clone or open the repository, run 
 | HCK-204 | Analyst disposition | Analyst accepts, modifies, rejects, escalates, or marks Cannot Assess; HumanDecision evidence is retained | Done |
 | HCK-205 | Draft report | Structured report preserves scope, Runbook, template, citations, analyst decisions, and governed Draft/Final status | Done |
 | HCK-206 | Trace view | Correlation, Skills, implementation versions, Plugins, outcomes, and ordered execution are visible | Done |
+| HCK-207 | Local governed reuse proof | Security Review Copilot and Architecture Review Workflow invoke the same pinned Document Intake Skill and Plugin versions through distinct Bindings and invocation identities | Done |
 
 ## H3 Quality and demo readiness
 
@@ -54,7 +55,7 @@ The Hackathon MVP is done when a reviewer can clone or open the repository, run 
 | HCK-401 | Copilot Studio entry | Agent invokes the same Skill contracts through Agent Actions | Environment and gate blocked |
 | HCK-402 | Power Automate adapters | Connected Plugin adapters preserve Demo contract behavior | Environment and gate blocked |
 | HCK-403 | Dataverse metadata | Selected registry, binding, invocation, and evidence records persist | Environment and gate blocked |
-| HCK-404 | Second Consumer | Architecture Review binds to an existing Skill without copying it | Blocked by HCK-401/403 |
+| HCK-404 | Connected second Consumer | Architecture Review binds to an existing Connected Mode Deployment without copying it | Blocked by HCK-401/403 |
 
 ## Immediate sequence
 

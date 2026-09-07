@@ -50,6 +50,22 @@ if (intentResolution.outcome?.requestedType !== "Action" || intentResolution.out
   throw new Error("Hosted outcome governance did not constrain the requested action");
 }
 
+const invokeDocumentIntake = async (consumerBindingCode) => (await jsonRequest("/api/skill-invocations/document-intake", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify({ caseId: "SYN-RG-001", request: "Review shared document intake.", consumerBindingCode }),
+})).body;
+const primaryIntake = await invokeDocumentIntake("CB-ESP-DEMO-001");
+const secondaryIntake = await invokeDocumentIntake("CB-ARCH-DEMO-001");
+if (primaryIntake.consumer.code === secondaryIntake.consumer.code || primaryIntake.consumerBinding.code === secondaryIntake.consumerBinding.code) {
+  throw new Error("Hosted reusable Skill invocations did not preserve distinct Consumer identity");
+}
+if (JSON.stringify(primaryIntake.skill) !== JSON.stringify(secondaryIntake.skill)
+  || JSON.stringify(primaryIntake.pluginInvocations.map(({ pluginCode, pluginVersion }) => ({ pluginCode, pluginVersion })))
+    !== JSON.stringify(secondaryIntake.pluginInvocations.map(({ pluginCode, pluginVersion }) => ({ pluginCode, pluginVersion })))) {
+  throw new Error("Hosted reusable Skill invocations did not resolve the same pinned assets");
+}
+
 const expectedCases = {
   "SYN-RG-001": { state: "AwaitingAnalystDisposition", outcome: "HumanHandoff", traceCount: 5 },
   "SYN-RG-002": { state: "NeedsInformation", outcome: "NeedsInformation", traceCount: 1 },
@@ -107,6 +123,11 @@ try {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   if (await page.title() !== "Enterprise Skill Platform") throw new Error("Hosted browser title is invalid");
+  await page.getByRole("button", { name: "Prove governed reuse" }).click();
+  await page.getByRole("heading", { name: "Architecture Review Workflow" }).waitFor();
+  if (!(await page.getByRole("region", { name: "One Skill, two Consumers." }).textContent())?.includes("No copied implementation")) {
+    throw new Error("Hosted governed reuse proof is not visible");
+  }
   await page.getByRole("button", { name: "Run review" }).click();
   await page.locator(".outcome").waitFor();
   if (await page.locator(".outcome").textContent() !== "HumanHandoff") throw new Error("Hosted browser workflow did not reach HumanHandoff");

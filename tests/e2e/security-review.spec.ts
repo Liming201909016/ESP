@@ -75,6 +75,22 @@ test("employee intent discovers an authorized governed path before execution", a
   expect(await page.evaluate(() => document.body.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
+test("two Consumers reuse the same pinned Document Intake Skill and Plugins", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Prove governed reuse" }).click();
+
+  const reuse = page.getByRole("region", { name: "One Skill, two Consumers." });
+  await expect(reuse.getByRole("heading", { name: "Security Review Copilot" })).toBeVisible();
+  await expect(reuse.getByRole("heading", { name: "Architecture Review Workflow" })).toBeVisible();
+  await expect(reuse).toContainText("CB-ESP-DEMO-001");
+  await expect(reuse).toContainText("CB-ARCH-DEMO-001");
+  await expect(reuse).toContainText("LS-SEC-DOC-INTAKE");
+  await expect(reuse).toContainText("PLG-DOC-SOURCE v1.0.0");
+  await expect(reuse).toContainText("PLG-EVIDENCE v1.0.0");
+  await expect(reuse).toContainText("No copied implementation");
+  expect(await page.evaluate(() => document.body.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
 test("recent review queue reopens and resumes the same persisted review", async ({ page }) => {
   await runCase(page, "SYN-APP-001");
   await expect(page.locator(".outcome")).toHaveText("HumanHandoff");
@@ -136,6 +152,10 @@ test("page passes automated WCAG A and AA checks", async ({ page }) => {
 
 test("primary review journey is keyboard operable with visible focus", async ({ page }) => {
   await page.goto("/");
+  await page.keyboard.press("Tab");
+  const reuseButton = page.getByRole("button", { name: "Prove governed reuse" });
+  await expect(reuseButton).toBeFocused();
+  expect(await reuseButton.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
   await page.keyboard.press("Tab");
   await expect(page.getByRole("combobox", { name: "Synthetic package" })).toBeFocused();
   await page.keyboard.press("ArrowDown");

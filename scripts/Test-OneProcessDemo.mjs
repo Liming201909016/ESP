@@ -56,6 +56,13 @@ try {
   })).json();
   const recentReviews = await (await fetch(`${baseUrl}/api/reviews?limit=1`)).json();
   const reopenedReview = await (await fetch(`${baseUrl}/api/reviews/${review.correlationId}`)).json();
+  const invokeDocumentIntake = async (consumerBindingCode) => (await fetch(`${baseUrl}/api/skill-invocations/document-intake`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ caseId: "SYN-RG-001", request: "Review shared document intake.", consumerBindingCode }),
+  })).json();
+  const primaryIntake = await invokeDocumentIntake("CB-ESP-DEMO-001");
+  const secondaryIntake = await invokeDocumentIntake("CB-ARCH-DEMO-001");
 
   if (!rootResponse.ok || !html.includes("Enterprise Skill Platform")) throw new Error("Built UI was not served");
   if (health.status !== "healthy" || !health.ready || health.reviewStore?.status !== "healthy") throw new Error("Health endpoint failed");
@@ -70,6 +77,14 @@ try {
   }
   if (recentReviews.reviews?.[0]?.correlationId !== review.correlationId || reopenedReview.correlationId !== review.correlationId) {
     throw new Error("Recent Review reopen failed");
+  }
+  if (primaryIntake.consumer.code === secondaryIntake.consumer.code || primaryIntake.consumerBinding.code === secondaryIntake.consumerBinding.code) {
+    throw new Error("Reusable Skill invocations did not preserve distinct Consumer identity");
+  }
+  if (JSON.stringify(primaryIntake.skill) !== JSON.stringify(secondaryIntake.skill)
+    || JSON.stringify(primaryIntake.pluginInvocations.map(({ pluginCode, pluginVersion }) => ({ pluginCode, pluginVersion })))
+      !== JSON.stringify(secondaryIntake.pluginInvocations.map(({ pluginCode, pluginVersion }) => ({ pluginCode, pluginVersion })))) {
+    throw new Error("Reusable Skill invocations did not resolve the same pinned assets");
   }
   console.log(`One-process Demo: PASS (port ${port})`);
 } finally {
