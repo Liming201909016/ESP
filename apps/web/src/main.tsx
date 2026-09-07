@@ -5,8 +5,10 @@ import "./styles.css";
 
 interface Registry {
   status: string;
-  skills: Array<{ code: string; name: string; version: string }>;
+  skills: Array<{ code: string; name: string; version: string; implementationVersion: string; plugins: string[]; oversight: "ReviewRequired" | "ApprovalRequired" }>;
   plugins: Array<{ code: string; name: string; version: string; status: string }>;
+  consumers: Array<{ code: string; name: string; type: string }>;
+  bindings: Array<{ code: string; consumerCode: string; status: string; skillCodes: string[] }>;
 }
 
 interface EvaluationRun {
@@ -451,6 +453,77 @@ function App() {
             </ul>
           </div>
         </div>
+      </section>
+
+      <section className="governance-plane" aria-labelledby="governance-title">
+        <div className="governance-heading">
+          <div>
+            <p className="section-label">Governance control plane</p>
+            <h2 id="governance-title">Controls that travel with every capability.</h2>
+            <p>This view reports controls executed by Demo Mode. It is inspection evidence, not a Pilot or Production approval.</p>
+          </div>
+          <span className="scope-badge">Synthetic · Demo</span>
+        </div>
+
+        <div className="control-strip" aria-label="Governance control status">
+          <div>
+            <span>Version control</span>
+            <strong>{registry ? `${registry.skills.length} Skills pinned` : "Loading"}</strong>
+            <small>Logical and implementation versions are recorded</small>
+          </div>
+          <div>
+            <span>Authorization</span>
+            <strong>{registry ? `${registry.bindings.filter((binding) => binding.status === "Active").length} active Bindings` : "Loading"}</strong>
+            <small>Consumers receive only explicitly allowed Skills</small>
+          </div>
+          <div>
+            <span>Human oversight</span>
+            <strong>{registry ? `${registry.skills.filter((skill) => skill.oversight === "ApprovalRequired").length} approval gate` : "Loading"}</strong>
+            <small>Risk remains proposed until accountable review</small>
+          </div>
+          <div>
+            <span>Evaluation gate</span>
+            <strong>{evaluation ? `${evaluation.aggregateMeasures.passedMandatoryAssertionCount}/${evaluation.aggregateMeasures.mandatoryAssertionCount} passed` : "Loading"}</strong>
+            <small>{evaluation?.decision.pilotGateEligible ? "Pilot eligible" : "Pilot remains blocked"}</small>
+          </div>
+        </div>
+
+        <div className="governance-detail">
+          <div className="binding-matrix">
+            <h3>Consumer authorization</h3>
+            {registry?.bindings.map((binding) => {
+              const consumer = registry.consumers.find((candidate) => candidate.code === binding.consumerCode);
+              return (
+                <div key={binding.code} className="binding-row">
+                  <div>
+                    <strong>{consumer?.name ?? binding.consumerCode}</strong>
+                    <code>{binding.code}</code>
+                  </div>
+                  <span>{binding.status}</span>
+                  <small>{binding.skillCodes.length} of {registry.skills.length} Skills authorized</small>
+                </div>
+              );
+            })}
+          </div>
+          <div className="governance-boundary">
+            <h3>Release boundary</h3>
+            <dl>
+              <div><dt>Foundation</dt><dd>{evaluation?.decision.foundationStatus ?? "Evaluating"}</dd></div>
+              <div><dt>Runtime</dt><dd>Deterministic Demo</dd></div>
+              <div><dt>Data</dt><dd>Synthetic only</dd></div>
+              <div><dt>Pilot</dt><dd>{evaluation?.decision.pilotGateEligible ? "Eligible" : "Blocked"}</dd></div>
+            </dl>
+            {evaluation?.decision.pilotBlockers.length ? <p>{evaluation.decision.pilotBlockers.join(" · ")}</p> : null}
+          </div>
+        </div>
+
+        {review ? (
+          <div className="execution-governance" aria-live="polite">
+            <span>Current execution</span>
+            <strong>{review.outcome}</strong>
+            <small>{review.consumerBinding.code} · {review.lineage.executedSkillCodes.length}/{review.lineage.selectedSkillCodes.length} Skills executed · {review.evidence.length} Evidence retained</small>
+          </div>
+        ) : null}
       </section>
 
       <section className="reuse-proof" aria-labelledby="reuse-title">

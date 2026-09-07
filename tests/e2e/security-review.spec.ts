@@ -101,6 +101,14 @@ test("two Consumers reuse the same pinned Document Intake Skill and Plugins", as
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Five governed Skills. Four reusable Plugins. One execution standard." })).toBeVisible();
   await expect(page.getByText("Skills define what the enterprise does.", { exact: false })).toBeVisible();
+  const governance = page.getByRole("region", { name: "Controls that travel with every capability." });
+  await expect(governance).toContainText("5 Skills pinned");
+  await expect(governance).toContainText("2 active Bindings");
+  await expect(governance).toContainText("1 approval gate");
+  await expect(governance).toContainText("84/84 passed");
+  await expect(governance).toContainText("Pilot remains blocked");
+  await expect(governance).toContainText("5 of 5 Skills authorized");
+  await expect(governance).toContainText("2 of 5 Skills authorized");
   await page.getByRole("button", { name: "Prove governed reuse" }).click();
 
   const reuse = page.getByRole("region", { name: "One Skill, two Consumers." });
