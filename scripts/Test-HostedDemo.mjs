@@ -110,7 +110,7 @@ try {
   await page.getByRole("button", { name: "Run review" }).click();
   await page.locator(".outcome").waitFor();
   if (await page.locator(".outcome").textContent() !== "HumanHandoff") throw new Error("Hosted browser workflow did not reach HumanHandoff");
-  await page.getByRole("button", { name: "Cannot assess" }).click();
+  await page.getByRole("button", { name: "Cannot assess", exact: true }).click();
   await page.locator(".outcome").filter({ hasText: "CannotAssess" }).waitFor();
   const overflow = await page.evaluate(() => document.body.scrollWidth > window.innerWidth);
   if (overflow) throw new Error("Hosted mobile UI has horizontal overflow");
