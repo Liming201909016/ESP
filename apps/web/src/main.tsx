@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useState } from "react";
+import { StrictMode, useEffect, useState, type KeyboardEvent } from "react";
 import { createRoot, type Root } from "react-dom/client";
 
 import "./styles.css";
@@ -191,6 +191,15 @@ interface DocumentIntakeInvocation {
   errors: Array<{ category: string; message: string; retryable: boolean }>;
 }
 
+type WorkspaceTab = "review" | "governance" | "reuse" | "evaluation";
+
+const workspaceTabs: Array<{ id: WorkspaceTab; label: string; description: string }> = [
+  { id: "review", label: "Review", description: "Run and resume governed reviews" },
+  { id: "governance", label: "Governance", description: "Inspect controls and authorization" },
+  { id: "reuse", label: "Reuse", description: "Prove shared capability execution" },
+  { id: "evaluation", label: "Evaluation", description: "Inspect cases, pins, and gates" },
+];
+
 async function fetchJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
   const response = await fetch(input, init);
   const text = await response.text();
@@ -233,6 +242,7 @@ function App() {
   const [reuseProof, setReuseProof] = useState<DocumentIntakeInvocation[]>([]);
   const [reuseRunning, setReuseRunning] = useState(false);
   const [reuseError, setReuseError] = useState("");
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>("review");
 
   useEffect(() => {
     void loadDashboard();
@@ -388,6 +398,20 @@ function App() {
     return value.replace(/([a-z])([A-Z])/g, "$1 $2");
   }
 
+  function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentTab: WorkspaceTab) {
+    const currentIndex = workspaceTabs.findIndex((tab) => tab.id === currentTab);
+    const nextIndex = event.key === "ArrowRight" ? (currentIndex + 1) % workspaceTabs.length
+      : event.key === "ArrowLeft" ? (currentIndex - 1 + workspaceTabs.length) % workspaceTabs.length
+      : event.key === "Home" ? 0
+      : event.key === "End" ? workspaceTabs.length - 1
+      : -1;
+    if (nextIndex < 0) return;
+    event.preventDefault();
+    const nextTab = workspaceTabs[nextIndex].id;
+    setActiveTab(nextTab);
+    document.getElementById(`workspace-tab-${nextTab}`)?.focus();
+  }
+
   return (
     <main className="shell">
       <header className="topbar">
@@ -419,6 +443,34 @@ function App() {
         </div>
       </section>
 
+      <nav className="workspace-tabs" aria-label="ESP workspace views">
+        <div role="tablist" aria-label="Workspace views">
+          {workspaceTabs.map((tab) => (
+            <button
+              type="button"
+              role="tab"
+              id={`workspace-tab-${tab.id}`}
+              key={tab.id}
+              aria-selected={activeTab === tab.id}
+              aria-controls={`workspace-panel-${tab.id}`}
+              tabIndex={activeTab === tab.id ? 0 : -1}
+              onClick={() => setActiveTab(tab.id)}
+              onKeyDown={(event) => handleTabKeyDown(event, tab.id)}
+            >
+              <strong>{tab.label}</strong>
+              <small>{tab.description}</small>
+            </button>
+          ))}
+        </div>
+      </nav>
+
+      <div
+        id="workspace-panel-governance"
+        role="tabpanel"
+        aria-labelledby="workspace-tab-governance"
+        className="workspace-panel"
+        hidden={activeTab !== "governance"}
+      >
       <section className="catalog" aria-labelledby="catalog-title">
         <div className="catalog-heading">
           <div>
@@ -525,7 +577,15 @@ function App() {
           </div>
         ) : null}
       </section>
+      </div>
 
+      <div
+        id="workspace-panel-reuse"
+        role="tabpanel"
+        aria-labelledby="workspace-tab-reuse"
+        className="workspace-panel"
+        hidden={activeTab !== "reuse"}
+      >
       <section className="reuse-proof" aria-labelledby="reuse-title">
         <div className="reuse-heading">
           <div>
@@ -575,7 +635,15 @@ function App() {
           </div>
         )}
       </section>
+      </div>
 
+      <div
+        id="workspace-panel-review"
+        role="tabpanel"
+        aria-labelledby="workspace-tab-review"
+        className="workspace-panel"
+        hidden={activeTab !== "review"}
+      >
       <section className="review-console" aria-labelledby="review-title">
         <div className="review-controls">
           <div>
@@ -899,7 +967,15 @@ function App() {
           )}
         </div>
       </section>
+      </div>
 
+      <div
+        id="workspace-panel-evaluation"
+        role="tabpanel"
+        aria-labelledby="workspace-tab-evaluation"
+        className="workspace-panel"
+        hidden={activeTab !== "evaluation"}
+      >
       <section className="evaluation-band" aria-labelledby="evaluation-title">
         <div className="evaluation-heading">
           <p className="section-label">Independent evaluation</p>
@@ -946,6 +1022,7 @@ function App() {
         ) : null}
         {evaluation?.decision.pilotBlockers?.length ? <p className="evaluation-note">{evaluation.decision.pilotBlockers.join(" · ")}</p> : null}
       </section>
+      </div>
     </main>
   );
 }

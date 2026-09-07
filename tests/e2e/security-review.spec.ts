@@ -99,6 +99,7 @@ test("employee intent discovers an authorized governed path before execution", a
 
 test("two Consumers reuse the same pinned Document Intake Skill and Plugins", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("tab", { name: /Governance/ }).click();
   await expect(page.getByRole("heading", { name: "Five governed Skills. Four reusable Plugins. One execution standard." })).toBeVisible();
   await expect(page.getByText("Skills define what the enterprise does.", { exact: false })).toBeVisible();
   const governance = page.getByRole("region", { name: "Controls that travel with every capability." });
@@ -109,6 +110,7 @@ test("two Consumers reuse the same pinned Document Intake Skill and Plugins", as
   await expect(governance).toContainText("Pilot remains blocked");
   await expect(governance).toContainText("5 of 5 Skills authorized");
   await expect(governance).toContainText("2 of 5 Skills authorized");
+  await page.getByRole("tab", { name: /Reuse/ }).click();
   await page.getByRole("button", { name: "Prove governed reuse" }).click();
 
   const reuse = page.getByRole("region", { name: "One Skill, two Consumers." });
@@ -185,6 +187,7 @@ test("page passes automated WCAG A and AA checks", async ({ page }) => {
 test("Evaluation Run is inspectable without polluting Recent Reviews", async ({ page, request }) => {
   const before = await (await request.get("/api/reviews?limit=50")).json() as { reviews: Array<{ correlationId: string }> };
   await page.goto("/");
+  await page.getByRole("tab", { name: /Evaluation/ }).click();
   const evaluation = page.getByRole("region", { name: "FoundationPass" });
   await expect(evaluation.locator("code")).toContainText("ER-APP-");
   await expect(evaluation).toContainText("84/84");
@@ -198,9 +201,14 @@ test("Evaluation Run is inspectable without polluting Recent Reviews", async ({ 
 test("primary review journey is keyboard operable with visible focus", async ({ page }) => {
   await page.goto("/");
   await page.keyboard.press("Tab");
-  const reuseButton = page.getByRole("button", { name: "Prove governed reuse" });
-  await expect(reuseButton).toBeFocused();
-  expect(await reuseButton.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
+  const reviewTab = page.getByRole("tab", { name: /Review/ });
+  await expect(reviewTab).toBeFocused();
+  expect(await reviewTab.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("tab", { name: /Governance/ })).toBeFocused();
+  await expect(page.getByRole("region", { name: "Controls that travel with every capability." })).toBeVisible();
+  await page.keyboard.press("Home");
+  await expect(reviewTab).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("combobox", { name: "Synthetic package" })).toBeFocused();
   await page.keyboard.press("ArrowDown");
