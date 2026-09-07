@@ -99,6 +99,8 @@ test("employee intent discovers an authorized governed path before execution", a
 
 test("two Consumers reuse the same pinned Document Intake Skill and Plugins", async ({ page }) => {
   await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Five governed Skills. Four reusable Plugins. One execution standard." })).toBeVisible();
+  await expect(page.getByText("Skills define what the enterprise does.", { exact: false })).toBeVisible();
   await page.getByRole("button", { name: "Prove governed reuse" }).click();
 
   const reuse = page.getByRole("region", { name: "One Skill, two Consumers." });
