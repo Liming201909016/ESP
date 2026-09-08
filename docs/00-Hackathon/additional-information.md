@@ -30,8 +30,10 @@ AI platform and reusable enterprise capability architecture, demonstrated throug
 - seven Power Platform Solution foundations packaging successfully;
 - public GitHub repository available;
 - local browser application, deterministic Router, four Plugins, analyst disposition, report, trace, and evaluator integration runnable;
-- 22 API integration tests and 16 desktop/mobile browser journeys passing.
-- clean-clone installation, build, browser tests, and 36/36 evaluation reproduced successfully.
+- earlier validation recorded 22 API integration tests and 16 desktop/mobile browser journeys; current-commit local regression remains pending workstation toolchain setup;
+- [Validate ESP CI run 34103533028](https://github.com/Liming201909016/ESP/actions/runs/34103533028) passed on 2026-09-07 for `a08c65e`, covering build, application tests, independent Python evaluation, and production dependency audit;
+- historical clean-clone validation on 2026-09-04 at `ef67627` reproduced installation, build, 21 API tests, 16 browser journeys, and 36/36 evaluation assertions; these are not current-commit results;
+- browser-based Hosted checks on 2026-09-08 passed seven synthetic scenarios, isolated 84/84 evaluation with Pilot blocked, shared Skill reuse, and desktop/mobile review flows; the full local suite and Python oracle were not rerun.
 
 ## What We Will Demonstrate
 

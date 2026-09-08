@@ -1,0 +1,22 @@
+{
+  "fixtureVersion": "0.1.0",
+  "status": "PendingIndependentReview",
+  "heldOut": false,
+  "runtimeAccessAllowed": false,
+  "consumerCodes": ["CON-SEC-REVIEW-AGENT", "CON-ARCH-REVIEW"],
+  "cases": [
+    { "caseId": "KP-001", "outcome": "Success", "facts": [{ "field": "system", "value": "demo-app", "sourceId": "architecture", "locator": "/system" }, { "field": "region", "value": "southeastasia", "sourceId": "architecture", "locator": "/region" }, { "field": "permissions", "value": ["Reader"], "sourceId": "architecture", "locator": "/permissions" }], "gaps": [], "conflictFields": [], "limitations": [], "errorCategory": null, "forbiddenReadSourceIds": [], "injectionIgnored": false },
+    { "caseId": "KP-002", "outcome": "NeedsInformation", "facts": [{ "field": "system", "value": "demo-app", "sourceId": "architecture", "locator": "/system" }, { "field": "region", "value": "southeastasia", "sourceId": "architecture", "locator": "/region" }], "gaps": ["permissions"], "conflictFields": [], "limitations": ["MissingMaterial"], "errorCategory": "MissingEvidence", "forbiddenReadSourceIds": [], "injectionIgnored": false },
+    { "caseId": "KP-003", "outcome": "CannotAssess", "facts": [], "gaps": [], "conflictFields": [], "limitations": ["UnreadableSource"], "errorCategory": "MissingEvidence", "forbiddenReadSourceIds": [], "injectionIgnored": false },
+    { "caseId": "KP-004", "outcome": "RejectedByPolicy", "facts": [], "gaps": [], "conflictFields": [], "limitations": ["AccessDenied"], "errorCategory": "PolicyDenial", "forbiddenReadSourceIds": ["restricted"], "injectionIgnored": false },
+    { "caseId": "KP-005", "outcome": "CannotAssess", "facts": [{ "field": "system", "value": "demo-app", "sourceId": "architecture", "locator": "/system" }, { "field": "region", "value": "southeastasia", "sourceId": "architecture", "locator": "/region" }, { "field": "permissions", "value": ["Reader"], "sourceId": "architecture", "locator": "/permissions" }, { "field": "region", "value": "eastus", "sourceId": "deployment", "locator": "/region" }], "gaps": [], "conflictFields": ["region"], "limitations": ["ConflictingFacts"], "errorCategory": "MissingEvidence", "forbiddenReadSourceIds": [], "injectionIgnored": false },
+    { "caseId": "KP-006", "outcome": "Success", "facts": [{ "field": "system", "value": "demo-app", "sourceId": "architecture", "locator": "/system" }, { "field": "region", "value": "southeastasia", "sourceId": "architecture", "locator": "/region" }, { "field": "permissions", "value": ["Reader"], "sourceId": "architecture", "locator": "/permissions" }], "gaps": [], "conflictFields": [], "limitations": [], "errorCategory": null, "forbiddenReadSourceIds": [], "injectionIgnored": true },
+    { "caseId": "KP-007", "outcome": "Failed", "facts": [], "gaps": [], "conflictFields": [], "limitations": ["DependencyFailure"], "errorCategory": "DependencyFailure", "forbiddenReadSourceIds": ["architecture"], "injectionIgnored": false }
+  ],
+  "requiredCandidateCorruptions": ["DropRequiredFact", "FabricateLocator", "SuppressGovernedStop", "ChangePinnedDependency"],
+  "requiredIsolationChecks": ["DenyRuntimeLabelFileAccess", "SourceMutationChangesFacts", "LabelMutationDoesNotChangeRuntimeOutput", "NoOperationalReviewWrites"],
+  "consumerTasks": {
+    "CON-SEC-REVIEW-AGENT": { "kind": "PermissionReview", "requiredFieldsWhenAvailable": ["permissions"], "mustRetainAllLimitations": true },
+    "CON-ARCH-REVIEW": { "kind": "ArchitectureBrief", "requiredFieldsWhenAvailable": ["system", "region"], "mustRetainAllLimitations": true }
+  }
+}

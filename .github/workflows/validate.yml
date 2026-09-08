@@ -53,6 +53,19 @@ jobs:
       - name: Build application
         run: npm run build
 
+      - name: Validate Knowledge Preparation draft
+        shell: pwsh
+        run: ./scripts/Test-KnowledgePreparationDraft.ps1
+
+      - name: Test unregistered Knowledge Preparation experiment
+        run: npm run test:knowledge-preparation
+
+      - name: Test Knowledge Preparation acceptance mechanics
+        run: npm run test:knowledge-preparation:acceptance
+
+      - name: Test Knowledge Preparation simulation mechanics
+        run: npm run test:knowledge-preparation:simulation
+
       - name: Run application tests
         run: npm test
 

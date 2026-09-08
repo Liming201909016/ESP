@@ -48,6 +48,9 @@
 07-Security-Review-MVP/use-cases.md
 08-Development/foundation-backlog.md
 08-Development/hackathon-mvp-backlog.md
+08-Development/knowledge-preparation-contract-draft.md
+08-Development/knowledge-preparation-execution-handoff.md
+08-Development/knowledge-preparation-reviewer-intake.md
 08-Development/mvp-hardening-backlog.md
 09-Feasibility/adr-001-local-mvp-stack.md
 09-Feasibility/technical-feasibility-assessment.md

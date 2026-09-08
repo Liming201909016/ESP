@@ -2,19 +2,21 @@
 
 **Target duration:** 5 minutes
 
-## 1. Problem, 30 seconds
+**Timing budget:** 290 seconds of planned content plus 10 seconds for transitions. A timed live rehearsal is still required; the section budget is not rehearsal evidence.
+
+## 1. Problem, 20 seconds
 
 Show two enterprise Copilots that would normally copy the same document-intake logic. Explain that copied prompts and tools cannot be independently versioned, evaluated, or traced.
 
-## 2. One Copilot, 45 seconds
+## 2. One Copilot, 35 seconds
 
 Open the ESP Security Review Copilot in Demo Mode. Select `SYN-RG-001` and ask for a review. Point out the single entry experience and Correlation ID.
 
-## 3. Skills and Plugins, 75 seconds
+## 3. Skills and Plugins, 60 seconds
 
 Introduce the registry as **five governed Skills, four reusable Plugins, and one execution standard**. Explain: Skills define what the enterprise does; Plugins provide how systems connect; the execution standard keeps identity, versions, evidence, outcomes, errors, and oversight consistent. Use the Governance Control Plane to show pinned versions, two active Consumer Bindings, the Risk Rating approval gate, the 84/84 Foundation evaluation, and the explicit Pilot block. Open the execution trace and highlight that Document Intake and Evidence Extraction share `PLG-DOC-SOURCE`, while every Skill uses `PLG-EVIDENCE`.
 
-## 4. Evidence and human accountability, 75 seconds
+## 4. Evidence and human accountability, 65 seconds
 
 Open a finding and its Evidence Item. Show the pinned source and Runbook version. Review the proposed risk and confirm or modify it as the analyst. Emphasize that the model proposal is not the final decision.
 
@@ -26,7 +28,7 @@ Run one standard governed-stop scenario: `SYN-RG-003` for `RejectedByPolicy`, `S
 
 Open the independent Evaluation Run, point out its Run ID and pinned Skill, implementation, package, Binding, Deployment, and threshold versions, then expand a Case to show all twelve mandatory assertions. Emphasize that Evaluation execution is isolated and does not create operational Reviews. Select **Prove governed reuse** and compare the Security Review Copilot with the Architecture Review Workflow as the secondary Consumer. Point out that each has a distinct Consumer Binding, Correlation ID, and Invocation ID while both resolve `LS-SEC-DOC-INTAKE` v1.0.0, the same implementation, and the same pinned Document Source and Evidence Plugin versions without copying assets.
 
-## 7. Close, 25 seconds
+## 7. Close, 20 seconds
 
 Summarize the pattern: build a governed Skill once, plug it into any Copilot, and retain the evidence needed to trust and improve it. Briefly show the enterprise Dataverse and seven-Solution architecture as the scale-out path, not as a dependency of the demo.
 

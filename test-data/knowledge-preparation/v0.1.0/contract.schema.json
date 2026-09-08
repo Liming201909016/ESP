@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://esp.example/experiments/knowledge-preparation/0.1.0/contract.schema.json",
+  "title": "Proposed Knowledge Preparation experiment; not a registered Logical Skill",
+  "oneOf": [{ "$ref": "#/$defs/request" }, { "$ref": "#/$defs/response" }, { "$ref": "#/$defs/consumerOutput" }],
+  "$defs": {
+    "identifier": { "type": "string", "minLength": 1 },
+    "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "field": { "enum": ["system", "region", "permissions"] },
+    "outcome": { "enum": ["Success", "NeedsInformation", "CannotAssess", "RejectedByPolicy", "Failed"] },
+    "consumer": { "enum": ["CON-SEC-REVIEW-AGENT", "CON-ARCH-REVIEW"] },
+    "value": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }] },
+    "sourceInput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sourceId", "sourceVersion"],
+      "properties": {
+        "sourceId": { "$ref": "#/$defs/identifier" }, "sourceVersion": { "$ref": "#/$defs/identifier" },
+        "body": { "type": "object" }
+      }
+    },
+    "request": {
+      "type": "object", "additionalProperties": false,
+      "required": ["messageType", "experiment", "contractVersion", "caseId", "requestedFields", "sources"],
+      "properties": {
+        "messageType": { "const": "request" }, "experiment": { "const": "knowledge-preparation" }, "contractVersion": { "const": "0.1.0" },
+        "caseId": { "$ref": "#/$defs/identifier" },
+        "requestedFields": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/field" } },
+        "sources": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/sourceInput" } }
+      }
+    },
+    "pins": {
+      "type": "object", "additionalProperties": false,
+      "required": ["implementationVersion", "plugins"],
+      "properties": {
+        "implementationVersion": { "const": "knowledge-preparation-draft-0.1.0" },
+        "plugins": {
+          "type": "object", "additionalProperties": false, "required": ["PLG-DOC-SOURCE", "PLG-EVIDENCE"],
+          "properties": { "PLG-DOC-SOURCE": { "const": "1.0.0" }, "PLG-EVIDENCE": { "const": "1.0.0" } }
+        }
+      }
+    },
+    "source": {
+      "type": "object", "additionalProperties": false, "required": ["sourceId", "sourceVersion", "sha256"],
+      "properties": { "sourceId": { "$ref": "#/$defs/identifier" }, "sourceVersion": { "$ref": "#/$defs/identifier" }, "sha256": { "$ref": "#/$defs/hash" } }
+    },
+    "fact": {
+      "type": "object", "additionalProperties": false, "required": ["factId", "field", "value", "evidenceIds"],
+      "properties": {
+        "factId": { "$ref": "#/$defs/identifier" }, "field": { "$ref": "#/$defs/field" }, "value": { "$ref": "#/$defs/value" },
+        "evidenceIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/identifier" } }
+      },
+      "allOf": [
+        { "if": { "properties": { "field": { "const": "permissions" } } }, "then": { "properties": { "value": { "type": "array" } } }, "else": { "properties": { "value": { "type": "string" } } } }
+      ]
+    },
+    "conflict": {
+      "type": "object", "additionalProperties": false, "required": ["field", "factIds"],
+      "properties": { "field": { "$ref": "#/$defs/field" }, "factIds": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "$ref": "#/$defs/identifier" } } }
+    },
+    "package": {
+      "type": "object", "additionalProperties": false, "required": ["facts", "sources", "conflicts", "gaps", "limitations"],
+      "properties": {
+        "facts": { "type": "array", "items": { "$ref": "#/$defs/fact" } }, "sources": { "type": "array", "items": { "$ref": "#/$defs/source" } },
+        "conflicts": { "type": "array", "items": { "$ref": "#/$defs/conflict" } },
+        "gaps": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/field" } },
+        "limitations": { "type": "array", "uniqueItems": true, "items": { "enum": ["MissingMaterial", "UnreadableSource", "AccessDenied", "ConflictingFacts", "DependencyFailure"] } }
+      }
+    },
+    "evidence": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false, "required": ["evidenceId", "type", "sourceId", "sourceVersion", "locator", "contentHash"],
+          "properties": { "evidenceId": { "$ref": "#/$defs/identifier" }, "type": { "const": "Fact" }, "sourceId": { "$ref": "#/$defs/identifier" }, "sourceVersion": { "$ref": "#/$defs/identifier" }, "locator": { "type": "string", "pattern": "^(/([^~/]|~[01])*)+$" }, "contentHash": { "$ref": "#/$defs/hash" } }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["evidenceId", "type", "eventId"],
+          "properties": { "evidenceId": { "$ref": "#/$defs/identifier" }, "type": { "const": "ToolResult" }, "eventId": { "$ref": "#/$defs/identifier" } }
+        }
+      ]
+    },
+    "event": {
+      "type": "object", "additionalProperties": false, "required": ["eventId", "pluginCode", "operation", "outcome"],
+      "properties": {
+        "eventId": { "$ref": "#/$defs/identifier" }, "pluginCode": { "enum": ["PLG-DOC-SOURCE", "PLG-EVIDENCE"] },
+        "operation": { "enum": ["Authorize", "Read", "IgnoreUntrustedInstruction", "RetainEvidence"] }, "outcome": { "$ref": "#/$defs/outcome" },
+        "sourceId": { "$ref": "#/$defs/identifier" }
+      }
+    },
+    "error": {
+      "type": "object", "additionalProperties": false, "required": ["category", "message", "retryable"],
+      "properties": { "category": { "enum": ["InvalidInput", "MissingEvidence", "DependencyFailure", "PolicyDenial", "Timeout", "InternalFailure"] }, "message": { "$ref": "#/$defs/identifier" }, "retryable": { "type": "boolean" } }
+    },
+    "response": {
+      "type": "object", "additionalProperties": false,
+      "required": ["messageType", "experiment", "contractVersion", "caseId", "correlationId", "invocationId", "consumerCode", "consumerBindingCode", "pins", "outcome", "package", "evidence", "events", "errors"],
+      "properties": {
+        "messageType": { "const": "response" }, "experiment": { "const": "knowledge-preparation" }, "contractVersion": { "const": "0.1.0" },
+        "caseId": { "$ref": "#/$defs/identifier" }, "correlationId": { "$ref": "#/$defs/identifier" }, "invocationId": { "$ref": "#/$defs/identifier" },
+        "consumerCode": { "$ref": "#/$defs/consumer" }, "consumerBindingCode": { "$ref": "#/$defs/identifier" }, "pins": { "$ref": "#/$defs/pins" },
+        "outcome": { "$ref": "#/$defs/outcome" }, "package": { "$ref": "#/$defs/package" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } }, "events": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/event" } },
+        "errors": { "type": "array", "items": { "$ref": "#/$defs/error" } }
+      },
+      "allOf": [
+        { "if": { "properties": { "outcome": { "const": "Success" } } }, "then": { "properties": { "errors": { "maxItems": 0 }, "package": { "properties": { "facts": { "minItems": 1 }, "sources": { "minItems": 1 }, "gaps": { "maxItems": 0 }, "conflicts": { "maxItems": 0 }, "limitations": { "maxItems": 0 } } } } }, "else": { "properties": { "errors": { "minItems": 1 }, "package": { "properties": { "limitations": { "minItems": 1 } } } } } },
+        { "if": { "properties": { "outcome": { "enum": ["RejectedByPolicy", "Failed"] } } }, "then": { "properties": { "package": { "properties": { "facts": { "maxItems": 0 }, "sources": { "maxItems": 0 } } }, "evidence": { "items": { "properties": { "type": { "const": "ToolResult" } } } } } } }
+      ]
+    },
+    "consumerOutput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["messageType", "experiment", "contractVersion", "caseId", "consumerCode", "consumerBindingCode", "packageInvocationId", "outcome", "status", "humanReviewRequired", "items", "questions"],
+      "properties": {
+        "messageType": { "const": "consumerOutput" }, "experiment": { "const": "knowledge-preparation" }, "contractVersion": { "const": "0.1.0" },
+        "caseId": { "$ref": "#/$defs/identifier" }, "consumerCode": { "$ref": "#/$defs/consumer" }, "consumerBindingCode": { "$ref": "#/$defs/identifier" }, "packageInvocationId": { "$ref": "#/$defs/identifier" },
+        "outcome": { "$ref": "#/$defs/outcome" }, "status": { "const": "Draft" }, "humanReviewRequired": { "const": true },
+        "items": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["kind", "factIds"], "properties": { "kind": { "enum": ["PermissionReview", "ArchitectureBrief"] }, "factIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/identifier" } } } } },
+        "questions": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["reason", "reference"], "properties": { "reason": { "enum": ["Gap", "Conflict", "Limitation"] }, "reference": { "$ref": "#/$defs/identifier" } } } }
+      }
+    }
+  }
+}

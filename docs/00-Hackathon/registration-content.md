@@ -36,7 +36,7 @@ https://github.com/Liming201909016/ESP
 Repository visibility: Public  
 Expected default branch: `main`
 
-The public repository contains a runnable local vertical slice plus the validated architecture, Skill contracts, synthetic demo assets, evaluation tooling, and Power Platform Solution foundations. A clean-clone validation has reproduced installation, build, 21 API tests, 16 desktop/mobile browser journeys, and 36/36 evaluation assertions.
+The public repository contains a runnable local vertical slice plus the validated architecture, Skill contracts, synthetic demo assets, evaluation tooling, and Power Platform Solution foundations. Historical clean-clone validation on 2026-09-04 at commit `ef67627` reproduced installation, build, 21 API tests, 16 desktop/mobile browser journeys, and 36/36 evaluation assertions. These are historical results, not a current-commit rerun.
 
 ## Description
 
@@ -164,7 +164,9 @@ The project has executable validation rather than architecture slides alone:
 - the evaluator explicitly reports `pilotEligible=false` for synthetic data;
 - seven Power Platform Solution foundations package successfully for the enterprise scale-out path;
 - the local Node/Express/Ajv foundation has compiled the canonical JSON Schema and passed an HTTP runtime smoke test.
-- 22 API integration tests and 16 desktop/mobile browser journeys pass across governed scenarios, persistence recovery, error recovery, accessibility, and keyboard operation.
+- Earlier validation recorded 22 API integration tests and 16 desktop/mobile browser journeys; current-commit local regression and clean-clone revalidation remain pending workstation toolchain setup.
+- [Validate ESP CI run 34103533028](https://github.com/Liming201909016/ESP/actions/runs/34103533028) passed on 2026-09-07 for commit `a08c65e`, covering build, API/production/browser tests, independent Python evaluation, and production dependency audit.
+- On 2026-09-08, browser-based Hosted checks passed seven synthetic scenarios, an isolated 84/84 Evaluation Run with Pilot blocked, shared Skill reuse, and desktop/mobile review flows. These checks do not replace the Python oracle or full local test suite.
 
 The local browser experience, Skill Router, Plugin runtime, analyst workflow, report path, execution trace, evaluator integration, and recorded fallback media are runnable. Optional Connected Mode remains gated stretch work.
 

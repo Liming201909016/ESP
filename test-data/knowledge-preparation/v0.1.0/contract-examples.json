@@ -1,0 +1,70 @@
+{
+  "status": "AuthoredExamplesNotRuntimeResults",
+  "sourceHashVector": {
+    "canonicalJson": "{\"permissions\":[\"Reader\"],\"region\":\"southeastasia\",\"system\":\"demo-app\"}",
+    "sha256": "bb33bf8a650b6a29203a02cdb81d7597b6f112d6624bbdc286dcca809cd2b046"
+  },
+  "preparationResponse": {
+    "messageType": "response", "experiment": "knowledge-preparation", "contractVersion": "0.1.0", "caseId": "KP-001",
+    "correlationId": "CORR-DRAFT-SEC-001", "invocationId": "INV-DRAFT-SEC-001", "consumerCode": "CON-SEC-REVIEW-AGENT", "consumerBindingCode": "CB-DRAFT-KP-SEC",
+    "pins": { "implementationVersion": "knowledge-preparation-draft-0.1.0", "plugins": { "PLG-DOC-SOURCE": "1.0.0", "PLG-EVIDENCE": "1.0.0" } },
+    "outcome": "Success",
+    "package": {
+      "facts": [
+        { "factId": "F-SYSTEM", "field": "system", "value": "demo-app", "evidenceIds": ["EV-SYSTEM"] },
+        { "factId": "F-REGION", "field": "region", "value": "southeastasia", "evidenceIds": ["EV-REGION"] },
+        { "factId": "F-PERMISSIONS", "field": "permissions", "value": ["Reader"], "evidenceIds": ["EV-PERMISSIONS"] }
+      ],
+      "sources": [{ "sourceId": "architecture", "sourceVersion": "1.0.0", "sha256": "bb33bf8a650b6a29203a02cdb81d7597b6f112d6624bbdc286dcca809cd2b046" }],
+      "conflicts": [], "gaps": [], "limitations": []
+    },
+    "evidence": [
+      { "evidenceId": "EV-SYSTEM", "type": "Fact", "sourceId": "architecture", "sourceVersion": "1.0.0", "locator": "/system", "contentHash": "bb33bf8a650b6a29203a02cdb81d7597b6f112d6624bbdc286dcca809cd2b046" },
+      { "evidenceId": "EV-REGION", "type": "Fact", "sourceId": "architecture", "sourceVersion": "1.0.0", "locator": "/region", "contentHash": "bb33bf8a650b6a29203a02cdb81d7597b6f112d6624bbdc286dcca809cd2b046" },
+      { "evidenceId": "EV-PERMISSIONS", "type": "Fact", "sourceId": "architecture", "sourceVersion": "1.0.0", "locator": "/permissions", "contentHash": "bb33bf8a650b6a29203a02cdb81d7597b6f112d6624bbdc286dcca809cd2b046" },
+      { "evidenceId": "EV-READ", "type": "ToolResult", "eventId": "EVENT-READ" }
+    ],
+    "events": [
+      { "eventId": "EVENT-AUTH", "pluginCode": "PLG-DOC-SOURCE", "operation": "Authorize", "outcome": "Success", "sourceId": "architecture" },
+      { "eventId": "EVENT-READ", "pluginCode": "PLG-DOC-SOURCE", "operation": "Read", "outcome": "Success", "sourceId": "architecture" },
+      { "eventId": "EVENT-EVIDENCE", "pluginCode": "PLG-EVIDENCE", "operation": "RetainEvidence", "outcome": "Success" }
+    ],
+    "errors": []
+  },
+  "architectureInvocation": { "correlationId": "CORR-DRAFT-ARCH-001", "invocationId": "INV-DRAFT-ARCH-001", "consumerCode": "CON-ARCH-REVIEW", "consumerBindingCode": "CB-DRAFT-KP-ARCH" },
+  "deniedResponse": {
+    "messageType": "response", "experiment": "knowledge-preparation", "contractVersion": "0.1.0", "caseId": "KP-004",
+    "correlationId": "CORR-DRAFT-SEC-004", "invocationId": "INV-DRAFT-SEC-004", "consumerCode": "CON-SEC-REVIEW-AGENT", "consumerBindingCode": "CB-DRAFT-KP-SEC",
+    "pins": { "implementationVersion": "knowledge-preparation-draft-0.1.0", "plugins": { "PLG-DOC-SOURCE": "1.0.0", "PLG-EVIDENCE": "1.0.0" } },
+    "outcome": "RejectedByPolicy",
+    "package": { "facts": [], "sources": [], "conflicts": [], "gaps": [], "limitations": ["AccessDenied"] },
+    "evidence": [{ "evidenceId": "EV-DENIAL", "type": "ToolResult", "eventId": "EVENT-DENIAL" }],
+    "events": [{ "eventId": "EVENT-DENIAL", "pluginCode": "PLG-DOC-SOURCE", "operation": "Authorize", "outcome": "RejectedByPolicy", "sourceId": "restricted" }],
+    "errors": [{ "category": "PolicyDenial", "message": "Requested source access was denied.", "retryable": false }]
+  },
+  "consumerOutputs": [
+    {
+      "messageType": "consumerOutput", "experiment": "knowledge-preparation", "contractVersion": "0.1.0", "caseId": "KP-001",
+      "consumerCode": "CON-SEC-REVIEW-AGENT", "consumerBindingCode": "CB-DRAFT-KP-SEC", "packageInvocationId": "INV-DRAFT-SEC-001",
+      "outcome": "Success", "status": "Draft", "humanReviewRequired": true,
+      "items": [{ "kind": "PermissionReview", "factIds": ["F-PERMISSIONS"] }], "questions": []
+    },
+    {
+      "messageType": "consumerOutput", "experiment": "knowledge-preparation", "contractVersion": "0.1.0", "caseId": "KP-001",
+      "consumerCode": "CON-ARCH-REVIEW", "consumerBindingCode": "CB-DRAFT-KP-ARCH", "packageInvocationId": "INV-DRAFT-ARCH-001",
+      "outcome": "Success", "status": "Draft", "humanReviewRequired": true,
+      "items": [{ "kind": "ArchitectureBrief", "factIds": ["F-SYSTEM", "F-REGION"] }], "questions": []
+    },
+    {
+      "messageType": "consumerOutput", "experiment": "knowledge-preparation", "contractVersion": "0.1.0", "caseId": "KP-004",
+      "consumerCode": "CON-SEC-REVIEW-AGENT", "consumerBindingCode": "CB-DRAFT-KP-SEC", "packageInvocationId": "INV-DRAFT-SEC-004",
+      "outcome": "RejectedByPolicy", "status": "Draft", "humanReviewRequired": true,
+      "items": [], "questions": [{ "reason": "Limitation", "reference": "AccessDenied" }]
+    }
+  ],
+  "invalidRequests": [
+    { "messageType": "request", "experiment": "knowledge-preparation", "contractVersion": "0.1.0", "caseId": "KP-INVALID-LABEL", "requestedFields": ["system"], "sources": [{ "sourceId": "architecture", "sourceVersion": "1.0.0", "body": { "system": "demo-app" } }], "expected": { "outcome": "Success" } },
+    { "messageType": "request", "experiment": "knowledge-preparation", "contractVersion": "0.1.0", "caseId": "KP-INVALID-EMPTY", "requestedFields": ["system"], "sources": [] },
+    { "messageType": "request", "experiment": "knowledge-preparation", "contractVersion": "0.1.0", "caseId": "KP-INVALID-FIELD", "requestedFields": ["grantAccess"], "sources": [{ "sourceId": "architecture", "sourceVersion": "1.0.0" }] }
+  ]
+}
