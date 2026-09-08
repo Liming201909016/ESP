@@ -4,6 +4,7 @@
 **Recording source:** isolated Demo Mode with synthetic data only  
 **Primary viewport:** 1440 × 900
 **Audio and captions:** English voiceover with English subtitles
+**Upload file:** `video/ESP-Hackathon-2026-Demo.mp4`
 
 ## Preflight
 
@@ -12,9 +13,10 @@
 3. Run `npm run capture:demo` to refresh five committed screenshots.
 4. Run `npm run record:demo` to refresh the two-slide and live-Demo walkthrough.
 5. Run `npm run test:media` to validate image dimensions and WebM metadata.
-6. Use `npm run prepare:video` to build, generate the picture track and screenshots, synthesize the English voiceover, and validate all assets.
-7. Confirm the first visible workspace is `Review` and Recent Reviews is empty.
-8. Close notifications, disable browser password prompts, and record at 100% zoom.
+6. Install FFmpeg 4.1 or later, or set `FFMPEG_PATH` to its executable.
+7. Use `npm run prepare:video` to build, generate and validate the source assets, then package one upload-ready MP4.
+8. Confirm the first visible workspace is `Review` and Recent Reviews is empty.
+9. Close notifications, disable browser password prompts, and record at 100% zoom.
 
 The media commands build the application, start an isolated local server, use a temporary empty Review store, and clean it afterward. No historical local or Hosted reviews appear in generated media.
 
@@ -36,7 +38,7 @@ The default first slide is `esp-demo-desktop.png`. To use the supplied ESP archi
 | 1:14–1:22 | Reuse tab | “Two Consumers resolve the same pinned Skill and Plugins without copied implementation.” |
 | 1:22–1:28 | Closing hold | “Build once. Govern once. Reuse everywhere.” |
 
-The source narration is `video/narration-en.txt`. Import `assets/esp-demo-fallback.webm`, `video/voiceover-en.wav`, and `video/subtitles-en.srt` into the editor at time zero. Keep the original audio muted, export at 1440 × 900, and verify the final duration remains below 2:00.
+The source narration is `video/narration-en.txt`. `npm run package:video` combines `assets/esp-demo-fallback.webm`, `video/voiceover-en.wav`, and `video/subtitles-en.srt` into one H.264/AAC MP4 with burned-in captions and fast-start metadata. Verify the final duration remains below 2:00 before upload.
 
 ## Demo Data
 

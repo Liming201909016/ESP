@@ -13,6 +13,7 @@
 00-Hackathon/registration-paste-ready.md
 00-Hackathon/registration-content.md
 00-Hackathon/video-production-guide.md
+00-Hackathon/video/ESP-Hackathon-2026-Demo.mp4
 00-Hackathon/video/narration-en.txt
 00-Hackathon/video/subtitles-en.srt
 00-Hackathon/video/voiceover-en.wav

@@ -1,43 +1,79 @@
 1
-00:00:00,000 --> 00:00:05,000
-Enterprise Skill Platform moves enterprise AI from copied agents to governed, reusable capabilities.
+00:00:00,050 --> 00:00:07,269
+Enterprise Skill Platform turns copied agent logic into governed, reusable capabilities.
 
 2
-00:00:05,000 --> 00:00:11,000
-Employees think in intents. Enterprise capabilities remain scattered. ESP bridges the gap.
+00:00:07,269 --> 00:00:09,578
+Employees think in intents.
 
 3
-00:00:11,000 --> 00:00:17,000
-This public Demo uses synthetic data. A natural-language request enters one governed Review workspace.
+00:00:09,578 --> 00:00:12,663
+Enterprise capabilities remain scattered.
 
 4
-00:00:17,000 --> 00:00:26,000
-The Router understands intent, validates the Consumer Binding, and executes five pinned Skills through authorized Plugins.
+00:00:12,663 --> 00:00:17,241
+ESP bridges the gap through one trusted Copilot.
 
 5
-00:00:26,000 --> 00:00:35,000
-Every material claim resolves to retained Evidence. Decision Lineage preserves versions, citations, and the Correlation ID.
+00:00:17,241 --> 00:00:20,081
+This public Demo uses synthetic data.
 
 6
-00:00:35,000 --> 00:00:44,000
-The model proposes risk. The accountable analyst changes the rating and creates Human Decision evidence.
+00:00:20,081 --> 00:00:24,130
+A natural-language request enters the Review workspace.
 
 7
-00:00:44,000 --> 00:00:54,000
-Policy denial stops the responsible Skill and Plugin. ESP does not bypass policy or invent a result.
+00:00:24,130 --> 00:00:32,432
+The Router understands intent, validates the Binding, and executes five pinned Skills through authorized Plugins.
 
 8
-00:00:54,000 --> 00:01:04,000
-The Governance Control Plane shows versions, Bindings, authorization, oversight, and the Pilot boundary.
+00:00:32,432 --> 00:00:35,692
+Every claim resolves to retained Evidence.
 
 9
-00:01:04,000 --> 00:01:14,000
-Seven synthetic cases pass all 84 mandatory assertions. Synthetic evidence does not establish Pilot approval.
+00:00:35,692 --> 00:00:41,399
+Decision Lineage preserves versions, citations, and the Correlation ID.
 
 10
-00:01:14,000 --> 00:01:22,000
-Two Consumers resolve the same pinned Skill and Plugins with no copied implementation.
+00:00:41,399 --> 00:00:43,437
+The model proposes risk.
 
 11
-00:01:22,000 --> 00:01:28,000
-Build once. Govern once. Reuse everywhere.
+00:00:43,437 --> 00:00:48,736
+The accountable analyst changes the rating and creates Human Decision evidence.
+
+12
+00:00:48,736 --> 00:00:53,043
+Policy denial stops the responsible Skill and Plugin.
+
+13
+00:00:53,043 --> 00:00:57,065
+ESP does not bypass policy or invent a result.
+
+14
+00:00:57,065 --> 00:01:04,714
+The control plane shows versions, Bindings, authorization, human oversight, and the Pilot boundary.
+
+15
+00:01:04,714 --> 00:01:09,972
+Seven synthetic cases pass all eighty-four mandatory assertions.
+
+16
+00:01:09,972 --> 00:01:14,157
+Synthetic evidence does not establish Pilot approval.
+
+17
+00:01:14,157 --> 00:01:20,557
+Two Consumers resolve the same pinned Skill and Plugins with no copied implementation.
+
+18
+00:01:20,557 --> 00:01:21,902
+Build once.
+
+19
+00:01:21,902 --> 00:01:23,097
+Govern once.
+
+20
+00:01:23,097 --> 00:01:24,836
+Reuse everywhere.

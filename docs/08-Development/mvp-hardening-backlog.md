@@ -45,3 +45,59 @@
 ## Connected and enterprise work
 
 Copilot Studio, Power Automate adapters, Dataverse persistence, Identity/Policy Bindings, DLP, customer Runbooks, approved thresholds, primary TEST Agent, and enterprise second Consumer remain governed Connected Mode work. They do not block the local synthetic demo but are required before enterprise Pilot claims.
+
+## Next delivery todo: Microsoft-integrated capabilities
+
+**Planning date:** 2026-09-08
+
+**Status:** Planned; this checklist does not approve Connected Mode, business-system writes, or Pilot.
+
+### Agreed direction and boundaries
+
+- Integrate with Microsoft products, especially Copilot Studio, while keeping Skill contracts independent of the runtime.
+- Govern reusable knowledge preparation and cleaning as well as online capability execution. A knowledge package is an asset; preparing it is a capability.
+- Select Skill boundaries by independently testable outcomes, ownership, and genuine second-Consumer demand. Do not turn every processing step into a Skill.
+- Start with one Security Review knowledge-preparation capability, reusing Document Intake and Evidence Extraction where their contracts fit. Parking remains an illustrative example, not an added MVP domain.
+- Preserve the existing synthetic Demo and human accountability. Do not require the full 42-table model, seven-Solution topology, or a new Agent engine for the first proof.
+- Treat shared knowledge assets and shared executable Skills as separate reuse claims. Two Consumers must invoke the same implementation to prove executable reuse.
+
+Earlier Done rows describe the historical Demo baseline. They do not establish real identity authorization, independent business-quality evaluation, or live Microsoft integration. In particular, the current evaluator derives some observed behaviors and Runbook values from expected labels; the reported 84/84 must not be treated as wholly independent evidence.
+
+### Phase 1: Local, synthetic, independently verifiable
+
+- [ ] CAP-001 - Define the minimum knowledge-preparation contract and capability ownership.
+	Acceptance: identify the proposed Capability Owner and Domain SME; document authorized source references, preparation requirements, source versions, draft knowledge output, quality report, conflicts, evidence mapping, limitations, and two concrete Consumers. Record why the boundary is independently useful instead of duplicating a Plugin operation.
+- [ ] CAP-002 - Remove expected-answer dependencies from runtime and candidate-result generation.
+	Acceptance: choose Runbooks and derive findings from approved synthetic input and runtime configuration, not expected labels. Obtain observed behaviors, versions, and dependency hashes from actual execution. Independent mutation tests fail when required behavior, citations, Runbook selection, or authorization enforcement is deliberately broken.
+- [ ] CAP-003 - Freeze an independent synthetic acceptance set before implementing the new capability.
+	Acceptance: include complete, missing, duplicate, conflicting, stale, unreadable, and unauthorized sources plus untrusted instructions. Expected outcomes are separate from runtime input; distinguish observed facts, model suggestions, and human decisions. Do not claim Domain SME approval before it is recorded.
+- [ ] CAP-004 - Implement knowledge preparation as a bounded, evidence-preserving workflow.
+	Acceptance: normalization and extraction preserve original meaning, source references, versions, and permissions; unresolved conflicts produce an explicit quality failure or review requirement. Changed input changes output or its quality report. Output remains a local draft and cannot silently become authoritative policy.
+- [ ] CAP-005 - Prove two independent local Consumers reuse the same implementation.
+	Acceptance: an interactive caller and an independently triggered workflow invoke the same pinned Skill and Plugins without copying core logic. Records have distinct invocation identities; unauthorized scope is rejected before accessing a restricted Plugin. Local simulated identities are explicitly labelled and are not evidence of real authentication.
+- [ ] CAP-006 - Make version and revocation rules affect execution.
+	Acceptance: Skill, Plugin, and knowledge-package versions are separately identifiable; a Consumer cannot silently follow Latest. Suspending a Binding or revoking a dependency blocks the next affected invocation before restricted execution without breaking unaffected authorized Consumers.
+
+### Phase 2: Microsoft integration, subject to environment authorization
+
+- [ ] CAP-101 - Obtain and record authorized DEV access and named accountability.
+	Acceptance: record the permitted environment, licensing or capacity availability, owners, non-secret connection references, runtime identities, DLP, approved synthetic repositories, retention, support, and rollback responsibilities. Follow the Development Readiness Gate; Foundation permission does not waive DG-001 through DG-008 for TEST integration.
+- [ ] CAP-102 - Bind trusted identities to server-controlled Consumer authorization.
+	Acceptance: validate the selected user, application, or connection identity at the trusted boundary; do not trust a client-supplied Binding as identity. Test allowed and denied source access, impersonation attempts, and the absence of permission elevation or identity switching after denial.
+- [ ] CAP-103 - Integrate a Copilot Studio tool and an independent workflow Consumer.
+	Acceptance: use approved Agent flows, Power Automate, or connectors to invoke the same implementation with typed inputs and structured results. Preserve contract and source references, actual dependency versions, evidence, failures, and human oversight. Run conformance checks through both real callers; mapping configuration alone is not integration evidence.
+
+### Phase 3: Controlled publication and evidence-based Pilot
+
+- [ ] CAP-201 - Approve the knowledge-publication write boundary before enabling it.
+	Acceptance: complete Architecture Change Review and the DG-003 scope update, name the publisher and approver, and approve target repositories and least-privilege write permissions. Until approved, retain local draft outputs only; do not write to an enterprise knowledge source.
+- [ ] CAP-202 - Implement and verify the approved publication lifecycle.
+	Acceptance: require quality validation and accountable approval before publication. Retain immutable knowledge-package versions and source lineage, prevent permissions from widening during transformation, and test source changes, revalidation, revocation, rollback, and cache or index refresh behavior. Native knowledge search must not be presented as fixed-version execution unless that guarantee is verified.
+- [ ] CAP-203 - Measure business value and update claims only after evidence exists.
+	Acceptance: obtain approved SME labels and thresholds, compare second-Consumer onboarding and maintenance effort with a documented baseline, and measure output quality, human correction, authorization failures, latency, and recovery. Update the Demo, documentation, evaluation claims, and video to distinguish deterministic behavior, live integrations, and remaining limitations. Stop expansion if shared semantics or net reuse value cannot be demonstrated.
+
+### Execution order and completion evidence
+
+Start with CAP-001 and CAP-002, then freeze CAP-003 before implementing CAP-004 through CAP-006. CAP-101 gates real environment work; CAP-201 gates publication writes. No pending item is completed by this planning record.
+
+For each completed item, retain the implementing commit, focused test command and result, evidence references, accountable owner, and any approval conditions. Leave blocked items unchecked and name their external prerequisite rather than substituting a Demo result for real integration evidence.

@@ -21,7 +21,8 @@
     "record:demo": "npm run build && node scripts/Record-DemoFallback.mjs",
     "test:media": "node scripts/Test-DemoMedia.mjs",
     "voiceover:demo": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/Generate-DemoVoiceover.ps1",
-    "prepare:video": "npm run build && node scripts/Capture-DemoScreenshots.mjs && node scripts/Record-DemoFallback.mjs && npm run voiceover:demo && node scripts/Test-DemoMedia.mjs",
+    "package:video": "node scripts/Create-UploadVideo.mjs",
+    "prepare:video": "npm run build && node scripts/Capture-DemoScreenshots.mjs && node scripts/Record-DemoFallback.mjs && npm run voiceover:demo && node scripts/Test-DemoMedia.mjs && npm run package:video",
     "start": "npm run start -w @esp/api",
     "demo": "npm run build && npm run start"
   },

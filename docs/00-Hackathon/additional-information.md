@@ -85,7 +85,7 @@ https://app-esp-esp-demo-vw6mjjpc4xh64.azurewebsites.net/
 
 ## Video URL
 
-https://github.com/Liming201909016/ESP/blob/main/docs/00-Hackathon/assets/esp-demo-fallback.webm
+https://github.com/Liming201909016/ESP/blob/main/docs/00-Hackathon/video/ESP-Hackathon-2026-Demo.mp4
 
 ## Team
 

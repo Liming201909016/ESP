@@ -130,9 +130,9 @@ The Security Review path is an explicit state machine. Generative orchestration 
 
 ![ESP Demo Mode showing the governed Skill and Plugin execution experience](docs/00-Hackathon/assets/esp-demo-desktop.png)
 
-[Download the two-minute Demo picture track](docs/00-Hackathon/assets/esp-demo-fallback.webm)
+[Download the upload-ready Hackathon Demo video](docs/00-Hackathon/video/ESP-Hackathon-2026-Demo.mp4)
 
-[Download the English voiceover](docs/00-Hackathon/video/voiceover-en.wav) · [Download the English subtitles](docs/00-Hackathon/video/subtitles-en.srt)
+[Download the source picture track](docs/00-Hackathon/assets/esp-demo-fallback.webm) · [Download the English voiceover](docs/00-Hackathon/video/voiceover-en.wav) · [Download the English subtitles](docs/00-Hackathon/video/subtitles-en.srt)
 
 [Use the five-minute video production guide](docs/00-Hackathon/video-production-guide.md)
 
